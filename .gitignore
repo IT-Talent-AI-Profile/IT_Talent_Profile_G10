@@ -1,0 +1,17 @@
+# Secrets & local config
+.env
+.env.*
+!.env.example
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+# Private CV & upload storage
+backend/uploads/
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
