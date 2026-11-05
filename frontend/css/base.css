@@ -1,0 +1,10 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f8; color: #222; }
+.container { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+h1, h2, h3 { margin-top: 0; }
+label { display: block; margin: 10px 0 4px; font-weight: bold; }
+input, select, textarea { width: 100%; padding: 8px; border: 1px solid #bbb; border-radius: 4px; font-size: 14px; }
+input[type="checkbox"] { width: auto; }
+textarea { min-height: 80px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 160px; }
