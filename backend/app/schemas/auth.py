@@ -1,26 +1,24 @@
-from typing import Optional, Literal
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from typing import Literal, Optional
+from pydantic import BaseModel, EmailStr, Field
 
-class RegisterRequest(BaseModel):
+class RegisterIn(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8, description="Mật khẩu tối thiểu 8 ký tự")
-    full_name: Optional[str] = Field(None, description="Họ và tên của ứng viên")
-    role: Literal["candidate", "recruiter"] = Field(..., description="Vai trò: candidate hoặc recruiter")
-
-    @field_validator("password")
-    @classmethod
-    def validate_password(cls, v: str) -> str:
-        if len(v) < 8:
-            raise ValueError("Mật khẩu phải có từ 8 ký tự trở lên")
-        return v
+    password: str = Field(min_length=8)
+    full_name: Optional[str] = Field(default=None, max_length=100)
+    role: Literal["candidate", "recruiter"]
 
 class RegisterResponse(BaseModel):
     message: str = "Đăng ký thành công"
 
-class LoginRequest(BaseModel):
+class LoginIn(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=1)
+    password: str
 
-class LoginResponse(BaseModel):
+class TokenOut(BaseModel):
     token: str
     role: str
+
+# Aliases tương thích ngược
+RegisterRequest = RegisterIn
+LoginRequest = LoginIn
+LoginResponse = TokenOut
