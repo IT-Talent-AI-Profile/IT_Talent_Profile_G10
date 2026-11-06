@@ -183,3 +183,15 @@ Chỉ trả về JSON, không thêm nội dung khác.
     raise ValueError(
         f"Không thể phân tích phản hồi AI sau 3 lần thử: {last_error}"
     ) from last_error
+
+
+def make_summary() -> str:
+    """
+    Mock tạo bản tóm tắt hồ sơ ứng viên.
+    Không cần gọi API thật.
+    """
+    return (
+        "Ứng viên có 1 năm kinh nghiệm phát triển phần mềm, "
+        "có kiến thức về Python và kỹ năng lập trình cơ bản. "
+        "Đã tốt nghiệp Đại học Công nghệ Thông tin."
+    )
