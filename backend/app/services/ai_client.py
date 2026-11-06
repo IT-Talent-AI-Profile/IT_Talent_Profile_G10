@@ -1,4 +1,3 @@
-
 import json
 import requests
 
@@ -6,7 +5,7 @@ from pydantic import ValidationError
 
 from app.core.config import settings
 from app.schemas.cv import CvResult
-from app.services.prompts import build_cv_extraction_prompt
+from app.services.prompts import build_cv_extraction_prompt, build_summary_prompt
 
 
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
@@ -185,13 +184,63 @@ Chỉ trả về JSON, không thêm nội dung khác.
     ) from last_error
 
 
-def make_summary() -> str:
+def _limit_words(text: str, max_words: int = 150) -> str:
+    """Giới hạn tối đa số từ của đoạn văn bản."""
+    words = text.strip().split()
+    if len(words) <= max_words:
+        return text.strip()
+    return " ".join(words[:max_words]).strip()
+
+
+def make_summary(
+    skills: list | None = None,
+    score: float | None = None,
+    level: str | None = None
+) -> str:
     """
-    Mock tạo bản tóm tắt hồ sơ ứng viên.
-    Không cần gọi API thật.
+    Tạo bản tóm tắt năng lực (điểm mạnh, điểm yếu) tối đa 150 từ (Task [AI-03]):
+    - Gửi danh sách kỹ năng, điểm và cấp độ cho AI.
+    - Có chế độ mock khi AI_MODE=mock hoặc không có AI_API_KEY.
+    - Nếu AI lỗi (mất mạng, timeout, lỗi API) thì trả chuỗi rỗng (không để làm hỏng cả luồng).
     """
-    return (
-        "Ứng viên có 1 năm kinh nghiệm phát triển phần mềm, "
-        "có kiến thức về Python và kỹ năng lập trình cơ bản. "
-        "Đã tốt nghiệp Đại học Công nghệ Thông tin."
-    )
+    # 1. Chế độ Mock
+    if (
+        settings.AI_MODE.lower() == "mock"
+        or not settings.AI_API_KEY
+    ):
+        skills_sample = []
+        if skills:
+            for s in skills:
+                if isinstance(s, dict):
+                    skills_sample.append(s.get("name", ""))
+                elif isinstance(s, str):
+                    skills_sample.append(s)
+                elif hasattr(s, "name"):
+                    skills_sample.append(s.name)
+
+        skills_str = ", ".join(skills_sample[:3]) if skills_sample else "lập trình cơ bản"
+        lvl = level or "Junior"
+        scr = f"{score:.1f}" if score is not None else "65.0"
+
+        mock_text = (
+            f"Ứng viên đạt cấp độ {lvl} với điểm đánh giá {scr}/100. "
+            f"Điểm mạnh: Nắm vững các công nghệ {skills_str}, tư duy logic tốt và khả năng học hỏi công nghệ mới nhanh. "
+            f"Điểm yếu: Cần trau dồi thêm kinh nghiệm thực chiến với các dự án thực tế quy mô lớn, tối ưu hóa hệ thống "
+            f"và nâng cấp kỹ năng làm việc nhóm trong môi trường agile."
+        )
+        return _limit_words(mock_text, 150)
+
+    # 2. Chế độ gọi AI thật
+    try:
+        prompt = build_summary_prompt(skills=skills, score=score, level=level)
+        response_text = call_ai(prompt)
+        cleaned = response_text.strip().strip('"').strip("'")
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[-1]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+            cleaned = cleaned.strip()
+        return _limit_words(cleaned, 150)
+    except Exception:
+        # Nếu AI lỗi (mất mạng, timeout, API lỗi) thì trả chuỗi rỗng
+        return ""
