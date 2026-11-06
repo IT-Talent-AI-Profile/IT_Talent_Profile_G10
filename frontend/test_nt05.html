@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Kiểm tra NT-05</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+<div class="container">
+<div id="error" class="error"></div>
+<div class="card">
+<h2>1. Kiểm tra esc()</h2>
+<p>Phải thấy đúng chữ bên dưới, không có hộp thoại alert nào hiện ra:</p>
+<div id="escOut"></div>
+</div>
+<div class="card">
+<h2>2. Kiểm tra guard()</h2>
+<p>Bấm một nút đặt vai trò giả, sau đó bấm nút thử guard.</p>
+<button onclick="setRole('candidate')">Đặt vai trò candidate</button>
+<button onclick="setRole('recruiter')">Đặt vai trò recruiter</button>
+<button onclick="localStorage.clear(); alert('Đã xóa token')">Xóa token</button>
+<p>
+<button class="secondary" onclick="guard('candidate')">Thử guard("candidate")</button>
+<button class="secondary" onclick="guard('recruiter')">Thử guard("recruiter")</button>
+</p>
+<p>Đúng vai trò: hiện thanh menu ở đầu trang. Sai vai trò hoặc không có token: chuyển sang login.html.</p>
+</div>
+<div class="card">
+<h2>3. Kiểm tra skillOptions() và api()</h2>
+<p>Cần backend chạy và đã có token thật trong localStorage.</p>
+<select id="skills"></select>
+<p><button onclick="skillOptions('skills')">Nạp danh sách kỹ năng</button></p>
+</div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/utils.js"></script>
+<script>
+document.getElementById("escOut").innerHTML = esc("<script>alert('xss')<\/script>");
+function setRole(role) {
+  localStorage.setItem("token", "token-gia");
+  localStorage.setItem("role", role);
+  alert("Đã đặt role = " + role);
+}
+</script>
+</body>
+</html>
