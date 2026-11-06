@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
-
 class Profile(Base):
     __tablename__ = "profiles"
     __table_args__ = (Index("idx_profiles_public_level", "is_public", "level"),)

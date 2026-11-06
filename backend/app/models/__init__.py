@@ -5,3 +5,13 @@ from app.models.profile_skill import ProfileSkill
 from app.models.cv_file import CvFile
 from app.models.job import Job
 from app.models.job_skill import JobSkill
+
+__all__ = [
+    "User",
+    "Profile",
+    "Skill",
+    "ProfileSkill",
+    "CvFile",
+    "Job",
+    "JobSkill",
+]
