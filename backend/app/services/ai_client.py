@@ -1,0 +1,197 @@
+
+import json
+import requests
+
+from pydantic import ValidationError
+
+from app.core.config import settings
+from app.schemas.cv import CvResult
+from app.services.prompts import build_cv_extraction_prompt
+
+
+ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
+ANTHROPIC_MODEL = "claude-sonnet-5"
+ANTHROPIC_VERSION = "2023-06-01"
+
+MAX_RETRIES = 2
+TIMEOUT = 30
+MAX_CV_CHARS = 12000
+
+
+def call_ai(prompt: str) -> str:
+    api_key = settings.AI_API_KEY
+
+    if not api_key:
+        raise RuntimeError("Chưa cấu hình AI_API_KEY")
+
+    headers = {
+        "x-api-key": api_key,
+        "anthropic-version": ANTHROPIC_VERSION,
+        "content-type": "application/json"
+    }
+
+    payload = {
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 4096,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    }
+
+    try:
+        response = requests.post(
+            ANTHROPIC_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=TIMEOUT
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+        content = data.get("content", [])
+
+        text_blocks = [
+            block.get("text", "")
+            for block in content
+            if block.get("type") == "text"
+        ]
+
+        if not text_blocks:
+            raise RuntimeError(
+                "Claude API không trả về nội dung văn bản"
+            )
+
+        return "\n".join(text_blocks).strip()
+
+    except requests.Timeout as error:
+        raise RuntimeError(
+            "Claude API đã vượt quá thời gian chờ 30 giây"
+        ) from error
+
+    except requests.HTTPError as error:
+        response = error.response
+        status_code = response.status_code if response is not None else "Unknown"
+
+        try:
+            message = response.json().get("error", {}).get(
+                "message", response.text
+            )
+        except (ValueError, AttributeError):
+            message = response.text if response is not None else str(error)
+
+        raise RuntimeError(
+            f"Claude API trả về lỗi HTTP {status_code}: {message}"
+        ) from error
+
+    except requests.RequestException as error:
+        raise RuntimeError(
+            f"Không thể kết nối Claude API: {error}"
+        ) from error
+
+
+def _parse_ai_response(response_text: str) -> CvResult:
+    cleaned_text = response_text.strip()
+
+    if cleaned_text.startswith("```"):
+        cleaned_text = cleaned_text.split("\n", 1)[-1]
+
+        if cleaned_text.endswith("```"):
+            cleaned_text = cleaned_text[:-3]
+
+        cleaned_text = cleaned_text.strip()
+
+    result_data = json.loads(cleaned_text)
+
+    return CvResult.model_validate(result_data)
+
+
+def _mock_extract_cv(skill_catalog: list[str]) -> CvResult:
+    mock_skills = []
+
+    if skill_catalog:
+        mock_skills.append({
+            "name": skill_catalog[0],
+            "proficiency": 3,
+            "years": 1.0
+        })
+
+    return CvResult(
+        skills=mock_skills,
+        years_experience=1.0,
+        education="Đại học Công nghệ Thông tin",
+        experience="Có 1 năm kinh nghiệm phát triển phần mềm"
+    )
+
+
+def extract_cv(
+    cv_text: str,
+    skill_catalog: list[str] | None = None
+) -> CvResult:
+
+    if not cv_text or not cv_text.strip():
+        raise ValueError("Nội dung CV không được để trống")
+
+    cv_text = cv_text[:MAX_CV_CHARS]
+    skill_catalog = skill_catalog or []
+
+    if (
+        settings.AI_MODE.lower() == "mock"
+        or not settings.AI_API_KEY
+    ):
+        return _mock_extract_cv(skill_catalog)
+
+    prompt = build_cv_extraction_prompt(
+        cv_text=cv_text,
+        skill_catalog=skill_catalog
+    )
+
+    last_error = None
+
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            response_text = call_ai(prompt)
+            result = _parse_ai_response(response_text)
+
+            allowed_skills = {
+                skill.lower() for skill in skill_catalog
+            }
+
+            result.skills = [
+                skill for skill in result.skills
+                if skill.name.lower() in allowed_skills
+            ]
+
+            return result
+
+        except (json.JSONDecodeError, ValidationError, ValueError) as error:
+            last_error = error
+
+            if attempt < MAX_RETRIES:
+                prompt += """
+
+Phản hồi trước đó không đúng định dạng JSON
+hoặc không đáp ứng cấu trúc dữ liệu yêu cầu.
+
+Hãy tạo lại JSON hợp lệ theo đúng cấu trúc.
+Chỉ trả về JSON, không thêm nội dung khác.
+"""
+
+    raise ValueError(
+        f"Không thể phân tích phản hồi AI sau 3 lần thử: {last_error}"
+    ) from last_error
+
+
+def make_summary() -> str:
+    """
+    Mock tạo bản tóm tắt hồ sơ ứng viên.
+    Không cần gọi API thật.
+    """
+    return (
+        "Ứng viên có 1 năm kinh nghiệm phát triển phần mềm, "
+        "có kiến thức về Python và kỹ năng lập trình cơ bản. "
+        "Đã tốt nghiệp Đại học Công nghệ Thông tin."
+    )
