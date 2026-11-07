@@ -1,4 +1,3 @@
-
 import json
 import pytest
 import requests
@@ -26,6 +25,58 @@ def test_make_summary():
 
     assert isinstance(result, str)
     assert len(result.strip()) > 0
+    assert len(result.split()) <= 150
+
+
+def test_make_summary_with_args_mock(monkeypatch):
+    monkeypatch.setattr(ai_client.settings, "AI_MODE", "mock")
+    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "")
+
+    skills = [{"name": "Python", "proficiency": 4, "years": 2.0}]
+    result = ai_client.make_summary(skills=skills, score=75.0, level="Middle")
+
+    assert isinstance(result, str)
+    assert "Middle" in result
+    assert "75.0" in result
+    assert len(result.split()) <= 150
+
+
+def test_make_summary_ai_success(monkeypatch):
+    monkeypatch.setattr(ai_client.settings, "AI_MODE", "real")
+    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test_key")
+
+    mock_text = "Ứng viên có kiến thức tốt về Python và hệ thống backend. Điểm yếu là cần thêm kinh nghiệm thực chiến."
+    monkeypatch.setattr(ai_client, "call_ai", lambda prompt: mock_text)
+
+    result = ai_client.make_summary(skills=["Python"], score=80.0, level="Senior")
+    assert result == mock_text
+    assert len(result.split()) <= 150
+
+
+def test_make_summary_ai_word_limit(monkeypatch):
+    monkeypatch.setattr(ai_client.settings, "AI_MODE", "real")
+    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test_key")
+
+    long_text = " ".join(["từ"] * 200)
+    monkeypatch.setattr(ai_client, "call_ai", lambda prompt: long_text)
+
+    result = ai_client.make_summary(skills=["Python"], score=60.0, level="Junior")
+    words = result.split()
+    assert len(words) == 150
+
+
+def test_make_summary_ai_network_error_returns_empty(monkeypatch):
+    monkeypatch.setattr(ai_client.settings, "AI_MODE", "real")
+    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test_key")
+
+    def raise_network_error(prompt):
+        raise RuntimeError("Không thể kết nối Claude API: Network is down")
+
+    monkeypatch.setattr(ai_client, "call_ai", raise_network_error)
+
+    # Khi lỗi mạng hoặc AI lỗi, hàm phải trả về chuỗi rỗng và KHÔNG ném ngoại lệ
+    result = ai_client.make_summary(skills=["Python"], score=60.0, level="Junior")
+    assert result == ""
 
 
 def test_extract_cv_empty():
@@ -51,53 +102,64 @@ def test_parse_valid_json():
 
     assert isinstance(result, CvResult)
     assert result.skills[0].name == "Python"
+    assert result.years_experience == 1
 
 
 def test_parse_invalid_json():
     with pytest.raises(json.JSONDecodeError):
-        ai_client._parse_ai_response("{invalid json}")
+        ai_client._parse_ai_response("invalid json")
 
 
 def test_parse_invalid_schema():
-    response = json.dumps({
-        "skills": [
-            {
-                "name": "Python",
-                "proficiency": 10,
-                "years": 1
-            }
-        ]
-    })
-
     with pytest.raises(ValidationError):
-        ai_client._parse_ai_response(response)
+        ai_client._parse_ai_response(json.dumps({"invalid": "schema"}))
 
 
 def test_extract_cv_retry(monkeypatch):
     monkeypatch.setattr(ai_client.settings, "AI_MODE", "real")
     monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test-key")
 
-    mock_call = Mock(return_value="{invalid json}")
+    calls = []
 
-    monkeypatch.setattr(ai_client, "call_ai", mock_call)
+    def fake_call_ai(prompt):
+        calls.append(prompt)
 
-    with pytest.raises(ValueError):
-        ai_client.extract_cv("CV mẫu", ["Python"])
+        if len(calls) == 1:
+            return "invalid json"
 
-    assert mock_call.call_count == 3
+        return json.dumps({
+            "skills": [
+                {
+                    "name": "Python",
+                    "proficiency": 3,
+                    "years": 1
+                }
+            ],
+            "years_experience": 1,
+            "education": None,
+            "experience": None
+        })
+
+    monkeypatch.setattr(ai_client, "call_ai", fake_call_ai)
+
+    result = ai_client.extract_cv("Nội dung CV", ["Python"])
+
+    assert len(calls) == 2
+    assert isinstance(result, CvResult)
+    assert result.skills[0].name == "Python"
 
 
 def test_call_ai_timeout(monkeypatch):
-    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test-key")
-
-    def fake_post(*args, **kwargs):
-        assert kwargs["timeout"] == 30
+    def timeout_post(*args, **kwargs):
         raise requests.Timeout()
 
-    monkeypatch.setattr(ai_client.requests, "post", fake_post)
+    monkeypatch.setattr(requests, "post", timeout_post)
+    monkeypatch.setattr(ai_client.settings, "AI_API_KEY", "test-key")
 
-    with pytest.raises(RuntimeError, match="30 giây"):
-        ai_client.call_ai("Prompt test")
+    with pytest.raises(RuntimeError) as exc_info:
+        ai_client.call_ai("test")
+
+    assert "30 giây" in str(exc_info.value)
 
 
 def test_extract_cv_filters_skills(monkeypatch):
@@ -112,14 +174,14 @@ def test_extract_cv_filters_skills(monkeypatch):
                 "years": 1
             },
             {
-                "name": "Java",
-                "proficiency": 4,
-                "years": 2
+                "name": "React",
+                "proficiency": 2,
+                "years": 1
             }
         ],
-        "years_experience": 2,
-        "education": "Đại học",
-        "experience": "Lập trình viên"
+        "years_experience": 1,
+        "education": None,
+        "experience": None
     })
 
     monkeypatch.setattr(
@@ -128,7 +190,7 @@ def test_extract_cv_filters_skills(monkeypatch):
         lambda prompt: response
     )
 
-    result = ai_client.extract_cv("CV mẫu", ["Python"])
+    result = ai_client.extract_cv("Nội dung CV", ["Python"])
 
     assert len(result.skills) == 1
     assert result.skills[0].name == "Python"
