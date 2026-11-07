@@ -455,6 +455,50 @@
             <input type="hidden" id="regRole" value="candidate">
           </div>
 
+          <!-- THÔNG TIN DOANH NGHIỆP BẮT BUỘC KHI ĐĂNG KÝ NHÀ TUYỂN DỤNG -->
+          <div id="recruiterFields" style="display: none; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); padding: 18px; margin-top: 14px; animation: modalSlideUp 0.3s ease;">
+            <div style="font-size: 12px; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+              <span>🏢</span> Thông Tin Doanh Nghiệp & Nhu Cầu Tuyển Dụng
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="companyName">Tên công ty / Doanh nghiệp (*)</label>
+              <input type="text" id="companyName" placeholder="vd: TechCorp Global, VNG Corporation">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="recruiterTitle">Chức vụ của bạn (*)</label>
+              <input type="text" id="recruiterTitle" placeholder="vd: Head of Talent Acquisition, HR Tech Lead">
+            </div>
+
+            <div class="row" style="margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="companySize">Quy mô công ty</label>
+                <select id="companySize" style="background: rgba(30, 41, 59, 0.9); color: #fff; border-color: rgba(255, 255, 255, 0.15);">
+                  <option value="1-50">1 - 50 nhân sự (Startup)</option>
+                  <option value="50-200" selected>50 - 200 nhân sự (SME)</option>
+                  <option value="200-500">200 - 500 nhân sự</option>
+                  <option value="500+">500+ nhân sự (Enterprise)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="companyIndustry">Lĩnh vực hoạt động</label>
+                <select id="companyIndustry" style="background: rgba(30, 41, 59, 0.9); color: #fff; border-color: rgba(255, 255, 255, 0.15);">
+                  <option value="software">Phần mềm & SaaS</option>
+                  <option value="fintech">Fintech & Ngân hàng</option>
+                  <option value="ecommerce">Thương mại điện tử</option>
+                  <option value="ai">AI & Big Data</option>
+                  <option value="outsourcing">Outsourcing & IT Services</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="companyWebsite">Website / LinkedIn công ty</label>
+              <input type="url" id="companyWebsite" placeholder="https://company.example.com">
+            </div>
+          </div>
+
           <button type="submit" id="btnRegSubmit" style="width: 100%; margin-top: 8px; padding: 12px;">Hoàn tất đăng ký</button>
         </form>
       </div>
@@ -473,6 +517,11 @@
       document.getElementById('regRole').value = role;
       document.getElementById('roleCandidate').className = 'role-card' + (role === 'candidate' ? ' selected' : '');
       document.getElementById('roleRecruiter').className = 'role-card' + (role === 'recruiter' ? ' selected' : '');
+      
+      const recFields = document.getElementById('recruiterFields');
+      if (recFields) {
+        recFields.style.display = role === 'recruiter' ? 'block' : 'none';
+      }
     }
 
     function fillDemo(email) {
@@ -564,6 +613,15 @@
       if (!password || password.length < 8) {
         showError("Mật khẩu phải có từ 8 ký tự trở lên");
         return;
+      }
+
+      if (role === "recruiter") {
+        const companyName = document.getElementById("companyName")?.value.trim();
+        const recruiterTitle = document.getElementById("recruiterTitle")?.value.trim();
+        if (!companyName || !recruiterTitle) {
+          showError("Vui lòng điền Tên công ty và Chức vụ công tác của bạn để hoàn tất hồ sơ nhà tuyển dụng");
+          return;
+        }
       }
 
       const btn = document.getElementById("btnRegSubmit");

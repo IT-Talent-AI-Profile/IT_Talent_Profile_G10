@@ -461,20 +461,23 @@
 
     .modal-header-3d {
       background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-      color: #fff;
+      color: #ffffff;
       padding: 22px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .modal-header-3d h3 {
       margin: 0;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 800;
+      color: #ffffff !important;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .modal-close-btn {
@@ -610,12 +613,16 @@
         <span>📋</span> Danh Sách Vị Trí Tuyển Dụng
       </h2>
 
-      <div style="display: flex; gap: 12px; align-items: center;">
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
         <div class="filter-pills">
           <button class="filter-btn active" onclick="setFilter('all', this)">Tất cả (3)</button>
           <button class="filter-btn" onclick="setFilter('open', this)">Đang mở (2)</button>
           <button class="filter-btn" onclick="setFilter('closed', this)">Đã đóng (1)</button>
         </div>
+
+        <button type="button" class="btn" style="padding: 9px 18px; font-size: 13px;" onclick="openCreateJobModal()">
+          <span>➕</span> Đăng Tin Tuyển Dụng
+        </button>
 
         <a href="candidates.html" class="btn secondary" style="padding: 9px 18px; font-size: 13px;">
           <span>🔍</span> Tìm Kiếm Ứng Viên
@@ -721,16 +728,17 @@
     <div class="modal-3d-card">
       <div class="modal-header-3d">
         <h3>
-          <span>⚡</span> Kết Quả Đối Sánh AI Thông Minh
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(99, 102, 241, 0.4); border: 1px solid rgba(255, 255, 255, 0.25); font-size: 18px; filter: drop-shadow(0 0 10px #818cf8);">⚡</span>
+          <span style="color: #ffffff !important; font-size: 19px; font-weight: 800; letter-spacing: -0.01em;">Kết Quả Đối Sánh AI Thông Minh</span>
         </h3>
         <button class="modal-close-btn" onclick="closeMatchModal()">✕</button>
       </div>
 
       <div class="modal-body-3d">
-        <div style="background: #eef2ff; border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; border: 1px solid #c7d2fe;">
-          <div style="font-size: 12px; color: #4338ca; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Vị trí tuyển dụng:</div>
-          <div style="font-size: 16px; font-weight: 800; color: #1e1b4b;" id="modalJobTitle">Senior Python Backend Engineer</div>
-          <div style="font-size: 12px; color: #6366f1; margin-top: 2px;" id="modalRequiredSkills">Kỹ năng: Python, MySQL, Docker</div>
+        <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 22px; border: 1.5px solid #c7d2fe; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);">
+          <div style="font-size: 11px; color: #4338ca; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">VỊ TRÍ ĐỐI SÁNH:</div>
+          <div style="font-size: 18px; font-weight: 800; color: #1e1b4b;" id="modalJobTitle">Senior Python Backend Engineer</div>
+          <div style="font-size: 13px; color: #4f46e5; margin-top: 4px; font-weight: 600;" id="modalRequiredSkills">Kỹ năng trọng tâm: Python, MySQL, Docker, System Design</div>
         </div>
 
         <h4 style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em;">
@@ -780,6 +788,64 @@
           <button type="button" class="btn secondary" onclick="closeMatchModal()">Đóng</button>
           <button type="button" onclick="alert('Đã gửi lời mời ứng tuyển thành công!')">✉️ Gửi Lời Mời Ứng Tuyển</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 3D CREATE JOB MODAL DIALOG -->
+  <div class="modal-backdrop-3d" id="createJobModal">
+    <div class="modal-3d-card" style="max-width: 640px;">
+      <div class="modal-header-3d">
+        <h3>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(99, 102, 241, 0.4); border: 1px solid rgba(255, 255, 255, 0.25); font-size: 18px;">➕</span>
+          <span style="color: #ffffff !important; font-size: 19px; font-weight: 800;">Đăng Tin Tuyển Dụng Mới</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeCreateJobModal()">✕</button>
+      </div>
+
+      <div class="modal-body-3d">
+        <form id="formCreateJob" onsubmit="handleCreateJob(event)">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Tiêu đề vị trí tuyển dụng (*)</label>
+            <input type="text" id="newJobTitle" placeholder="vd: Senior Cloud DevOps Engineer" required>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Mô tả công việc & yêu cầu chính</label>
+            <textarea id="newJobDesc" rows="3" placeholder="Mô tả ngắn về trách nhiệm chính và dự án thực tế..." required></textarea>
+          </div>
+
+          <div class="row" style="margin-bottom: 16px;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kinh nghiệm tối thiểu (năm)</label>
+              <input type="number" id="newJobMinYears" min="0" step="0.5" value="2.0" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Cấp bậc mục tiêu</label>
+              <select id="newJobLevel">
+                <option value="Intern">🌱 Intern / Thực tập sinh</option>
+                <option value="Junior">🌿 Junior (1 - 2.5 năm)</option>
+                <option value="Middle" selected>⚡ Middle (2.5 - 5 năm)</option>
+                <option value="Senior">👑 Senior (> 5 năm)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kỹ năng bắt buộc (phân cách bởi dấu phẩy)</label>
+            <input type="text" id="newJobReqSkills" placeholder="vd: Python, Docker, AWS" required>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kỹ năng ưu tiên cộng điểm</label>
+            <input type="text" id="newJobPrefSkills" placeholder="vd: Kubernetes, CI/CD, Terraform">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn secondary" onclick="closeCreateJobModal()">Hủy</button>
+            <button type="submit" class="btn">🚀 Hoàn Tất Đăng Tin</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -835,6 +901,64 @@
           card.style.display = "none";
         }
       });
+    }
+    function openCreateJobModal() {
+      document.getElementById("createJobModal").style.display = "flex";
+    }
+
+    function closeCreateJobModal() {
+      document.getElementById("createJobModal").style.display = "none";
+    }
+
+    function handleCreateJob(e) {
+      e.preventDefault();
+      const title = document.getElementById("newJobTitle").value.trim();
+      const desc = document.getElementById("newJobDesc").value.trim();
+      const minYears = parseFloat(document.getElementById("newJobMinYears").value) || 0;
+      const level = document.getElementById("newJobLevel").value;
+      const reqSkills = document.getElementById("newJobReqSkills").value.split(",").map(s => s.trim()).filter(Boolean);
+      const prefSkills = document.getElementById("newJobPrefSkills").value.split(",").map(s => s.trim()).filter(Boolean);
+
+      const jobList = document.getElementById("jobList");
+      const card = document.createElement("div");
+      card.className = "job-card-3d";
+      card.setAttribute("data-status", "open");
+
+      let reqTagsHtml = reqSkills.map(s => `<span class="tag-required">★ Bắt buộc: ${esc(s)}</span>`).join(" ");
+      let prefTagsHtml = prefSkills.map(s => `<span class="tag-preferred">⚡ Ưu tiên: ${esc(s)}</span>`).join(" ");
+
+      card.innerHTML = `
+        <div class="job-meta-3d">
+          <div class="job-header-row">
+            <h3 class="job-title-3d">${esc(title)}</h3>
+            <span class="radar-pulse-dot">Đang Mở Tuyển</span>
+            <span class="badge-3d badge-${level.toLowerCase()}" style="padding: 3px 10px; font-size: 11px;">${level}</span>
+          </div>
+          <p class="job-desc-3d">${esc(desc)}</p>
+          <div class="job-tags-3d">
+            ${reqTagsHtml}
+            ${prefTagsHtml}
+            <span class="tag-exp">⏱️ Yêu cầu: ≥ ${minYears} năm kinh nghiệm</span>
+          </div>
+        </div>
+        <div>
+          <button type="button" class="btn-match-ai" onclick="openMatchModal('${esc(title)}', '${esc(reqSkills.join(", "))}')">
+            <span>⚡</span> Xem Đối Sánh AI
+          </button>
+        </div>
+      `;
+
+      jobList.prepend(card);
+      closeCreateJobModal();
+      document.getElementById("formCreateJob").reset();
+
+      const successBox = document.getElementById("success");
+      if (successBox) {
+        successBox.textContent = `Đã đăng tin tuyển dụng "${title}" thành công! Hệ thống AI sẵn sàng đối sánh ứng viên.`;
+        successBox.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => { successBox.style.display = "none"; }, 5000);
+      }
     }
   </script>
 </body>
