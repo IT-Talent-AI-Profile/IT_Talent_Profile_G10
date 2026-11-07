@@ -166,3 +166,72 @@ def test_extract_cv_limits_cv_length(monkeypatch):
     ai_client.extract_cv("A" * 15000, ["Python"])
 
     assert captured["length"] == 12000
+
+
+def test_call_ai_success(monkeypatch):
+    monkeypatch.setattr(
+        ai_client.settings,
+        "AI_API_KEY",
+        "test-key"
+    )
+
+    captured = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": '{"skills": []}'
+                    }
+                ]
+            }
+
+    def fake_post(url, **kwargs):
+        captured["url"] = url
+        captured["headers"] = kwargs["headers"]
+        captured["payload"] = kwargs["json"]
+        captured["timeout"] = kwargs["timeout"]
+        return FakeResponse()
+
+    monkeypatch.setattr(
+        ai_client.requests,
+        "post",
+        fake_post
+    )
+
+    result = ai_client.call_ai("Prompt kiểm tra")
+
+    assert result == '{"skills": []}'
+    assert captured["url"] == ai_client.ANTHROPIC_API_URL
+    assert captured["headers"]["x-api-key"] == "test-key"
+    assert captured["headers"]["anthropic-version"] == ai_client.ANTHROPIC_VERSION
+    assert captured["payload"]["model"] == ai_client.ANTHROPIC_MODEL
+    assert captured["payload"]["messages"][0]["content"] == "Prompt kiểm tra"
+    assert captured["timeout"] == 30
+
+
+def test_build_prompt_contains_cv_and_catalog():
+    from app.services.prompts import build_cv_extraction_prompt
+
+    prompt = build_cv_extraction_prompt(
+        cv_text="Tôi có 2 năm kinh nghiệm Python",
+        skill_catalog=["Python", "Java"]
+    )
+
+    assert "Tôi có 2 năm kinh nghiệm Python" in prompt
+    assert "Python" in prompt
+    assert "Java" in prompt
+    assert "JSON hợp lệ" in prompt
+    assert "Không tự tạo thêm kỹ năng" in prompt
+
+
+def test_build_prompt_rejects_empty_cv():
+    from app.services.prompts import build_cv_extraction_prompt
+
+    with pytest.raises(ValueError):
+        build_cv_extraction_prompt("", ["Python"])
