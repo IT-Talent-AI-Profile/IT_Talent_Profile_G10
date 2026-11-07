@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Tin Tuyển Dụng - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .job-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      background: #fff;
+      transition: var(--transition);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .job-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+    .job-meta h3 {
+      margin: 0 0 6px;
+      color: var(--text-main);
+      font-size: 18px;
+    }
+    .job-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .job-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <div class="card-header" style="margin-top: 24px; border: none; padding: 0;">
+      <div>
+        <h1>🏢 Danh Sách Tin Tuyển Dụng</h1>
+        <p style="color: var(--text-muted); margin: 0;">Quản lý các vị trí tuyển dụng công nghệ và đối sánh ứng viên phù hợp bằng AI</p>
+      </div>
+      <div>
+        <a href="candidates.html" class="btn btn-secondary">🔍 Tìm kiếm ứng viên</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+      <div class="card-header">
+        <h3 class="card-title">Tin tuyển dụng đang mở</h3>
+        <span class="badge badge-middle">2 JD Đang Mở</span>
+      </div>
+
+      <!-- JOB 1 -->
+      <div class="job-card">
+        <div class="job-meta">
+          <h3>Senior Python Backend Engineer</h3>
+          <p class="job-desc">Tuyển Senior Python tham gia xây dựng hệ thống phân tán chịu tải cao, tối ưu hóa CSDL MySQL và triển khai hạ tầng Docker.</p>
+          <div class="job-tags">
+            <span class="badge" style="background: #eef2ff; color: #4f46e5;">Bắt buộc: Python</span>
+            <span class="badge" style="background: #eef2ff; color: #4f46e5;">Bắt buộc: MySQL</span>
+            <span class="badge" style="background: #f1f5f9; color: #64748b;">Ưu tiên: Docker</span>
+            <span class="badge" style="background: #f1f5f9; color: #64748b;">Ưu tiên: System Design</span>
+            <span class="badge badge-senior">Yêu cầu: ≥ 5.0 năm</span>
+          </div>
+        </div>
+        <div>
+          <button type="button" onclick="alert('Đang tính toán đối sánh ứng viên cho vị trí này...')">⚡ Xem đối sánh ứng viên</button>
+        </div>
+      </div>
+
+      <!-- JOB 2 -->
+      <div class="job-card">
+        <div class="job-meta">
+          <h3>Junior Frontend React Developer</h3>
+          <p class="job-desc">Tuyển dụng lập trình viên Frontend phát triển giao diện người dùng web ứng dụng hiện đại với React, JavaScript và Tailwind CSS.</p>
+          <div class="job-tags">
+            <span class="badge" style="background: #eef2ff; color: #4f46e5;">Bắt buộc: React</span>
+            <span class="badge" style="background: #eef2ff; color: #4f46e5;">Bắt buộc: JavaScript</span>
+            <span class="badge" style="background: #f1f5f9; color: #64748b;">Ưu tiên: Tailwind CSS</span>
+            <span class="badge badge-junior">Yêu cầu: ≥ 1.0 năm</span>
+          </div>
+        </div>
+        <div>
+          <button type="button" onclick="alert('Đang tính toán đối sánh ứng viên cho vị trí này...')">⚡ Xem đối sánh ứng viên</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    guard("recruiter");
+  </script>
+</body>
+</html>

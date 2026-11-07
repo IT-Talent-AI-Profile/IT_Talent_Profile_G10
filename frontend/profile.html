@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ Sơ Năng Lực - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .profile-header-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .profile-user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .user-meta h2 {
+      color: #fff;
+      margin: 0 0 4px;
+      font-size: 22px;
+    }
+
+    .user-meta p {
+      color: #94a3b8;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .user-stats {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stat-box {
+      text-align: right;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+
+    .ai-summary-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-top: 20px;
+      display: flex;
+      gap: 14px;
+    }
+
+    .ai-summary-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .ai-summary-text h4 {
+      margin: 0 0 4px;
+      color: #166534;
+      font-size: 14px;
+    }
+
+    .ai-summary-text p {
+      margin: 0;
+      color: #15803d;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .skill-rating {
+      color: #f59e0b;
+      letter-spacing: 2px;
+      font-size: 13px;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-top: 14px;
+    }
+
+    .toggle-group label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <!-- PROFILE HERO HEADER -->
+    <div class="card profile-header-card">
+      <div class="profile-user-info">
+        <div class="user-avatar" id="avatarLetter">U</div>
+        <div class="user-meta">
+          <h2 id="headerFullName">Đang tải hồ sơ...</h2>
+          <p id="headerDesiredPos">Vị trí mong muốn</p>
+          <div style="margin-top: 6px;">
+            <span id="badgeLevel" class="badge badge-intern">Intern</span>
+            <span id="badgeVisibility" class="badge" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Riêng tư</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-stats">
+        <div class="stat-box">
+          <div class="stat-label">Điểm tổng AI</div>
+          <div class="stat-value" id="statScore">0 / 100</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Kinh nghiệm</div>
+          <div class="stat-value" id="statExp">0 năm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI SUMMARY NOTIFICATION -->
+    <div id="aiSummaryBox" class="ai-summary-card" style="display: none;">
+      <div class="ai-summary-icon">🤖</div>
+      <div class="ai-summary-text">
+        <h4>Nhận xét năng lực từ AI (Claude LLM)</h4>
+        <p id="aiSummaryContent"></p>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKSPACE -->
+    <div class="profile-grid">
+      
+      <!-- CỘT TRÁI: FORM SỬA THÔNG TIN CÁ NHÂN (HS-01) -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📝 Thông Tin Cá Nhân</h3>
+        </div>
+
+        <form id="formProfile" onsubmit="handleUpdateProfile(event)">
+          <div class="row">
+            <div>
+              <label for="fullName">Họ và tên (*)</label>
+              <input type="text" id="fullName" required placeholder="Họ và tên của bạn">
+            </div>
+            <div>
+              <label for="desiredPosition">Vị trí mong muốn</label>
+              <input type="text" id="desiredPosition" placeholder="vd: Backend Engineer">
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="yearsExperience">Số năm kinh nghiệm</label>
+              <input type="number" id="yearsExperience" min="0" step="0.5" value="0">
+            </div>
+            <div>
+              <label for="githubUrl">Link GitHub / Portfolio</label>
+              <input type="url" id="githubUrl" placeholder="https://github.com/username">
+            </div>
+          </div>
+
+          <div>
+            <label for="education">Học vấn & Bằng cấp</label>
+            <textarea id="education" placeholder="vd: Đại học Bách Khoa, Chuyên ngành Kỹ thuật Phần mềm (2020 - 2024)"></textarea>
+          </div>
+
+          <div>
+            <label for="experience">Tóm tắt kinh nghiệm làm việc</label>
+            <textarea id="experience" placeholder="vd: 2 năm làm việc với Python, thiết kế RESTful API và tối ưu cơ sở dữ liệu MySQL..."></textarea>
+          </div>
+
+          <div class="toggle-group">
+            <input type="checkbox" id="isPublic">
+            <label for="isPublic">
+              <strong>Công khai hồ sơ</strong> (Cho phép nhà tuyển dụng tìm thấy bạn trong kết quả đối sánh)
+            </label>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+            <button type="submit" id="btnSaveProfile">💾 Lưu thay đổi hồ sơ</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CỘT PHẢI: QUẢN LÝ KỸ NĂNG CHUYÊN MÔN (HS-02) -->
+      <div>
+        <!-- FORM THÊM KỸ NĂNG -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⚡ Thêm Kỹ Năng Mới</h3>
+          </div>
+
+          <form id="formAddSkill" onsubmit="handleAddSkill(event)">
+            <div>
+              <label for="skillSelect">Chọn kỹ năng (*)</label>
+              <select id="skillSelect" required>
+                <option value="">-- Đang tải kỹ năng --</option>
+              </select>
+            </div>
+
+            <div class="row" style="margin-top: 10px;">
+              <div>
+                <label for="skillProficiency">Mức thành thạo (1 - 5 sao)</label>
+                <select id="skillProficiency" required>
+                  <option value="1">⭐ 1/5 - Mới bắt đầu</option>
+                  <option value="2">⭐⭐ 2/5 - Cơ bản</option>
+                  <option value="3" selected>⭐⭐⭐ 3/5 - Khá</option>
+                  <option value="4">⭐⭐⭐⭐ 4/5 - Thành thạo</option>
+                  <option value="5">⭐⭐⭐⭐⭐ 5/5 - Chuyên gia</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="skillYears">Số năm sử dụng</label>
+                <input type="number" id="skillYears" min="0" step="0.5" value="1.0" required>
+              </div>
+            </div>
+
+            <button type="submit" style="width: 100%; margin-top: 16px;">+ Thêm / Cập nhật kỹ năng</button>
+          </form>
+        </div>
+
+        <!-- DANH SÁCH KỸ NĂNG ĐÃ GẮN VÀO HỒ SƠ -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🎯 Kỹ Năng Đã Thêm (<span id="skillCount">0</span>)</h3>
+          </div>
+
+          <table id="tableSkills">
+            <thead>
+              <tr>
+                <th>Kỹ năng</th>
+                <th>Mức độ</th>
+                <th>Năm</th>
+                <th style="text-align: right;">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="skillListBody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    // Kiểm tra phân quyền: Chỉ cho ứng viên truy cập trang này
+    guard("candidate");
+
+    function renderStars(level) {
+      let stars = "";
+      for (let i = 1; i <= 5; i++) {
+        stars += i <= level ? "★" : "☆";
+      }
+      return stars;
+    }
+
+    function showSuccessMsg(msg) {
+      const box = document.getElementById("success");
+      if (box) {
+        box.textContent = msg;
+        box.style.display = "block";
+        setTimeout(() => { box.style.display = "none"; }, 4000);
+      }
+    }
+
+    async function loadProfile() {
+      clearError();
+      const profile = await api("/profiles/me", "GET");
+      if (!profile) return;
+
+      // Đổ dữ liệu vào Hero Card
+      document.getElementById("headerFullName").textContent = esc(profile.full_name || "Ứng viên");
+      document.getElementById("avatarLetter").textContent = (profile.full_name || "U").charAt(0).toUpperCase();
+      document.getElementById("headerDesiredPos").textContent = esc(profile.desired_position || "Chưa cập nhật vị trí mong muốn");
+      document.getElementById("statScore").textContent = (profile.total_score != null ? profile.total_score.toFixed(1) : "0.0") + " / 100";
+      document.getElementById("statExp").textContent = (profile.years_experience || 0) + " năm";
+
+      // Cấp độ badge
+      const levelEl = document.getElementById("badgeLevel");
+      const lvl = profile.level || "Intern";
+      levelEl.textContent = lvl;
+      levelEl.className = "badge badge-" + lvl.toLowerCase();
+
+      // Công khai badge
+      const visEl = document.getElementById("badgeVisibility");
+      if (profile.is_public) {
+        visEl.textContent = "Công khai";
+        visEl.className = "badge badge-junior";
+      } else {
+        visEl.textContent = "Riêng tư";
+        visEl.className = "badge badge-intern";
+      }
+
+      // AI Summary
+      const aiBox = document.getElementById("aiSummaryBox");
+      const aiContent = document.getElementById("aiSummaryContent");
+      if (profile.ai_summary && profile.ai_summary.trim()) {
+        aiContent.textContent = esc(profile.ai_summary);
+        aiBox.style.display = "flex";
+      } else {
+        aiBox.style.display = "none";
+      }
+
+      // Đổ dữ liệu vào Form thông tin cá nhân
+      document.getElementById("fullName").value = profile.full_name || "";
+      document.getElementById("desiredPosition").value = profile.desired_position || "";
+      document.getElementById("yearsExperience").value = profile.years_experience != null ? profile.years_experience : 0;
+      document.getElementById("githubUrl").value = profile.github_url || "";
+      document.getElementById("education").value = profile.education || "";
+      document.getElementById("experience").value = profile.experience || "";
+      document.getElementById("isPublic").checked = Boolean(profile.is_public);
+
+      // Đổ danh sách kỹ năng
+      renderSkillsTable(profile.skills || []);
+    }
+
+    function renderSkillsTable(skills) {
+      document.getElementById("skillCount").textContent = skills.length;
+      const tbody = document.getElementById("skillListBody");
+      tbody.innerHTML = "";
+
+      if (skills.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.</td></tr>`;
+        return;
+      }
+
+      skills.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <strong>${esc(s.name)}</strong>
+            <div style="font-size: 11px; color: var(--text-muted);">${esc(s.group)}</div>
+          </td>
+          <td>
+            <span class="skill-rating">${renderStars(s.proficiency)}</span>
+            <span style="font-size: 12px; color: var(--text-muted);">(${s.proficiency}/5)</span>
+          </td>
+          <td>${s.years_used} năm</td>
+          <td style="text-align: right;">
+            <button type="button" class="danger" style="padding: 4px 10px; font-size: 12px;" onclick="handleDeleteSkill(${s.skill_id})">Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      clearError();
+
+      const btn = document.getElementById("btnSaveProfile");
+      btn.disabled = true;
+      btn.textContent = "Đang lưu...";
+
+      const payload = {
+        full_name: document.getElementById("fullName").value.trim(),
+        desired_position: document.getElementById("desiredPosition").value.trim() || null,
+        years_experience: parseFloat(document.getElementById("yearsExperience").value) || 0,
+        education: document.getElementById("education").value.trim() || null,
+        experience: document.getElementById("experience").value.trim() || null,
+        github_url: document.getElementById("githubUrl").value.trim() || null,
+        is_public: document.getElementById("isPublic").checked
+      };
+
+      const updated = await api("/profiles/me", "PUT", payload);
+      btn.disabled = false;
+      btn.textContent = "💾 Lưu thay đổi hồ sơ";
+
+      if (updated) {
+        showSuccessMsg("Đã cập nhật hồ sơ thành công!");
+        loadProfile();
+      }
+    }
+
+    async function handleAddSkill(e) {
+      e.preventDefault();
+      clearError();
+
+      const skillId = parseInt(document.getElementById("skillSelect").value);
+      const proficiency = parseInt(document.getElementById("skillProficiency").value);
+      const yearsUsed = parseFloat(document.getElementById("skillYears").value) || 0;
+
+      if (!skillId) {
+        showError("Vui lòng chọn kỹ năng từ danh sách");
+        return;
+      }
+
+      const res = await api("/profiles/me/skills", "POST", {
+        skill_id: skillId,
+        proficiency: proficiency,
+        years_used: yearsUsed
+      });
+
+      if (res) {
+        showSuccessMsg("Đã thêm/cập nhật kỹ năng thành công!");
+        renderSkillsTable(res.skills || []);
+      }
+    }
+
+    async function handleDeleteSkill(skillId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa kỹ năng này khỏi hồ sơ?")) return;
+      clearError();
+
+      const res = await api("/profiles/me/skills/" + skillId, "DELETE");
+      if (res) {
+        showSuccessMsg("Đã xóa kỹ năng khỏi hồ sơ!");
+        renderSkillsTable(res.skills || []);
+      }
+    }
+
+    // Khởi tạo trang
+    window.addEventListener("DOMContentLoaded", async () => {
+      await skillOptions("skillSelect");
+      await loadProfile();
+    });
+  </script>
+</body>
+</html>
