@@ -52,10 +52,63 @@ function showMenu(role) {
     });
   }
 
+  // Chuông thông báo dành riêng cho Ứng viên & Nhà tuyển dụng
+  const notifyBtn = document.createElement("button");
+  notifyBtn.type = "button";
+  notifyBtn.className = "nav-notify-btn";
+  notifyBtn.style.marginLeft = "auto";
+  notifyBtn.style.marginRight = "10px";
+  notifyBtn.title = "Thông báo & Lời mời ứng tuyển";
+  notifyBtn.innerHTML = `
+    <span>🔔</span>
+    <span class="nav-notify-badge" id="navNotifyBadge">1</span>
+  `;
+
+  // Dropdown thông báo 3D
+  const dropdown = document.createElement("div");
+  dropdown.className = "nav-notify-dropdown";
+  dropdown.id = "navNotifyDropdown";
+  dropdown.innerHTML = `
+    <div class="notify-header">
+      <h4>📬 Hộp Thư & Lời Mời Ứng Tuyển</h4>
+      <span style="font-size: 11px; color: #6366f1; font-weight: 700; cursor: pointer;" onclick="markAllNotificationsRead()">Đánh dấu đã đọc</span>
+    </div>
+    <div id="notifyListContainer">
+      <div class="notify-item unread" onclick="location.href='profile.html#invitationsSection'">
+        <div class="notify-item-icon">🏢</div>
+        <div>
+          <div style="font-weight: 700; font-size: 13px; color: #0f172a;">Lời mời phỏng vấn từ TechCorp Vietnam</div>
+          <div style="font-size: 12px; color: #475569; margin-top: 2px;">Vị trí: <strong>Senior Python Backend Engineer</strong> (Khớp 96%)</div>
+          <div style="font-size: 11px; color: #16a34a; font-weight: 700; margin-top: 4px;">10 phút trước • Cần phản hồi</div>
+        </div>
+      </div>
+      <div class="notify-item" onclick="location.href='profile.html'">
+        <div class="notify-item-icon">✨</div>
+        <div>
+          <div style="font-weight: 700; font-size: 13px; color: #0f172a;">AI đã hoàn tất đánh giá hồ sơ</div>
+          <div style="font-size: 12px; color: #475569; margin-top: 2px;">Điểm năng lực của bạn đạt mức xếp hạng Senior (85.0/100).</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Hôm nay</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  notifyBtn.onclick = (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  };
+
+  document.addEventListener("click", () => {
+    dropdown.style.display = "none";
+  });
+  dropdown.onclick = (e) => e.stopPropagation();
+
+  nav.appendChild(notifyBtn);
+  nav.appendChild(dropdown);
+
   // Vai trò người dùng badge
   const roleBadge = document.createElement("span");
   roleBadge.className = `badge ${role === "candidate" ? "badge-junior" : "badge-middle"}`;
-  roleBadge.style.marginLeft = "auto";
   roleBadge.style.marginRight = "12px";
   roleBadge.textContent = role === "candidate" ? "Ứng viên" : "Nhà tuyển dụng";
   nav.appendChild(roleBadge);
@@ -108,4 +161,10 @@ async function skillOptions(select) {
     box.appendChild(option);
   });
   return skillList;
+}
+
+function markAllNotificationsRead() {
+  const badge = document.getElementById("navNotifyBadge");
+  if (badge) badge.style.display = "none";
+  document.querySelectorAll(".notify-item.unread").forEach(el => el.classList.remove("unread"));
 }

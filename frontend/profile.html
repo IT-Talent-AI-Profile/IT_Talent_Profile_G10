@@ -672,6 +672,52 @@
       </div>
     </div>
 
+    <!-- 2.5 RECRUITER INVITATIONS NOTIFICATION CARD (LỜI MỜI ỨNG TUYỂN) -->
+    <div class="card-3d" id="invitationsSection" style="margin-top: 24px; border: 1.5px solid #c7d2fe; background: linear-gradient(145deg, #ffffff 0%, #f5f7ff 100%); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; bottom: 0; width: 6px; background: linear-gradient(180deg, #6366f1, #a855f7);"></div>
+      
+      <div class="card-header-3d" style="border-bottom: 1px solid #e0e7ff; margin-bottom: 18px;">
+        <h2 class="card-title-3d" style="display: flex; align-items: center; gap: 10px;">
+          <span>📬</span> Hộp Thư: Lời Mời Ứng Tuyển & Phỏng Vấn
+          <span class="badge-3d" style="background: #ef4444; color: #fff; font-size: 11px; padding: 2px 10px; text-transform: none;">1 Lời mời mới</span>
+        </h2>
+        <span style="font-size: 12px; color: #6366f1; font-weight: 700;">Tự động gửi từ Nhà Tuyển Dụng</span>
+      </div>
+
+      <!-- INVITATION ITEM -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 16px; align-items: flex-start;">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; border: 1px solid #a5b4fc;">
+              🏢
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #0f172a;">TechCorp Global Vietnam</h3>
+                <span style="font-size: 11px; font-weight: 700; background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; padding: 2px 8px; border-radius: 12px;">Độ khớp AI: 96%</span>
+                <span style="font-size: 12px; color: #94a3b8;">15 phút trước</span>
+              </div>
+              <div style="font-size: 14px; font-weight: 700; color: #4f46e5; margin: 4px 0 8px;">
+                Vị trí: Senior Python Backend Engineer (Mức lương: 2,000$ - 3,000$)
+              </div>
+              <p style="font-size: 13.5px; color: #334155; line-height: 1.6; margin: 0; background: #f8fafc; padding: 12px 16px; border-radius: var(--radius-md); border-left: 3px solid #6366f1;">
+                <em>"Chào bạn! Dựa trên phân tích năng lực của AI, chuyên môn vững vàng của bạn về <strong>Python (5★)</strong> và <strong>MySQL (4★)</strong> rất phù hợp với dự án Core Backend chịu tải lớn của chúng tôi. Công ty trân trọng mời bạn tham gia buổi phỏng vấn trực tuyến."</em>
+              </p>
+            </div>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 8px; min-width: 170px;" id="invitationActions">
+            <button type="button" class="btn" style="padding: 10px 18px; font-size: 13px;" onclick="acceptInvitation(this)">
+              <span>✅</span> Đồng Ý Phỏng Vấn
+            </button>
+            <button type="button" class="btn secondary" style="padding: 8px 18px; font-size: 13px;" onclick="rejectInvitation(this)">
+              <span>❌</span> Tạm Bỏ Qua
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 3. WORKSPACE TWO-COLUMN GRID -->
     <div class="profile-grid-3d">
       
@@ -1059,6 +1105,29 @@
       if (res) {
         showSuccessMsg("Đã xóa kỹ năng khỏi hồ sơ!");
         renderSkillsTable(res.skills || []);
+      }
+    }
+
+    function acceptInvitation(btn) {
+      const actions = document.getElementById("invitationActions");
+      actions.innerHTML = `
+        <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: var(--radius-md); padding: 12px 16px; text-align: center;">
+          <div style="font-size: 13px; font-weight: 800; color: #16a34a;">ĐÃ XÁC NHẬN! 🎉</div>
+          <div style="font-size: 11px; color: #15803d; margin-top: 3px;">HR TechCorp sẽ gửi link phỏng vấn đến email của bạn trong 24h tới.</div>
+        </div>
+      `;
+      showSuccessMsg("Bạn đã đồng ý tham gia phỏng vấn thành công!");
+      const badge = document.getElementById("navNotifyBadge");
+      if (badge) badge.style.display = "none";
+    }
+
+    function rejectInvitation(btn) {
+      const section = document.getElementById("invitationsSection");
+      if (confirm("Bạn có chắc chắn muốn bỏ qua lời mời phỏng vấn này không?")) {
+        section.style.display = "none";
+        showSuccessMsg("Đã tạm bỏ qua lời mời ứng tuyển.");
+        const badge = document.getElementById("navNotifyBadge");
+        if (badge) badge.style.display = "none";
       }
     }
 
