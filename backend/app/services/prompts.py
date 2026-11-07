@@ -1,4 +1,3 @@
-
 MAX_CV_CHARS = 12000
 
 
@@ -80,4 +79,50 @@ NỘI DUNG CV CẦN PHÂN TÍCH:
 </cv_content>
 """
 
+    return prompt.strip()
+
+
+def build_summary_prompt(
+    skills: list | None = None,
+    score: float | None = None,
+    level: str | None = None
+) -> str:
+    """
+    Tạo prompt yêu cầu AI viết đoạn tóm tắt năng lực (điểm mạnh, điểm yếu), tối đa 150 từ.
+    (Phục vụ Task [AI-03])
+    """
+    skills_repr = []
+    if skills:
+        for s in skills:
+            if isinstance(s, dict):
+                name = s.get("name", "")
+                prof = s.get("proficiency", "")
+                yrs = s.get("years", 0)
+                skills_repr.append(f"{name} ({prof}/5, {yrs} năm)")
+            elif isinstance(s, str):
+                skills_repr.append(s)
+            elif hasattr(s, "name"):
+                skills_repr.append(s.name)
+
+    skills_text = ", ".join(skills_repr) if skills_repr else "Chưa có kỹ năng ghi nhận"
+    score_text = f"{score}/100" if score is not None else "Chưa có điểm"
+    level_text = level if level else "Chưa phân cấp"
+
+    prompt = f"""
+Bạn là chuyên gia nhân sự và đánh giá năng lực lập trình viên IT.
+
+Dựa vào thông tin hồ sơ dưới đây:
+- Cấp độ năng lực: {level_text}
+- Điểm đánh giá: {score_text}
+- Danh sách kỹ năng: {skills_text}
+
+Nhiệm vụ: Viết một đoạn tóm tắt ngắn gọn bằng tiếng Việt nhận xét về:
+1. Điểm mạnh chính của ứng viên.
+2. Điểm cần cải thiện / điểm yếu.
+
+YÊU CẦU BẮT BUỘC:
+- Độ dài: Tối đa 150 từ.
+- Văn phong chuyên nghiệp, khách quan, súc tích.
+- Chỉ trả về duy nhất đoạn văn bản tóm tắt, không thêm tiêu đề, không gạch đầu dòng, không lời chào hỏi.
+"""
     return prompt.strip()
