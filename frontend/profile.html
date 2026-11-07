@@ -3,263 +3,758 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hồ Sơ Năng Lực - IT Talent AI Profile</title>
+  <title>Hồ Sơ Năng Lực 3D - IT Talent AI Profile</title>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <style>
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.9fr;
-      gap: 24px;
+    /* =====================================================================
+       3D & CYBER SAAS EXPERIENCE - PROFILE PAGE
+       ===================================================================== */
+    
+    :root {
+      --hero-bg: radial-gradient(130% 120% at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+      --glass-card: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 0 15px rgba(99, 102, 241, 0.05);
+    }
+
+    body {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 30%, rgba(168, 85, 247, 0.06) 0px, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* 1. 3D HERO HEADER CARD */
+    .hero-3d-wrapper {
+      perspective: 1200px;
       margin-top: 24px;
     }
 
-    .profile-header-card {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    .hero-3d-card {
+      background: var(--hero-bg);
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+    .hero-3d-card:hover {
+      box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.55), 0 0 45px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Ambient animated lighting blobs inside hero */
+    .hero-glow-blob {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(168, 85, 247, 0) 70%);
+      filter: blur(40px);
+      pointer-events: none;
+      top: -100px;
+      right: -50px;
+      animation: floatGlow 8s ease-in-out infinite alternate;
+    }
+
+    .hero-glow-blob-2 {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(99, 102, 241, 0) 70%);
+      filter: blur(35px);
+      pointer-events: none;
+      bottom: -80px;
+      left: 10%;
+      animation: floatGlow2 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-30px, 40px) scale(1.15); }
+    }
+
+    @keyframes floatGlow2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.2); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 20px;
+      gap: 24px;
     }
 
-    .profile-user-info {
+    .hero-identity {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 22px;
     }
 
-    .user-avatar {
-      width: 64px;
-      height: 64px;
+    /* 3D Glowing Avatar */
+    .avatar-3d-container {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+    }
+
+    .avatar-3d-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #6366f1, #a855f7, #38bdf8, #6366f1);
+      animation: spinRing 6s linear infinite;
+      filter: blur(2px);
+    }
+
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar-3d-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.3), 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-meta h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-meta .desired-role {
+      font-size: 15px;
+      color: #94a3b8;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-3d {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
       border-radius: var(--radius-full);
-      background: var(--primary-gradient);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s ease;
+      cursor: default;
+    }
+
+    .badge-3d:hover {
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    .badge-senior {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      color: #fff;
+      border: 1px solid rgba(168, 85, 247, 0.5);
+    }
+
+    .badge-middle {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #fff;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+    }
+
+    .badge-junior {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #fff;
+      border: 1px solid rgba(52, 211, 153, 0.5);
+    }
+
+    .badge-intern {
+      background: linear-gradient(135deg, #475569 0%, #334155 100%);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .badge-visibility {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 3D Holographic Stat Boxes */
+    .hero-stats-3d {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stat-card-3d {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 14px 22px;
+      text-align: right;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+      min-width: 140px;
+    }
+
+    .stat-card-3d:hover {
+      transform: translateY(-4px) translateZ(10px);
+      border-color: rgba(99, 102, 241, 0.6);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-label-3d {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .stat-value-3d {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    /* Level Career Roadmap Bar */
+    .career-roadmap {
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .roadmap-track {
+      position: relative;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-full);
+      overflow: visible;
+    }
+
+    .roadmap-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, #10b981 0%, #38bdf8 50%, #8b5cf6 100%);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 25%;
+    }
+
+    .roadmap-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .roadmap-step {
+      cursor: default;
+      transition: color 0.3s ease;
+    }
+
+    .roadmap-step.active {
+      color: #38bdf8;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    /* 2. 3D SHIMMERING AI SUMMARY CARD */
+    .ai-summary-3d-box {
+      margin-top: 24px;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 22px 28px;
+      position: relative;
+      border: 1px solid #e0e7ff;
+      box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15), 0 2px 6px rgba(0, 0, 0, 0.03);
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ai-summary-3d-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.22);
+    }
+
+    .ai-summary-3d-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, #6366f1 0%, #a855f7 50%, #38bdf8 100%);
+    }
+
+    .ai-bot-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 26px;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-
-    .user-meta h2 {
-      color: #fff;
-      margin: 0 0 4px;
-      font-size: 22px;
-    }
-
-    .user-meta p {
-      color: #94a3b8;
-      margin: 0;
-      font-size: 14px;
-    }
-
-    .user-stats {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .stat-box {
-      text-align: right;
-      padding: 10px 18px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius-md);
-    }
-
-    .stat-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #94a3b8;
-      margin-bottom: 2px;
-    }
-
-    .stat-value {
-      font-size: 20px;
-      font-weight: 800;
-      color: #38bdf8;
-    }
-
-    .ai-summary-card {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: var(--radius-lg);
-      padding: 18px 20px;
-      margin-top: 20px;
-      display: flex;
-      gap: 14px;
-    }
-
-    .ai-summary-icon {
-      font-size: 24px;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+      animation: floatBot 4s ease-in-out infinite;
+      border: 1px solid #c7d2fe;
     }
 
-    .ai-summary-text h4 {
-      margin: 0 0 4px;
-      color: #166534;
-      font-size: 14px;
+    @keyframes floatBot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
-    .ai-summary-text p {
+    .ai-summary-details {
+      flex: 1;
+    }
+
+    .ai-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .ai-summary-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e1b4b;
       margin: 0;
-      color: #15803d;
-      font-size: 13px;
-      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .skill-rating {
-      color: #f59e0b;
-      letter-spacing: 2px;
-      font-size: 13px;
+    .ai-pill-verified {
+      font-size: 11px;
+      font-weight: 700;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .toggle-group {
+    .ai-summary-content {
+      font-size: 14px;
+      line-height: 1.65;
+      color: #334155;
+      margin: 0;
+      font-weight: 450;
+    }
+
+    /* 3. MAIN WORKSPACE 3D GRID */
+    .profile-grid-3d {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 24px;
+      margin-top: 24px;
+      align-items: start;
+    }
+
+    .card-3d {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--glass-shadow);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .card-3d:hover {
+      box-shadow: 0 25px 45px -12px rgba(15, 23, 42, 0.09), 0 0 20px rgba(99, 102, 241, 0.06);
+    }
+
+    .card-header-3d {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title-3d {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin: 0;
       display: flex;
       align-items: center;
       gap: 10px;
-      background: #f8fafc;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      margin-top: 14px;
     }
 
-    .toggle-group label {
-      margin: 0;
+    /* Form Fields 3D Experience */
+    .form-group-3d {
+      margin-bottom: 18px;
+    }
+
+    .form-group-3d label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"], input[type="url"], textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: 14px;
+      background: #f8fafc;
+      color: #0f172a;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    input:focus, textarea:focus, select:focus {
+      background: #ffffff;
+      border-color: #6366f1;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+      transform: translateY(-1px);
+    }
+
+    .toggle-switch-3d {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #f8fafc;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid #e2e8f0;
+      margin-top: 16px;
       cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .toggle-switch-3d:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .toggle-switch-3d input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #6366f1;
+    }
+
+    /* 4. SKILLS TABLE 3D */
+    .skills-table-container {
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .table-3d {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table-3d th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 14px 18px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    .table-3d td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+      color: #1e293b;
+      vertical-align: middle;
+      transition: background 0.2s ease;
+    }
+
+    .table-3d tr:hover td {
+      background: #f8fafc;
+    }
+
+    .skill-name-cell strong {
+      display: block;
+      color: #0f172a;
       font-size: 14px;
     }
 
-    @media (max-width: 860px) {
-      .profile-grid {
+    .skill-name-cell span {
+      display: inline-block;
+      font-size: 11px;
+      color: #6366f1;
+      background: #eef2ff;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .proficiency-visual {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stars-glow {
+      color: #f59e0b;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+    }
+
+    .prof-bar-bg {
+      width: 60px;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .prof-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      border-radius: var(--radius-full);
+    }
+
+    @media (max-width: 900px) {
+      .profile-grid-3d {
         grid-template-columns: 1fr;
+      }
+      .hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero-stats-3d {
+        width: 100%;
+        justify-content: flex-start;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="container" style="max-width: 1180px; padding-bottom: 60px;">
+    
     <div id="error" class="error"></div>
     <div id="success" class="success" style="display: none;"></div>
 
-    <!-- PROFILE HERO HEADER -->
-    <div class="card profile-header-card">
-      <div class="profile-user-info">
-        <div class="user-avatar" id="avatarLetter">U</div>
-        <div class="user-meta">
-          <h2 id="headerFullName">Đang tải hồ sơ...</h2>
-          <p id="headerDesiredPos">Vị trí mong muốn</p>
-          <div style="margin-top: 6px;">
-            <span id="badgeLevel" class="badge badge-intern">Intern</span>
-            <span id="badgeVisibility" class="badge" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Riêng tư</span>
+    <!-- 1. 3D HERO PROFILE BANNER -->
+    <div class="hero-3d-wrapper">
+      <div class="hero-3d-card" id="heroCard">
+        <div class="hero-glow-blob"></div>
+        <div class="hero-glow-blob-2"></div>
+
+        <div class="hero-content">
+          <div class="hero-identity">
+            <div class="avatar-3d-container">
+              <div class="avatar-3d-ring"></div>
+              <div class="avatar-3d-face" id="avatarLetter">U</div>
+            </div>
+
+            <div class="hero-meta">
+              <h1 id="headerFullName">Đang nạp hồ sơ...</h1>
+              <div class="desired-role">
+                <span>🎯</span>
+                <span id="headerDesiredPos">Vị trí mong muốn</span>
+              </div>
+              <div class="hero-badges-row">
+                <span id="badgeLevel" class="badge-3d badge-intern">Intern</span>
+                <span id="badgeVisibility" class="badge-3d badge-visibility">Riêng tư</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-stats-3d">
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Điểm Tổng AI</div>
+              <div class="stat-value-3d" id="statScore">0.0 / 100</div>
+            </div>
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Kinh Nghiệm</div>
+              <div class="stat-value-3d" id="statExp">0.0 năm</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Career Progression Track -->
+        <div class="career-roadmap">
+          <div class="roadmap-track">
+            <div class="roadmap-fill" id="roadmapFill" style="width: 25%;"></div>
+          </div>
+          <div class="roadmap-labels">
+            <span class="roadmap-step" id="stepIntern">🌱 Intern</span>
+            <span class="roadmap-step" id="stepJunior">🌿 Junior</span>
+            <span class="roadmap-step" id="stepMiddle">⚡ Middle</span>
+            <span class="roadmap-step" id="stepSenior">👑 Senior</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="user-stats">
-        <div class="stat-box">
-          <div class="stat-label">Điểm tổng AI</div>
-          <div class="stat-value" id="statScore">0 / 100</div>
+    <!-- 2. AI SUMMARY CARD (CLAUDE LLM) -->
+    <div id="aiSummaryBox" class="ai-summary-3d-box" style="display: none;">
+      <div class="ai-bot-avatar">🤖</div>
+      <div class="ai-summary-details">
+        <div class="ai-summary-header">
+          <h3>Đánh Giá Năng Lực Từ AI</h3>
+          <span class="ai-pill-verified">✨ Claude 3.5 Sonnet Analysis</span>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Kinh nghiệm</div>
-          <div class="stat-value" id="statExp">0 năm</div>
-        </div>
+        <p class="ai-summary-content" id="aiSummaryContent"></p>
       </div>
     </div>
 
-    <!-- AI SUMMARY NOTIFICATION -->
-    <div id="aiSummaryBox" class="ai-summary-card" style="display: none;">
-      <div class="ai-summary-icon">🤖</div>
-      <div class="ai-summary-text">
-        <h4>Nhận xét năng lực từ AI (Claude LLM)</h4>
-        <p id="aiSummaryContent"></p>
-      </div>
-    </div>
-
-    <!-- MAIN TWO-COLUMN WORKSPACE -->
-    <div class="profile-grid">
+    <!-- 3. WORKSPACE TWO-COLUMN GRID -->
+    <div class="profile-grid-3d">
       
-      <!-- CỘT TRÁI: FORM SỬA THÔNG TIN CÁ NHÂN (HS-01) -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">📝 Thông Tin Cá Nhân</h3>
+      <!-- CỘT TRÁI: FORM SỬA HỒ SƠ (TASK HS-01) -->
+      <div class="card-3d">
+        <div class="card-header-3d">
+          <h2 class="card-title-3d">
+            <span>📝</span> Thông Tin Cá Nhân & Nghề Nghiệp
+          </h2>
+          <span style="font-size: 12px; color: #64748b;">DoD: HS-01</span>
         </div>
 
         <form id="formProfile" onsubmit="handleUpdateProfile(event)">
           <div class="row">
-            <div>
+            <div class="form-group-3d">
               <label for="fullName">Họ và tên (*)</label>
-              <input type="text" id="fullName" required placeholder="Họ và tên của bạn">
+              <input type="text" id="fullName" required placeholder="Nguyễn Văn A">
             </div>
-            <div>
+            <div class="form-group-3d">
               <label for="desiredPosition">Vị trí mong muốn</label>
-              <input type="text" id="desiredPosition" placeholder="vd: Backend Engineer">
+              <input type="text" id="desiredPosition" placeholder="vd: Senior Backend Engineer">
             </div>
           </div>
 
           <div class="row">
-            <div>
+            <div class="form-group-3d">
               <label for="yearsExperience">Số năm kinh nghiệm</label>
               <input type="number" id="yearsExperience" min="0" step="0.5" value="0">
             </div>
-            <div>
+            <div class="form-group-3d">
               <label for="githubUrl">Link GitHub / Portfolio</label>
               <input type="url" id="githubUrl" placeholder="https://github.com/username">
             </div>
           </div>
 
-          <div>
+          <div class="form-group-3d">
             <label for="education">Học vấn & Bằng cấp</label>
-            <textarea id="education" placeholder="vd: Đại học Bách Khoa, Chuyên ngành Kỹ thuật Phần mềm (2020 - 2024)"></textarea>
+            <textarea id="education" rows="2" placeholder="vd: Đại học Bách Khoa TP.HCM - Kỹ thuật Phần mềm (2018 - 2022)"></textarea>
           </div>
 
-          <div>
-            <label for="experience">Tóm tắt kinh nghiệm làm việc</label>
-            <textarea id="experience" placeholder="vd: 2 năm làm việc với Python, thiết kế RESTful API và tối ưu cơ sở dữ liệu MySQL..."></textarea>
+          <div class="form-group-3d">
+            <label for="experience">Kinh nghiệm thực chiến</label>
+            <textarea id="experience" rows="3" placeholder="vd: 5 năm kinh nghiệm lập trình backend với Python, thiết kế RESTful API và tối ưu cơ sở dữ liệu MySQL..."></textarea>
           </div>
 
-          <div class="toggle-group">
+          <label class="toggle-switch-3d" for="isPublic">
             <input type="checkbox" id="isPublic">
-            <label for="isPublic">
-              <strong>Công khai hồ sơ</strong> (Cho phép nhà tuyển dụng tìm thấy bạn trong kết quả đối sánh)
-            </label>
-          </div>
+            <div>
+              <strong style="color: #0f172a; font-size: 14px;">Công khai hồ sơ cho Nhà tuyển dụng</strong>
+              <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Cho phép các công ty tìm kiếm và đối sánh bạn với các vị trí tuyển dụng phù hợp.</div>
+            </div>
+          </label>
 
-          <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-            <button type="submit" id="btnSaveProfile">💾 Lưu thay đổi hồ sơ</button>
+          <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+            <button type="submit" id="btnSaveProfile" style="padding: 12px 28px; font-size: 15px;">
+              <span>💾</span> Lưu Thay Đổi Hồ Sơ
+            </button>
           </div>
         </form>
       </div>
 
-      <!-- CỘT PHẢI: QUẢN LÝ KỸ NĂNG CHUYÊN MÔN (HS-02) -->
+      <!-- CỘT PHẢI: QUẢN LÝ KỸ NĂNG (TASK HS-02) -->
       <div>
         <!-- FORM THÊM KỸ NĂNG -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">⚡ Thêm Kỹ Năng Mới</h3>
+        <div class="card-3d" style="margin-bottom: 24px;">
+          <div class="card-header-3d">
+            <h2 class="card-title-3d">
+              <span>⚡</span> Thêm Kỹ Năng Mới
+            </h2>
+            <span style="font-size: 12px; color: #64748b;">DoD: HS-02</span>
           </div>
 
           <form id="formAddSkill" onsubmit="handleAddSkill(event)">
-            <div>
+            <div class="form-group-3d">
               <label for="skillSelect">Chọn kỹ năng (*)</label>
               <select id="skillSelect" required>
-                <option value="">-- Đang tải kỹ năng --</option>
+                <option value="">-- Đang nạp danh mục kỹ năng --</option>
               </select>
             </div>
 
-            <div class="row" style="margin-top: 10px;">
-              <div>
-                <label for="skillProficiency">Mức thành thạo (1 - 5 sao)</label>
+            <div class="row">
+              <div class="form-group-3d">
+                <label for="skillProficiency">Mức thành thạo (1 - 5)</label>
                 <select id="skillProficiency" required>
                   <option value="1">⭐ 1/5 - Mới bắt đầu</option>
                   <option value="2">⭐⭐ 2/5 - Cơ bản</option>
@@ -269,37 +764,45 @@
                 </select>
               </div>
 
-              <div>
+              <div class="form-group-3d">
                 <label for="skillYears">Số năm sử dụng</label>
                 <input type="number" id="skillYears" min="0" step="0.5" value="1.0" required>
               </div>
             </div>
 
-            <button type="submit" style="width: 100%; margin-top: 16px;">+ Thêm / Cập nhật kỹ năng</button>
+            <button type="submit" id="btnAddSkill" style="width: 100%; margin-top: 8px; padding: 12px;">
+              <span>+</span> Thêm / Cập Nhật Kỹ Năng
+            </button>
           </form>
         </div>
 
-        <!-- DANH SÁCH KỸ NĂNG ĐÃ GẮN VÀO HỒ SƠ -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">🎯 Kỹ Năng Đã Thêm (<span id="skillCount">0</span>)</h3>
+        <!-- BẢNG DANH SÁCH KỸ NĂNG ĐÃ THÊM -->
+        <div class="card-3d">
+          <div class="card-header-3d">
+            <h2 class="card-title-3d">
+              <span>🎯</span> Kỹ Năng Đã Thêm (<span id="skillCount">0</span>)
+            </h2>
           </div>
 
-          <table id="tableSkills">
-            <thead>
-              <tr>
-                <th>Kỹ năng</th>
-                <th>Mức độ</th>
-                <th>Năm</th>
-                <th style="text-align: right;">Hành động</th>
-              </tr>
-            </thead>
-            <tbody id="skillListBody">
-              <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="skills-table-container">
+            <table class="table-3d" id="tableSkills">
+              <thead>
+                <tr>
+                  <th>Kỹ năng</th>
+                  <th>Mức độ</th>
+                  <th>Năm</th>
+                  <th style="text-align: right;">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="skillListBody">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: #94a3b8; padding: 28px;">
+                    Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -312,6 +815,43 @@
   <script>
     // Kiểm tra phân quyền: Chỉ cho ứng viên truy cập trang này
     guard("candidate");
+
+    // Micro-interaction: Gắn hiệu ứng gợn sóng 3D (Ripple) cho tất cả buttons
+    document.addEventListener("click", function(e) {
+      const btn = e.target.closest("button, .btn");
+      if (btn) {
+        const circle = document.createElement("span");
+        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+        const radius = diameter / 2;
+        const rect = btn.getBoundingClientRect();
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${e.clientX - rect.left - radius}px`;
+        circle.style.top = `${e.clientY - rect.top - radius}px`;
+        circle.classList.add("btn-ripple");
+        const existing = btn.querySelector(".btn-ripple");
+        if (existing) existing.remove();
+        btn.appendChild(circle);
+      }
+    });
+
+    // 3D Card Tilt Interaction trên Hero Banner
+    const heroCard = document.getElementById("heroCard");
+    if (heroCard) {
+      heroCard.addEventListener("mousemove", (e) => {
+        const rect = heroCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+        heroCard.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(5px)`;
+      });
+
+      heroCard.addEventListener("mouseleave", () => {
+        heroCard.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+      });
+    }
 
     function renderStars(level) {
       let stars = "";
@@ -326,7 +866,35 @@
       if (box) {
         box.textContent = msg;
         box.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => { box.style.display = "none"; }, 4000);
+      }
+    }
+
+    function updateCareerRoadmap(level) {
+      const fill = document.getElementById("roadmapFill");
+      const steps = {
+        intern: document.getElementById("stepIntern"),
+        junior: document.getElementById("stepJunior"),
+        middle: document.getElementById("stepMiddle"),
+        senior: document.getElementById("stepSenior")
+      };
+
+      Object.values(steps).forEach(s => s && s.classList.remove("active"));
+
+      const lvl = (level || "intern").toLowerCase();
+      if (lvl === "intern") {
+        fill.style.width = "25%";
+        steps.intern?.classList.add("active");
+      } else if (lvl === "junior") {
+        fill.style.width = "50%";
+        steps.junior?.classList.add("active");
+      } else if (lvl === "middle") {
+        fill.style.width = "75%";
+        steps.middle?.classList.add("active");
+      } else if (lvl === "senior") {
+        fill.style.width = "100%";
+        steps.senior?.classList.add("active");
       }
     }
 
@@ -336,33 +904,37 @@
       if (!profile) return;
 
       // Đổ dữ liệu vào Hero Card
-      document.getElementById("headerFullName").textContent = esc(profile.full_name || "Ứng viên");
-      document.getElementById("avatarLetter").textContent = (profile.full_name || "U").charAt(0).toUpperCase();
-      document.getElementById("headerDesiredPos").textContent = esc(profile.desired_position || "Chưa cập nhật vị trí mong muốn");
+      const name = profile.full_name || "Ứng viên";
+      document.getElementById("headerFullName").textContent = name;
+      document.getElementById("avatarLetter").textContent = name.charAt(0).toUpperCase();
+      document.getElementById("headerDesiredPos").textContent = profile.desired_position || "Chưa cập nhật vị trí mong muốn";
       document.getElementById("statScore").textContent = (profile.total_score != null ? profile.total_score.toFixed(1) : "0.0") + " / 100";
-      document.getElementById("statExp").textContent = (profile.years_experience || 0) + " năm";
+      document.getElementById("statExp").textContent = (profile.years_experience != null ? profile.years_experience : 0) + " năm";
 
-      // Cấp độ badge
-      const levelEl = document.getElementById("badgeLevel");
+      // Cấp độ badge & Career Roadmap
       const lvl = profile.level || "Intern";
+      const levelEl = document.getElementById("badgeLevel");
       levelEl.textContent = lvl;
-      levelEl.className = "badge badge-" + lvl.toLowerCase();
+      levelEl.className = "badge-3d badge-" + lvl.toLowerCase();
+      updateCareerRoadmap(lvl);
 
       // Công khai badge
       const visEl = document.getElementById("badgeVisibility");
       if (profile.is_public) {
         visEl.textContent = "Công khai";
-        visEl.className = "badge badge-junior";
+        visEl.style.borderColor = "rgba(52, 211, 153, 0.4)";
+        visEl.style.color = "#34d399";
       } else {
         visEl.textContent = "Riêng tư";
-        visEl.className = "badge badge-intern";
+        visEl.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        visEl.style.color = "#cbd5e1";
       }
 
-      // AI Summary
+      // AI Summary Box (Claude LLM)
       const aiBox = document.getElementById("aiSummaryBox");
       const aiContent = document.getElementById("aiSummaryContent");
       if (profile.ai_summary && profile.ai_summary.trim()) {
-        aiContent.textContent = esc(profile.ai_summary);
+        aiContent.textContent = profile.ai_summary;
         aiBox.style.display = "flex";
       } else {
         aiBox.style.display = "none";
@@ -387,24 +959,32 @@
       tbody.innerHTML = "";
 
       if (skills.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 28px;">Chưa có kỹ năng nào. Hãy chọn kỹ năng phía trên để thêm.</td></tr>`;
         return;
       }
 
       skills.forEach(s => {
         const tr = document.createElement("tr");
+        const percent = Math.min(100, (s.proficiency / 5) * 100);
         tr.innerHTML = `
-          <td>
+          <td class="skill-name-cell">
             <strong>${esc(s.name)}</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">${esc(s.group)}</div>
+            <span>${esc(s.group)}</span>
           </td>
           <td>
-            <span class="skill-rating">${renderStars(s.proficiency)}</span>
-            <span style="font-size: 12px; color: var(--text-muted);">(${s.proficiency}/5)</span>
+            <div class="proficiency-visual">
+              <span class="stars-glow">${renderStars(s.proficiency)}</span>
+              <div class="prof-bar-bg">
+                <div class="prof-bar-fill" style="width: ${percent}%;"></div>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-weight: 600;">(${s.proficiency}/5)</span>
+            </div>
           </td>
-          <td>${s.years_used} năm</td>
+          <td style="font-weight: 600; color: #475569;">${s.years_used} năm</td>
           <td style="text-align: right;">
-            <button type="button" class="danger" style="padding: 4px 10px; font-size: 12px;" onclick="handleDeleteSkill(${s.skill_id})">Xóa</button>
+            <button type="button" class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="handleDeleteSkill(${s.skill_id})">
+              <span>✕</span> Xóa
+            </button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -417,7 +997,7 @@
 
       const btn = document.getElementById("btnSaveProfile");
       btn.disabled = true;
-      btn.textContent = "Đang lưu...";
+      btn.innerHTML = "<span>⏳</span> Đang lưu...";
 
       const payload = {
         full_name: document.getElementById("fullName").value.trim(),
@@ -431,10 +1011,10 @@
 
       const updated = await api("/profiles/me", "PUT", payload);
       btn.disabled = false;
-      btn.textContent = "💾 Lưu thay đổi hồ sơ";
+      btn.innerHTML = "<span>💾</span> Lưu Thay Đổi Hồ Sơ";
 
       if (updated) {
-        showSuccessMsg("Đã cập nhật hồ sơ thành công!");
+        showSuccessMsg("Đã cập nhật hồ sơ năng lực thành công!");
         loadProfile();
       }
     }
@@ -452,20 +1032,27 @@
         return;
       }
 
+      const btn = document.getElementById("btnAddSkill");
+      btn.disabled = true;
+      btn.innerHTML = "<span>⏳</span> Đang thêm...";
+
       const res = await api("/profiles/me/skills", "POST", {
         skill_id: skillId,
         proficiency: proficiency,
         years_used: yearsUsed
       });
 
+      btn.disabled = false;
+      btn.innerHTML = "<span>+</span> Thêm / Cập Nhật Kỹ Năng";
+
       if (res) {
-        showSuccessMsg("Đã thêm/cập nhật kỹ năng thành công!");
+        showSuccessMsg("Đã lưu kỹ năng vào hồ sơ thành công!");
         renderSkillsTable(res.skills || []);
       }
     }
 
     async function handleDeleteSkill(skillId) {
-      if (!confirm("Bạn có chắc chắn muốn xóa kỹ năng này khỏi hồ sơ?")) return;
+      if (!confirm("Bạn có chắc chắn muốn xóa kỹ năng này khỏi hồ sơ năng lực?")) return;
       clearError();
 
       const res = await api("/profiles/me/skills/" + skillId, "DELETE");
