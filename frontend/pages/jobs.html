@@ -1,0 +1,966 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Tuyển Dụng AI 3D - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <style>
+    /* =====================================================================
+       3D & CYBER SAAS EXPERIENCE - RECRUITER JOBS COMMAND CENTER
+       ===================================================================== */
+    
+    :root {
+      --hero-bg: radial-gradient(130% 120% at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+      --glass-card: rgba(255, 255, 255, 0.9);
+      --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 0 15px rgba(99, 102, 241, 0.05);
+    }
+
+    body {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 30%, rgba(168, 85, 247, 0.06) 0px, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* 1. 3D HERO COMMAND BANNER */
+    .hero-3d-wrapper {
+      perspective: 1200px;
+      margin-top: 24px;
+    }
+
+    .hero-3d-card {
+      background: var(--hero-bg);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+    .hero-3d-card:hover {
+      box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.55), 0 0 45px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Ambient animated lighting blobs */
+    .hero-glow-blob {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(168, 85, 247, 0) 70%);
+      filter: blur(45px);
+      pointer-events: none;
+      top: -100px;
+      right: -50px;
+      animation: floatGlow 8s ease-in-out infinite alternate;
+    }
+
+    .hero-glow-blob-2 {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(99, 102, 241, 0) 70%);
+      filter: blur(40px);
+      pointer-events: none;
+      bottom: -80px;
+      left: 5%;
+      animation: floatGlow2 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-30px, 40px) scale(1.15); }
+    }
+
+    @keyframes floatGlow2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.2); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .hero-identity {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .avatar-3d-container {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+    }
+
+    .avatar-3d-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #38bdf8, #818cf8, #a855f7, #38bdf8);
+      animation: spinRing 6s linear infinite;
+      filter: blur(2px);
+    }
+
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar-3d-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.3), 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-meta h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-meta p {
+      font-size: 14px;
+      color: #94a3b8;
+      margin: 0 0 10px;
+    }
+
+    /* 3D Stat Counters */
+    .hero-stats-3d {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-card-3d {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      text-align: right;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+      min-width: 130px;
+    }
+
+    .stat-card-3d:hover {
+      transform: translateY(-4px) translateZ(10px);
+      border-color: rgba(99, 102, 241, 0.6);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-label-3d {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .stat-value-3d {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    /* 2. FILTER & TOOLBAR */
+    .toolbar-3d {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .toolbar-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      background: #ffffff;
+      padding: 4px;
+      border-radius: var(--radius-lg);
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      box-shadow: none;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      color: #4f46e5;
+      background: #f8fafc;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    /* 3. 3D INTERACTIVE JOB CARDS */
+    .job-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .job-card-3d {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      border: 1px solid #e2e8f0;
+      padding: 26px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .job-card-3d:hover {
+      transform: translateY(-5px) scale(1.008);
+      box-shadow: 0 25px 45px -12px rgba(15, 23, 42, 0.12), 0 0 25px rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .job-card-3d::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: linear-gradient(180deg, #6366f1, #38bdf8);
+      opacity: 0.8;
+      transition: width 0.3s ease;
+    }
+
+    .job-card-3d:hover::before {
+      width: 8px;
+    }
+
+    .job-meta-3d {
+      flex: 1;
+    }
+
+    .job-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .job-title-3d {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin: 0;
+      transition: color 0.2s ease;
+    }
+
+    .job-card-3d:hover .job-title-3d {
+      color: #4f46e5;
+    }
+
+    .radar-pulse-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #16a34a;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .radar-pulse-dot::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      animation: pulseRadar 2s infinite;
+    }
+
+    @keyframes pulseRadar {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    .job-desc-3d {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+      max-width: 740px;
+    }
+
+    .job-tags-3d {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tag-required {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .tag-preferred {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f8fafc;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .tag-exp {
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .btn-match-ai {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-match-ai:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+    }
+
+    /* 4. 3D AI MATCHING MODAL */
+    .modal-backdrop-3d {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-3d-card {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), 0 0 30px rgba(99, 102, 241, 0.2);
+      max-width: 680px;
+      width: 100%;
+      overflow: hidden;
+      animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(30px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-header-3d {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      color: #ffffff;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .modal-header-3d h3 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff !important;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .modal-body-3d {
+      padding: 24px 28px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .candidate-match-card {
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    .candidate-match-card:hover {
+      border-color: #6366f1;
+      background: #f8fafc;
+      transform: translateX(4px);
+    }
+
+    .match-percent-badge {
+      font-size: 18px;
+      font-weight: 800;
+      color: #16a34a;
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      padding: 8px 14px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      min-width: 80px;
+    }
+
+    @media (max-width: 860px) {
+      .job-card-3d {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .btn-match-ai {
+        width: 100%;
+        justify-content: center;
+      }
+      .hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 1180px; padding-bottom: 60px;">
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <!-- 1. 3D HERO COMMAND CENTER BANNER -->
+    <div class="hero-3d-wrapper">
+      <div class="hero-3d-card" id="heroRecruiterCard">
+        <div class="hero-glow-blob"></div>
+        <div class="hero-glow-blob-2"></div>
+
+        <div class="hero-content">
+          <div class="hero-identity">
+            <div class="avatar-3d-container">
+              <div class="avatar-3d-ring"></div>
+              <div class="avatar-3d-face">🏢</div>
+            </div>
+
+            <div class="hero-meta">
+              <h1>Trung Tâm Quản Lý Tuyển Dụng AI</h1>
+              <p>Quản lý các vị trí công nghệ & tự động đối sánh nhân tài IT phù hợp nhất bằng Claude LLM</p>
+              <div style="display: flex; gap: 10px;">
+                <span class="badge-3d" style="background: rgba(99, 102, 241, 0.25); border: 1px solid rgba(99, 102, 241, 0.5); color: #c7d2fe;">
+                  ⚡ AI Match Engine: Sẵn sàng
+                </span>
+                <span class="badge-3d" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                  ● Hệ thống trực tuyến
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-stats-3d">
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Tin Đang Mở</div>
+              <div class="stat-value-3d">2 Vị trí</div>
+            </div>
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Ứng Viên Sẵn Sàng</div>
+              <div class="stat-value-3d">6 Nhân tài</div>
+            </div>
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Tỉ Lệ Khớp AI</div>
+              <div class="stat-value-3d" style="color: #34d399;">96.8%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TOOLBAR & FILTER -->
+    <div class="toolbar-3d">
+      <h2 class="toolbar-title">
+        <span>📋</span> Danh Sách Vị Trí Tuyển Dụng
+      </h2>
+
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <div class="filter-pills">
+          <button class="filter-btn active" onclick="setFilter('all', this)">Tất cả (3)</button>
+          <button class="filter-btn" onclick="setFilter('open', this)">Đang mở (2)</button>
+          <button class="filter-btn" onclick="setFilter('closed', this)">Đã đóng (1)</button>
+        </div>
+
+        <button type="button" class="btn" style="padding: 9px 18px; font-size: 13px;" onclick="openCreateJobModal()">
+          <span>➕</span> Đăng Tin Tuyển Dụng
+        </button>
+
+        <a href="candidates.html" class="btn secondary" style="padding: 9px 18px; font-size: 13px;">
+          <span>🔍</span> Tìm Kiếm Ứng Viên
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. DANH SÁCH TIN TUYỂN DỤNG (3D CARDS) -->
+    <div class="job-list-container" id="jobList">
+
+      <!-- JOB 1: SENIOR PYTHON BACKEND -->
+      <div class="job-card-3d" data-status="open">
+        <div class="job-meta-3d">
+          <div class="job-header-row">
+            <h3 class="job-title-3d">Senior Python Backend Engineer</h3>
+            <span class="radar-pulse-dot">Đang Mở Tuyển</span>
+            <span class="badge-3d badge-senior" style="padding: 3px 10px; font-size: 11px;">Senior</span>
+          </div>
+
+          <p class="job-desc-3d">
+            Tuyển Senior Python tham gia xây dựng hệ thống phân tán chịu tải cao, tối ưu hóa CSDL MySQL và triển khai hạ tầng Docker.
+          </p>
+
+          <div class="job-tags-3d">
+            <span class="tag-required">★ Bắt buộc: Python</span>
+            <span class="tag-required">★ Bắt buộc: MySQL</span>
+            <span class="tag-preferred">⚡ Ưu tiên: Docker</span>
+            <span class="tag-preferred">⚡ Ưu tiên: System Design</span>
+            <span class="tag-exp">⏱️ Yêu cầu: ≥ 5.0 năm kinh nghiệm</span>
+          </div>
+        </div>
+
+        <div>
+          <button type="button" class="btn-match-ai" onclick="openMatchModal('Senior Python Backend Engineer', 'Python, MySQL, Docker, System Design')">
+            <span>⚡</span> Xem Đối Sánh AI
+          </button>
+        </div>
+      </div>
+
+      <!-- JOB 2: JUNIOR FRONTEND REACT -->
+      <div class="job-card-3d" data-status="open">
+        <div class="job-meta-3d">
+          <div class="job-header-row">
+            <h3 class="job-title-3d">Junior Frontend React Developer</h3>
+            <span class="radar-pulse-dot">Đang Mở Tuyển</span>
+            <span class="badge-3d badge-junior" style="padding: 3px 10px; font-size: 11px;">Junior</span>
+          </div>
+
+          <p class="job-desc-3d">
+            Tuyển dụng lập trình viên Frontend phát triển giao diện người dùng web ứng dụng hiện đại với React, JavaScript và Tailwind CSS.
+          </p>
+
+          <div class="job-tags-3d">
+            <span class="tag-required">★ Bắt buộc: React</span>
+            <span class="tag-required">★ Bắt buộc: JavaScript</span>
+            <span class="tag-preferred">⚡ Ưu tiên: Tailwind CSS</span>
+            <span class="tag-preferred">⚡ Ưu tiên: Git</span>
+            <span class="tag-exp">⏱️ Yêu cầu: ≥ 1.0 năm kinh nghiệm</span>
+          </div>
+        </div>
+
+        <div>
+          <button type="button" class="btn-match-ai" onclick="openMatchModal('Junior Frontend React Developer', 'React, JavaScript, Tailwind CSS')">
+            <span>⚡</span> Xem Đối Sánh AI
+          </button>
+        </div>
+      </div>
+
+      <!-- JOB 3: DEVOPS ENGINEER (ĐÃ ĐÓNG) -->
+      <div class="job-card-3d" data-status="closed" style="opacity: 0.85;">
+        <div class="job-meta-3d">
+          <div class="job-header-row">
+            <h3 class="job-title-3d">DevOps Engineer (Đã đủ chỉ tiêu)</h3>
+            <span class="badge-3d" style="background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; font-size: 11px; padding: 3px 10px;">Đã Đóng</span>
+            <span class="badge-3d badge-middle" style="padding: 3px 10px; font-size: 11px;">Middle</span>
+          </div>
+
+          <p class="job-desc-3d">
+            Tuyển kỹ sư vận hành hệ thống CI/CD và Kubernetes, giám sát hạ tầng máy chủ đám mây.
+          </p>
+
+          <div class="job-tags-3d">
+            <span class="tag-required">★ Bắt buộc: Docker</span>
+            <span class="tag-required">★ Bắt buộc: Kubernetes</span>
+            <span class="tag-preferred">⚡ Ưu tiên: AWS</span>
+            <span class="tag-exp">⏱️ Yêu cầu: ≥ 3.0 năm</span>
+          </div>
+        </div>
+
+        <div>
+          <button type="button" class="btn secondary" style="font-size: 13px;" onclick="alert('Vị trí này đã đóng tuyển dụng.')">
+            <span>🔒</span> Tin Đã Đóng
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 4. 3D AI MATCH MODAL DIALOG -->
+  <div class="modal-backdrop-3d" id="matchModal">
+    <div class="modal-3d-card">
+      <div class="modal-header-3d">
+        <h3>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(99, 102, 241, 0.4); border: 1px solid rgba(255, 255, 255, 0.25); font-size: 18px; filter: drop-shadow(0 0 10px #818cf8);">⚡</span>
+          <span style="color: #ffffff !important; font-size: 19px; font-weight: 800; letter-spacing: -0.01em;">Kết Quả Đối Sánh AI Thông Minh</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeMatchModal()">✕</button>
+      </div>
+
+      <div class="modal-body-3d">
+        <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 22px; border: 1.5px solid #c7d2fe; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);">
+          <div style="font-size: 11px; color: #4338ca; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">VỊ TRÍ ĐỐI SÁNH:</div>
+          <div style="font-size: 18px; font-weight: 800; color: #1e1b4b;" id="modalJobTitle">Senior Python Backend Engineer</div>
+          <div style="font-size: 13px; color: #4f46e5; margin-top: 4px; font-weight: 600;" id="modalRequiredSkills">Kỹ năng trọng tâm: Python, MySQL, Docker, System Design</div>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+          Top Ứng Viên Phù Hợp Nhất (Theo Claude LLM):
+        </h4>
+
+        <!-- CANDIDATE 1 -->
+        <div class="candidate-match-card">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;">N</div>
+            <div>
+              <div style="font-weight: 800; color: #0f172a; font-size: 15px;">Nguyễn Văn Senior</div>
+              <div style="font-size: 12px; color: #64748b;">Senior Backend Engineer • 6.0 năm KN</div>
+              <div style="margin-top: 4px;">
+                <span class="tag-required" style="font-size: 11px; padding: 2px 8px;">Python: 5★</span>
+                <span class="tag-required" style="font-size: 11px; padding: 2px 8px;">MySQL: 4★</span>
+                <span class="tag-preferred" style="font-size: 11px; padding: 2px 8px;">Docker: 4★</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="match-percent-badge">96%</div>
+            <div style="font-size: 11px; color: #16a34a; font-weight: 700; text-align: center; margin-top: 4px;">Rất Phù Hợp</div>
+          </div>
+        </div>
+
+        <!-- CANDIDATE 2 -->
+        <div class="candidate-match-card">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;">T</div>
+            <div>
+              <div style="font-weight: 800; color: #0f172a; font-size: 15px;">Trần Thị Middle</div>
+              <div style="font-size: 12px; color: #64748b;">Backend Developer • 3.0 năm KN</div>
+              <div style="margin-top: 4px;">
+                <span class="tag-required" style="font-size: 11px; padding: 2px 8px;">Python: 4★</span>
+                <span class="tag-preferred" style="font-size: 11px; padding: 2px 8px;">RESTful API: 4★</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="match-percent-badge" style="color: #0284c7; background: #f0f9ff; border-color: #7dd3fc;">82%</div>
+            <div style="font-size: 11px; color: #0284c7; font-weight: 700; text-align: center; margin-top: 4px;">Tiềm Năng</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn secondary" onclick="closeMatchModal()">Đóng</button>
+          <button type="button" onclick="alert('Đã gửi lời mời ứng tuyển thành công!')">✉️ Gửi Lời Mời Ứng Tuyển</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 3D CREATE JOB MODAL DIALOG -->
+  <div class="modal-backdrop-3d" id="createJobModal">
+    <div class="modal-3d-card" style="max-width: 640px;">
+      <div class="modal-header-3d">
+        <h3>
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(99, 102, 241, 0.4); border: 1px solid rgba(255, 255, 255, 0.25); font-size: 18px;">➕</span>
+          <span style="color: #ffffff !important; font-size: 19px; font-weight: 800;">Đăng Tin Tuyển Dụng Mới</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeCreateJobModal()">✕</button>
+      </div>
+
+      <div class="modal-body-3d">
+        <form id="formCreateJob" onsubmit="handleCreateJob(event)">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Tiêu đề vị trí tuyển dụng (*)</label>
+            <input type="text" id="newJobTitle" placeholder="vd: Senior Cloud DevOps Engineer" required>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Mô tả công việc & yêu cầu chính</label>
+            <textarea id="newJobDesc" rows="3" placeholder="Mô tả ngắn về trách nhiệm chính và dự án thực tế..." required></textarea>
+          </div>
+
+          <div class="row" style="margin-bottom: 16px;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kinh nghiệm tối thiểu (năm)</label>
+              <input type="number" id="newJobMinYears" min="0" step="0.5" value="2.0" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Cấp bậc mục tiêu</label>
+              <select id="newJobLevel">
+                <option value="Intern">🌱 Intern / Thực tập sinh</option>
+                <option value="Junior">🌿 Junior (1 - 2.5 năm)</option>
+                <option value="Middle" selected>⚡ Middle (2.5 - 5 năm)</option>
+                <option value="Senior">👑 Senior (> 5 năm)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kỹ năng bắt buộc (phân cách bởi dấu phẩy)</label>
+            <input type="text" id="newJobReqSkills" placeholder="vd: Python, Docker, AWS" required>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px;">Kỹ năng ưu tiên cộng điểm</label>
+            <input type="text" id="newJobPrefSkills" placeholder="vd: Kubernetes, CI/CD, Terraform">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn secondary" onclick="closeCreateJobModal()">Hủy</button>
+            <button type="submit" class="btn">🚀 Hoàn Tất Đăng Tin</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    guard("recruiter");
+
+    // 3D Card Tilt trên Hero Banner Nhà Tuyển Dụng
+    const heroCard = document.getElementById("heroRecruiterCard");
+    if (heroCard) {
+      heroCard.addEventListener("mousemove", (e) => {
+        const rect = heroCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+        heroCard.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(5px)`;
+      });
+
+      heroCard.addEventListener("mouseleave", () => {
+        heroCard.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+      });
+    }
+
+    // Modal Đối Sánh AI
+    function openMatchModal(title, skills) {
+      document.getElementById("modalJobTitle").textContent = title;
+      document.getElementById("modalRequiredSkills").textContent = "Kỹ năng trọng tâm: " + skills;
+      const modal = document.getElementById("matchModal");
+      modal.style.display = "flex";
+    }
+
+    function closeMatchModal() {
+      document.getElementById("matchModal").style.display = "none";
+    }
+
+    // Lọc trạng thái JD (All, Open, Closed)
+    function setFilter(status, btn) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const cards = document.querySelectorAll(".job-card-3d");
+      cards.forEach(card => {
+        const cardStatus = card.getAttribute("data-status");
+        if (status === "all" || cardStatus === status) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+    function openCreateJobModal() {
+      document.getElementById("createJobModal").style.display = "flex";
+    }
+
+    function closeCreateJobModal() {
+      document.getElementById("createJobModal").style.display = "none";
+    }
+
+    function handleCreateJob(e) {
+      e.preventDefault();
+      const title = document.getElementById("newJobTitle").value.trim();
+      const desc = document.getElementById("newJobDesc").value.trim();
+      const minYears = parseFloat(document.getElementById("newJobMinYears").value) || 0;
+      const level = document.getElementById("newJobLevel").value;
+      const reqSkills = document.getElementById("newJobReqSkills").value.split(",").map(s => s.trim()).filter(Boolean);
+      const prefSkills = document.getElementById("newJobPrefSkills").value.split(",").map(s => s.trim()).filter(Boolean);
+
+      const jobList = document.getElementById("jobList");
+      const card = document.createElement("div");
+      card.className = "job-card-3d";
+      card.setAttribute("data-status", "open");
+
+      let reqTagsHtml = reqSkills.map(s => `<span class="tag-required">★ Bắt buộc: ${esc(s)}</span>`).join(" ");
+      let prefTagsHtml = prefSkills.map(s => `<span class="tag-preferred">⚡ Ưu tiên: ${esc(s)}</span>`).join(" ");
+
+      card.innerHTML = `
+        <div class="job-meta-3d">
+          <div class="job-header-row">
+            <h3 class="job-title-3d">${esc(title)}</h3>
+            <span class="radar-pulse-dot">Đang Mở Tuyển</span>
+            <span class="badge-3d badge-${level.toLowerCase()}" style="padding: 3px 10px; font-size: 11px;">${level}</span>
+          </div>
+          <p class="job-desc-3d">${esc(desc)}</p>
+          <div class="job-tags-3d">
+            ${reqTagsHtml}
+            ${prefTagsHtml}
+            <span class="tag-exp">⏱️ Yêu cầu: ≥ ${minYears} năm kinh nghiệm</span>
+          </div>
+        </div>
+        <div>
+          <button type="button" class="btn-match-ai" onclick="openMatchModal('${esc(title)}', '${esc(reqSkills.join(", "))}')">
+            <span>⚡</span> Xem Đối Sánh AI
+          </button>
+        </div>
+      `;
+
+      jobList.prepend(card);
+      closeCreateJobModal();
+      document.getElementById("formCreateJob").reset();
+
+      const successBox = document.getElementById("success");
+      if (successBox) {
+        successBox.textContent = `Đã đăng tin tuyển dụng "${title}" thành công! Hệ thống AI sẵn sàng đối sánh ứng viên.`;
+        successBox.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => { successBox.style.display = "none"; }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,673 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Talent AI Profile - Đăng nhập & Đăng ký</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%);
+      color: #f8fafc;
+      padding: 24px;
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* LEFT HERO PANEL */
+    .hero-panel {
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-full);
+      color: #a5b4fc;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #818cf8 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .feature-text h4 {
+      margin: 0 0 2px;
+      font-size: 14px;
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .feature-text p {
+      margin: 0;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .hero-footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* RIGHT FORM PANEL */
+    .form-panel {
+      padding: 48px;
+      background: #ffffff;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .tab-switcher {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: none;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .auth-header {
+      margin-bottom: 20px;
+    }
+
+    .auth-header h2 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      margin: 0 0 6px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .role-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: var(--transition);
+      background: #fff;
+    }
+
+    .role-card:hover {
+      border-color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .role-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .role-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .role-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .demo-accounts {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .demo-accounts strong {
+      color: var(--text-main);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .demo-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .demo-chip {
+      padding: 4px 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .demo-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--border-focus);
+    }
+
+    @media (max-width: 860px) {
+      .auth-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .hero-panel {
+        display: none;
+      }
+      .form-panel {
+        padding: 32px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-wrapper">
+    <!-- CỘT BÊN TRÁI: BRAND & TÍNH NĂNG NỔI BẬT -->
+    <div class="hero-panel">
+      <div>
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon">⚡</div>
+          <span>IT Talent AI</span>
+        </a>
+
+        <div style="margin-top: 36px;">
+          <div class="hero-badge">✨ Nền tảng AI thế hệ mới</div>
+          <h1 class="hero-title">Đánh giá Hồ sơ & Tuyển dụng <span>Thông minh bằng AI</span></h1>
+          <p class="hero-desc">
+            Tối ưu hóa hành trình nghề nghiệp IT của bạn: từ phân tích CV tự động, đo lường năng lực chuẩn xác đến đối sánh việc làm phù hợp nhất.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-icon">📄</div>
+              <div class="feature-text">
+                <h4>Trích xuất CV bằng AI</h4>
+                <p>Nhận diện chính xác 60+ kỹ năng, số năm kinh nghiệm và học vấn từ file PDF.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">📊</div>
+              <div class="feature-text">
+                <h4>Chấm điểm & Xếp cấp độ</h4>
+                <p>Hệ thống tự động chấm điểm theo trọng số chuẩn và phân cấp Intern $\rightarrow$ Senior.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">🎯</div>
+              <div class="feature-text">
+                <h4>Đối sánh Tuyển dụng (JD Matching)</h4>
+                <p>Khớp nối chính xác ứng viên phù hợp với từng bài đăng tuyển dụng theo tỷ lệ %.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-footer">
+        <span>© 2026 IT Talent AI Profile</span>
+        <span>•</span>
+        <span>FastAPI & MySQL & Claude LLM</span>
+      </div>
+    </div>
+
+    <!-- CỘT BÊN PHẢI: FORM ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div class="form-panel">
+      <div class="tab-switcher">
+        <button type="button" id="tabLogin" class="tab-btn active" onclick="switchTab('login')">Đăng nhập</button>
+        <button type="button" id="tabRegister" class="tab-btn" onclick="switchTab('register')">Đăng ký mới</button>
+      </div>
+
+      <div id="error" class="error"></div>
+      <div id="success" class="success" style="display: none;"></div>
+
+      <!-- FORM ĐĂNG NHẬP -->
+      <div id="viewLogin">
+        <div class="auth-header">
+          <h2>Chào mừng trở lại! 👋</h2>
+          <p>Nhập thông tin tài khoản của bạn để tiếp tục</p>
+        </div>
+
+        <form id="formLogin" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="vd: nguyen.senior@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Mật khẩu</label>
+            <input type="password" id="loginPassword" placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="btnLoginSubmit" style="width: 100%; margin-top: 8px; padding: 12px;">Đăng nhập ngay</button>
+        </form>
+
+        <!-- TÀI KHOẢN MẪU ĐỂ TEST NHANH -->
+        <div class="demo-accounts">
+          <strong>⚡ Tài khoản mẫu để kiểm thử nhanh (Mật khẩu: 12345678):</strong>
+          <div class="demo-btn-group">
+            <span class="demo-chip" onclick="fillDemo('nguyen.senior@example.com')">👨‍💻 Ứng viên Senior</span>
+            <span class="demo-chip" onclick="fillDemo('tran.middle@example.com')">👨‍💻 Ứng viên Middle</span>
+            <span class="demo-chip" onclick="fillDemo('hr.techcorp@example.com')">🏢 Nhà tuyển dụng</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM ĐĂNG KÝ -->
+      <div id="viewRegister" style="display: none;">
+        <div class="auth-header">
+          <h2>Tạo tài khoản mới 🚀</h2>
+          <p>Bắt đầu xây dựng hồ sơ năng lực IT chuyên nghiệp</p>
+        </div>
+
+        <form id="formRegister" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="regFullName">Họ và tên</label>
+            <input type="text" id="regFullName" placeholder="vd: Nguyễn Văn An" required>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" placeholder="vd: an.nguyen@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Mật khẩu</label>
+            <input type="password" id="regPassword" placeholder="Tối thiểu 8 ký tự" minlength="8" required autocomplete="new-password">
+          </div>
+
+          <div class="form-group">
+            <label>Bạn tham gia với vai trò</label>
+            <div class="role-grid">
+              <div class="role-card selected" id="roleCandidate" onclick="selectRole('candidate')">
+                <span class="role-title">👨‍💻 Ứng viên</span>
+                <span class="role-desc">Tải CV & Đánh giá năng lực</span>
+              </div>
+              <div class="role-card" id="roleRecruiter" onclick="selectRole('recruiter')">
+                <span class="role-title">🏢 Tuyển dụng</span>
+                <span class="role-desc">Đăng JD & Tìm nhân tài</span>
+              </div>
+            </div>
+            <input type="hidden" id="regRole" value="candidate">
+          </div>
+
+          <!-- THÔNG TIN DOANH NGHIỆP BẮT BUỘC KHI ĐĂNG KÝ NHÀ TUYỂN DỤNG -->
+          <div id="recruiterFields" style="display: none; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); padding: 18px; margin-top: 14px; animation: modalSlideUp 0.3s ease;">
+            <div style="font-size: 12px; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+              <span>🏢</span> Thông Tin Doanh Nghiệp & Nhu Cầu Tuyển Dụng
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="companyName">Tên công ty / Doanh nghiệp (*)</label>
+              <input type="text" id="companyName" placeholder="vd: TechCorp Global, VNG Corporation">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="recruiterTitle">Chức vụ của bạn (*)</label>
+              <input type="text" id="recruiterTitle" placeholder="vd: Head of Talent Acquisition, HR Tech Lead">
+            </div>
+
+            <div class="row" style="margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="companySize">Quy mô công ty</label>
+                <select id="companySize" style="background: rgba(30, 41, 59, 0.9); color: #fff; border-color: rgba(255, 255, 255, 0.15);">
+                  <option value="1-50">1 - 50 nhân sự (Startup)</option>
+                  <option value="50-200" selected>50 - 200 nhân sự (SME)</option>
+                  <option value="200-500">200 - 500 nhân sự</option>
+                  <option value="500+">500+ nhân sự (Enterprise)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="companyIndustry">Lĩnh vực hoạt động</label>
+                <select id="companyIndustry" style="background: rgba(30, 41, 59, 0.9); color: #fff; border-color: rgba(255, 255, 255, 0.15);">
+                  <option value="software">Phần mềm & SaaS</option>
+                  <option value="fintech">Fintech & Ngân hàng</option>
+                  <option value="ecommerce">Thương mại điện tử</option>
+                  <option value="ai">AI & Big Data</option>
+                  <option value="outsourcing">Outsourcing & IT Services</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="companyWebsite">Website / LinkedIn công ty</label>
+              <input type="url" id="companyWebsite" placeholder="https://company.example.com">
+            </div>
+          </div>
+
+          <button type="submit" id="btnRegSubmit" style="width: 100%; margin-top: 8px; padding: 12px;">Hoàn tất đăng ký</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    let currentSelectedRole = 'candidate';
+
+    function selectRole(role) {
+      currentSelectedRole = role;
+      document.getElementById('regRole').value = role;
+      document.getElementById('roleCandidate').className = 'role-card' + (role === 'candidate' ? ' selected' : '');
+      document.getElementById('roleRecruiter').className = 'role-card' + (role === 'recruiter' ? ' selected' : '');
+      
+      const recFields = document.getElementById('recruiterFields');
+      if (recFields) {
+        recFields.style.display = role === 'recruiter' ? 'block' : 'none';
+      }
+    }
+
+    function fillDemo(email) {
+      document.getElementById("loginEmail").value = email;
+      document.getElementById("loginPassword").value = "12345678";
+    }
+
+    function showSuccess(msg) {
+      const box = document.getElementById("success");
+      if (box) {
+        box.textContent = msg;
+        box.style.display = "block";
+      }
+    }
+
+    function clearSuccess() {
+      const box = document.getElementById("success");
+      if (box) {
+        box.textContent = "";
+        box.style.display = "none";
+      }
+    }
+
+    function switchTab(tab) {
+      clearError();
+      clearSuccess();
+      const isLogin = tab === 'login';
+      document.getElementById("viewLogin").style.display = isLogin ? "block" : "none";
+      document.getElementById("viewRegister").style.display = isLogin ? "none" : "block";
+      document.getElementById("tabLogin").className = "tab-btn" + (isLogin ? " active" : "");
+      document.getElementById("tabRegister").className = "tab-btn" + (!isLogin ? " active" : "");
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      clearError();
+      clearSuccess();
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!password || password.length < 8) {
+        showError("Mật khẩu phải có từ 8 ký tự trở lên");
+        return;
+      }
+
+      const btn = document.getElementById("btnLoginSubmit");
+      btn.disabled = true;
+      btn.textContent = "Đang đăng nhập...";
+
+      try {
+        const res = await api("/auth/login", "POST", { email, password });
+        if (!res) {
+          btn.disabled = false;
+          btn.textContent = "Đăng nhập ngay";
+          return;
+        }
+
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("role", res.role);
+
+        showSuccess("Đăng nhập thành công! Đang chuyển hướng...");
+
+        setTimeout(() => {
+          if (res.role === "candidate") {
+            location.href = "profile.html";
+          } else if (res.role === "recruiter") {
+            location.href = "jobs.html";
+          } else {
+            location.href = "profile.html";
+          }
+        }, 400);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = "Đăng nhập ngay";
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      clearError();
+      clearSuccess();
+
+      const fullName = document.getElementById("regFullName").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const role = document.getElementById("regRole").value;
+
+      if (!password || password.length < 8) {
+        showError("Mật khẩu phải có từ 8 ký tự trở lên");
+        return;
+      }
+
+      if (role === "recruiter") {
+        const companyName = document.getElementById("companyName")?.value.trim();
+        const recruiterTitle = document.getElementById("recruiterTitle")?.value.trim();
+        if (!companyName || !recruiterTitle) {
+          showError("Vui lòng điền Tên công ty và Chức vụ công tác của bạn để hoàn tất hồ sơ nhà tuyển dụng");
+          return;
+        }
+      }
+
+      const btn = document.getElementById("btnRegSubmit");
+      btn.disabled = true;
+      btn.textContent = "Đang xử lý...";
+
+      try {
+        const payload = {
+          full_name: fullName,
+          email: email,
+          password: password,
+          role: role
+        };
+
+        const res = await api("/auth/register", "POST", payload);
+        if (!res) {
+          btn.disabled = false;
+          btn.textContent = "Hoàn tất đăng ký";
+          return;
+        }
+
+        showSuccess("Đăng ký thành công! Đang tự động đăng nhập...");
+
+        const loginRes = await api("/auth/login", "POST", { email, password });
+        if (loginRes) {
+          localStorage.setItem("token", loginRes.token);
+          localStorage.setItem("role", loginRes.role);
+          setTimeout(() => {
+            if (loginRes.role === "candidate") {
+              location.href = "profile.html";
+            } else {
+              location.href = "jobs.html";
+            }
+          }, 500);
+        } else {
+          switchTab("login");
+          document.getElementById("loginEmail").value = email;
+          btn.disabled = false;
+          btn.textContent = "Hoàn tất đăng ký";
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = "Hoàn tất đăng ký";
+      }
+    }
+  </script>
+</body>
+</html>
+

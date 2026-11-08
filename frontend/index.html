@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Talent AI Profile - Nền tảng Đánh giá & Tuyển dụng IT Thông minh</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* GLASS NAV */
+    .landing-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .landing-nav .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .landing-nav .brand .icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary-gradient);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      max-width: 1100px;
+      margin: 80px auto 60px;
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: var(--radius-full);
+      color: #a5b4fc;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .hero-main-title {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .hero-main-title span.gradient-text {
+      background: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      max-width: 720px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero {
+      padding: 14px 32px;
+      font-size: 16px;
+      border-radius: var(--radius-lg);
+    }
+
+    /* FEATURES GRID */
+    .features-section {
+      max-width: 1140px;
+      margin: 60px auto 100px;
+      padding: 0 24px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-title h2 {
+      font-size: 32px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-xl);
+      padding: 32px 24px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      background: rgba(30, 41, 59, 0.85);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      color: #f8fafc;
+      margin: 0;
+    }
+
+    .feature-card p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* FOOTER */
+    .landing-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 36px 40px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-main-title {
+        font-size: 36px;
+      }
+      .landing-nav {
+        padding: 16px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="landing-nav">
+    <a href="index.html" class="brand">
+      <div class="icon">⚡</div>
+      <span>IT Talent AI</span>
+    </a>
+
+    <div class="nav-actions">
+      <a href="http://localhost:8000/docs" target="_blank" class="btn btn-secondary" style="background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.15);">API Swagger Docs</a>
+      <a href="login.html" class="btn btn-hero" style="padding: 9px 20px; font-size: 14px;">Đăng nhập / Đăng ký</a>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-badge-pill">
+      <span>✨ Trí tuệ Nhân tạo Thế hệ Mới</span>
+      <span>•</span>
+      <span>Nhóm 10</span>
+    </div>
+
+    <h1 class="hero-main-title">
+      Đánh Giá Năng Lực IT & Đối Sánh Tuyển Dụng <br>
+      <span class="gradient-text">Chuẩn Xác Với Sức Mạnh AI</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Tự động trích xuất kỹ năng từ CV, định lượng năng lực chuyên môn theo 4 cấp bậc tiêu chuẩn, và kết nối bài đăng tuyển dụng với nhân tài công nghệ chỉ trong vài giây.
+    </p>
+
+    <div class="hero-cta">
+      <a href="login.html" class="btn btn-hero">Bắt đầu trải nghiệm ngay 🚀</a>
+      <a href="http://localhost:8000/docs" target="_blank" class="btn btn-secondary btn-hero" style="background: rgba(255,255,255,0.06); color: #fff; border-color: rgba(255,255,255,0.15);">Xem tài liệu API (24 endpoints)</a>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section">
+    <div class="section-title">
+      <h2>Bốn Trụ Cột Công Nghệ Cốt Lõi</h2>
+      <p>Kiến trúc phân tầng tối ưu giữa FastAPI, MySQL và Mô hình Ngôn ngữ Lớn (LLM)</p>
+    </div>
+
+    <div class="grid-4">
+      <div class="feature-card">
+        <div class="card-icon">🤖</div>
+        <h3>AI Trích xuất CV (PDF)</h3>
+        <p>Tiếp nhận file PDF, phân tích ngữ nghĩa thông minh để trích xuất 60+ kỹ năng chuẩn, số năm kinh nghiệm và học vấn.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon">📊</div>
+        <h3>Chấm điểm & Phân cấp</h3>
+        <p>Thuật toán trọng số tự động đo lường độ thành thạo và thời gian sử dụng, phân cấp chuẩn xác: Intern, Junior, Middle, Senior.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon">🎯</div>
+        <h3>Đối sánh Tuyển dụng (JD)</h3>
+        <p>Tính toán phần trăm phù hợp dựa trên 60% kỹ năng bắt buộc, 20% kỹ năng ưu tiên và 20% số năm kinh nghiệm yêu cầu.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon">🔒</div>
+        <h3>Bảo mật Chuẩn Doanh nghiệp</h3>
+        <p>Mã hóa mật khẩu bằng bcrypt, xác thực người dùng bằng JWT Token 60 phút và phân quyền nghiêm ngặt giữa Ứng viên & Nhà tuyển dụng.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="landing-footer">
+    <p>© 2026 Hệ thống IT Talent AI Profile (Nhóm 10). Mọi quyền được bảo lưu.</p>
+    <p style="font-size: 12px; margin-top: 4px;">Phát triển trên nền tảng FastAPI • MySQL 8 • SQLAlchemy • Anthropic Claude API</p>
+  </footer>
+
+</body>
+</html>

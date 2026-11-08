@@ -2,7 +2,7 @@ import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "mysql+pymysql://root:123456@localhost:3306/it_talent_ai"
+    DATABASE_URL: str = "mysql+pymysql://root:123456@localhost:3306/it_talent_ai?charset=utf8mb4"
     JWT_SECRET_KEY: str = "it_talent_ai_secret_key_development_2026_super_secure"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
