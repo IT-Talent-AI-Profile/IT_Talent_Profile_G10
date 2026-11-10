@@ -1,7 +1,10 @@
 import pytest
 from fastapi import HTTPException
-from app.models import Job, JobSkill
+from fastapi.testclient import TestClient
+from app.main import app
+from app.models import Job, JobSkill, User
 from app.schemas.job import JobIn, JobSkillIn
+from app.core.security import create_token
 from app.services.job_service import (
     create_job,
     list_jobs,
@@ -11,9 +14,12 @@ from app.services.job_service import (
     set_status,
     add_skill,
     remove_skill,
-    find_job
+    find_job,
 )
 
+# ============================================================
+# PHẦN 1: UNIT TESTS CHO SERVICE LAYER (JD-01, JD-02)
+# ============================================================
 
 def test_create_and_get_job(db, data):
     """Kiểm tra tạo JD mới và đọc lại thông tin đúng như yêu cầu DoD."""
@@ -21,7 +27,7 @@ def test_create_and_get_job(db, data):
     job_in = JobIn(
         title="Senior Python Backend Engineer",
         description="Tuyển lập trình viên Python phát triển hệ thống phân tán",
-        min_years=3.5
+        min_years=3.5,
     )
 
     job_dict = create_job(db, recruiter_a.id, job_in)
@@ -33,7 +39,6 @@ def test_create_and_get_job(db, data):
     assert job_dict["is_open"] is True
     assert job_dict["skills"] == []
 
-    # Đọc lại thông tin qua get_job
     fetched = get_job(db, recruiter_a.id, job_dict["id"])
     assert fetched["id"] == job_dict["id"]
     assert fetched["title"] == job_dict["title"]
@@ -110,13 +115,11 @@ def test_add_and_update_skill(db, data):
     skill1 = data["skill1"]
     job = create_job(db, recruiter_a.id, JobIn(title="JD Python & Cloud", description="", min_years=2))
 
-    # 1. Gắn kỹ năng với is_required = True
     res1 = add_skill(db, recruiter_a.id, job["id"], JobSkillIn(skill_id=skill1.id, is_required=True))
     assert len(res1["skills"]) == 1
     assert res1["skills"][0]["skill_id"] == skill1.id
     assert res1["skills"][0]["is_required"] is True
 
-    # 2. Gắn lại cùng kỹ năng với is_required = False -> Phải cập nhật, không tăng số lượng
     res2 = add_skill(db, recruiter_a.id, job["id"], JobSkillIn(skill_id=skill1.id, is_required=False))
     assert len(res2["skills"]) == 1
     assert res2["skills"][0]["skill_id"] == skill1.id
@@ -169,18 +172,108 @@ def test_delete_job_cascades_skills(db, data):
     add_skill(db, recruiter_a.id, job_id, JobSkillIn(skill_id=skill1.id, is_required=True))
     add_skill(db, recruiter_a.id, job_id, JobSkillIn(skill_id=skill2.id, is_required=False))
 
-    # Xác nhận trong DB có 2 dòng job_skills
     count_before = db.query(JobSkill).filter(JobSkill.job_id == job_id).count()
     assert count_before == 2
 
-    # Xóa JD
     delete_job(db, recruiter_a.id, job_id)
 
-    # Kiểm tra job không còn
     with pytest.raises(HTTPException) as exc_info:
         find_job(db, recruiter_a.id, job_id)
     assert exc_info.value.status_code == 404
 
-    # Kiểm tra job_skills liên quan bị xóa theo hoàn toàn
     count_after = db.query(JobSkill).filter(JobSkill.job_id == job_id).count()
     assert count_after == 0
+
+
+# ============================================================
+# PHẦN 2: INTEGRATION TESTS CHO REST API ENDPOINTS (JD-03)
+# ============================================================
+
+client = TestClient(app)
+
+
+def headers_of(user):
+    token = create_token({"sub": str(user.id), "user_id": user.id, "email": user.email, "role": user.role})
+    return {"Authorization": "Bearer " + token}
+
+
+@pytest.fixture
+def ha(data):
+    return headers_of(data["a"])
+
+
+@pytest.fixture
+def hb(data):
+    return headers_of(data["b"])
+
+
+@pytest.fixture
+def hc(db):
+    ungvien = User(email="test_c@test.com", password_hash="x", role="candidate")
+    db.add(ungvien)
+    db.commit()
+    return headers_of(ungvien)
+
+
+def tao_jd(headers, title="Backend Junior"):
+    res = client.post("/jobs", json={"title": title, "description": "Mô tả", "min_years": 1}, headers=headers)
+    assert res.status_code == 200
+    return res.json()
+
+
+def test_chua_dang_nhap_tra_401():
+    assert client.get("/jobs").status_code == 401
+    assert client.post("/jobs", json={"title": "x"}).status_code == 401
+
+
+def test_ung_vien_goi_api_ntd_tra_403(hc):
+    assert client.get("/jobs", headers=hc).status_code == 403
+    assert client.post("/jobs", json={"title": "x"}, headers=hc).status_code == 403
+
+
+def test_du_lieu_sai_tra_422(ha):
+    assert client.post("/jobs", json={"title": ""}, headers=ha).status_code == 422
+    assert client.post("/jobs", json={"title": "x", "min_years": -1}, headers=ha).status_code == 422
+
+
+def test_tao_xem_sua_xoa(ha):
+    job = tao_jd(ha)
+    assert job["is_open"] is True
+    assert client.get("/jobs/" + str(job["id"]), headers=ha).json()["title"] == "Backend Junior"
+    res = client.put("/jobs/" + str(job["id"]), json={"title": "Backend Middle", "description": "Mới", "min_years": 2}, headers=ha)
+    assert res.json()["title"] == "Backend Middle"
+    assert res.json()["min_years"] == 2
+    assert client.delete("/jobs/" + str(job["id"]), headers=ha).json() == {"message": "Đã xóa JD"}
+    assert client.get("/jobs/" + str(job["id"]), headers=ha).status_code == 404
+
+
+def test_ntd_khac_khong_doc_duoc_jd_tra_404(ha, hb):
+    job = tao_jd(ha)
+    url = "/jobs/" + str(job["id"])
+    assert client.get(url, headers=hb).status_code == 404
+    assert client.put(url, json={"title": "x"}, headers=hb).status_code == 404
+    assert client.delete(url, headers=hb).status_code == 404
+    assert client.patch(url + "/status", json={"is_open": False}, headers=hb).status_code == 404
+    assert client.get("/jobs", headers=hb).json() == []
+
+
+def test_dong_mo_jd(ha):
+    job = tao_jd(ha)
+    url = "/jobs/" + str(job["id"]) + "/status"
+    assert client.patch(url, json={"is_open": False}, headers=ha).json()["is_open"] is False
+    assert client.patch(url, json={"is_open": True}, headers=ha).json()["is_open"] is True
+
+
+def test_gan_va_go_ky_nang(ha, data):
+    job = tao_jd(ha)
+    base = "/jobs/" + str(job["id"]) + "/skills"
+    skill_id = data["skill1"].id
+    res = client.post(base, json={"skill_id": skill_id, "is_required": True}, headers=ha)
+    assert len(res.json()["skills"]) == 1
+    res = client.post(base, json={"skill_id": skill_id, "is_required": False}, headers=ha)
+    assert len(res.json()["skills"]) == 1
+    assert res.json()["skills"][0]["is_required"] is False
+    assert client.post(base, json={"skill_id": 999999, "is_required": True}, headers=ha).status_code == 404
+    res = client.delete(base + "/" + str(skill_id), headers=ha)
+    assert res.json()["skills"] == []
+    assert client.delete(base + "/" + str(skill_id), headers=ha).status_code == 404
