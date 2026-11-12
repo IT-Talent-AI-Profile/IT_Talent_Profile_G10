@@ -100,6 +100,15 @@ def test_cv_upload_get_and_confirm_flow(cv_test_context):
     assert confirm.json()["years_experience"] == 2.5
     assert confirm.json()["education"] == "Bachelor of Information Technology"
     assert len(confirm.json()["skills"]) == 1
+    assert confirm.json()["total_score"] == 68.0
+    assert confirm.json()["level"] == "Middle"
+    assert confirm.json()["ai_summary"]
+
+    evaluation = client.get("/evaluation/me")
+    assert evaluation.status_code == 200, evaluation.text
+    assert evaluation.json()["total_score"] == 68.0
+    assert evaluation.json()["level"] == "Middle"
+    assert evaluation.json()["groups"]["Backend"] == 68.0
 
     cv_record = db.query(cv_service.CvFile).filter_by(id=cv_id).one()
     assert cv_record.status == "confirmed"
