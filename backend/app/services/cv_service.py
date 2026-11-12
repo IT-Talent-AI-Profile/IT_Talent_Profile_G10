@@ -12,6 +12,7 @@ from app.models.user import User
 from app.schemas.cv import CvAnalysisOut, CvConfirmIn, CvSkillOut, CvStatusOut
 from app.schemas.profile import ProfileOut
 from app.services.ai_client import extract_cv
+from app.services.evaluation_service import evaluate_profile
 from app.services.profile_service import format_profile_out
 from app.utils.pdf_parser import (
     InvalidPdfError,
@@ -274,6 +275,9 @@ def confirm_cv(
         cv_file.ai_result = confirmed_result.model_dump()
         cv_file.status = "confirmed"
         cv_file.error_message = None
+        db.flush()
+        db.expire(profile, ["skills"])
+        evaluate_profile(profile)
         db.commit()
         db.refresh(profile)
     except Exception:
