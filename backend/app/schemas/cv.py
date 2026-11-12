@@ -1,16 +1,18 @@
 from typing import Optional
+
 from pydantic import BaseModel, Field
+
 from app.schemas.profile import ProfileSkillIn
 
 
 class AiSkill(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=100)
     proficiency: int = Field(ge=1, le=5)
     years: float = Field(default=0, ge=0)
 
 
 class CvResult(BaseModel):
-    skills: list[AiSkill]
+    skills: list[AiSkill] = Field(default_factory=list)
     years_experience: float = Field(default=0, ge=0)
     education: Optional[str] = None
     experience: Optional[str] = None
@@ -19,15 +21,15 @@ class CvResult(BaseModel):
 class CvSkillOut(BaseModel):
     skill_id: int
     name: str
-    proficiency: int
-    years_used: float
+    proficiency: int = Field(ge=1, le=5)
+    years_used: float = Field(default=0, ge=0)
 
 
 class CvAnalysisOut(BaseModel):
     cv_id: int
-    skills: list[CvSkillOut]
-    skills_not_found: list[str] = []
-    years_experience: float = 0
+    skills: list[CvSkillOut] = Field(default_factory=list)
+    skills_not_found: list[str] = Field(default_factory=list)
+    years_experience: float = Field(default=0, ge=0)
     education: Optional[str] = None
     experience: Optional[str] = None
 
@@ -40,7 +42,7 @@ class CvStatusOut(BaseModel):
 
 
 class CvConfirmIn(BaseModel):
-    skills: list[ProfileSkillIn]
+    skills: list[ProfileSkillIn] = Field(default_factory=list)
     years_experience: float = Field(default=0, ge=0)
     education: Optional[str] = None
     experience: Optional[str] = None
