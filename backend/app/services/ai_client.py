@@ -166,7 +166,7 @@ def extract_cv(
 
             return result
 
-        except (json.JSONDecodeError, ValidationError, ValueError) as error:
+        except (json.JSONDecodeError, ValidationError, ValueError, RuntimeError) as error:
             last_error = error
 
             if attempt < MAX_RETRIES:
@@ -178,6 +178,11 @@ hoặc không đáp ứng cấu trúc dữ liệu yêu cầu.
 Hãy tạo lại JSON hợp lệ theo đúng cấu trúc.
 Chỉ trả về JSON, không thêm nội dung khác.
 """
+
+    if isinstance(last_error, RuntimeError):
+        raise RuntimeError(
+            f"Không thể gọi hoặc phân tích phản hồi AI sau 3 lần thử: {last_error}"
+        ) from last_error
 
     raise ValueError(
         f"Không thể phân tích phản hồi AI sau 3 lần thử: {last_error}"
