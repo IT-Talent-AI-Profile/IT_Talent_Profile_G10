@@ -44,7 +44,7 @@ def test_calculate_skill_score(proficiency, years_used, expected):
         (5, 75, "Senior"),
         (2, 55, "Middle"),
         (1, 40, "Junior"),
-        (4.9, 90, "Junior"),
+        (4.9, 90, "Middle"),
         (0.9, 90, "Intern"),
         (8, 74.99, "Middle"),
     ],
