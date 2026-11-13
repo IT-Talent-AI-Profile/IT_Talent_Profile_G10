@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey, UniqueConstraint, CheckConstraint, Index
+from sqlalchemy import Column, Integer, Float, ForeignKey, UniqueConstraint, CheckConstraint, Index, SmallInteger
 from sqlalchemy.dialects.mysql import TINYINT
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -15,7 +15,7 @@ class ProfileSkill(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     profile_id = Column(Integer, ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
     skill_id = Column(Integer, ForeignKey("skills.id", ondelete="RESTRICT"), nullable=False)
-    proficiency = Column(TINYINT, nullable=False)
+    proficiency = Column(SmallInteger().with_variant(TINYINT(), "mysql"), nullable=False)
     years_used = Column(Float, default=0)
     profile = relationship("Profile", back_populates="skills")
     skill = relationship("Skill")
