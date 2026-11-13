@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.profile import ProfileSkillIn
 
@@ -12,6 +12,8 @@ class AiSkill(BaseModel):
 
 
 class CvResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     skills: list[AiSkill] = Field(default_factory=list)
     years_experience: float = Field(default=0, ge=0)
     education: Optional[str] = None
