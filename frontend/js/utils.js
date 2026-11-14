@@ -57,10 +57,10 @@ function showMenu(role) {
   notifyBtn.type = "button";
   notifyBtn.className = "nav-notify-btn";
   notifyBtn.style.marginLeft = "auto";
-  notifyBtn.style.marginRight = "10px";
+  notifyBtn.style.marginRight = "14px";
   notifyBtn.title = "Thông báo & Lời mời ứng tuyển";
   notifyBtn.innerHTML = `
-    <span>🔔</span>
+    <span class="bell-icon">🔔</span>
     <span class="nav-notify-badge" id="navNotifyBadge">1</span>
   `;
 
@@ -106,17 +106,25 @@ function showMenu(role) {
   nav.appendChild(notifyBtn);
   nav.appendChild(dropdown);
 
-  // Vai trò người dùng badge
-  const roleBadge = document.createElement("span");
-  roleBadge.className = `badge ${role === "candidate" ? "badge-junior" : "badge-middle"}`;
-  roleBadge.style.marginRight = "12px";
-  roleBadge.textContent = role === "candidate" ? "Ứng viên" : "Nhà tuyển dụng";
-  nav.appendChild(roleBadge);
+  // User Capsule Chip: Vai trò & Trạng thái trực tuyến
+  const userChip = document.createElement("div");
+  userChip.className = "nav-user-chip";
+  const isRecruiter = role === "recruiter";
+  userChip.innerHTML = `
+    <div class="user-avatar-badge ${isRecruiter ? 'avatar-recruiter' : 'avatar-candidate'}">
+      ${isRecruiter ? '🏢' : '👨‍💻'}
+    </div>
+    <div class="user-details">
+      <span class="user-role-label">${isRecruiter ? 'Nhà tuyển dụng' : 'Ứng viên'}</span>
+      <span class="user-status-online"><span class="status-pulse-dot"></span>Trực tuyến</span>
+    </div>
+  `;
+  nav.appendChild(userChip);
 
   // Nút đăng xuất
   const button = document.createElement("button");
   button.className = "logout";
-  button.textContent = "Đăng xuất";
+  button.innerHTML = `<span>🚪</span><span>Đăng xuất</span>`;
   button.onclick = logout;
   nav.appendChild(button);
 

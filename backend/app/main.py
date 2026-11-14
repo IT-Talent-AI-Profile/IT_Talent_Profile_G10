@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.router import api_router
 
 app = FastAPI(
@@ -19,6 +21,11 @@ app.add_middleware(
 
 # Nạp router chính tích hợp tất cả các module
 app.include_router(api_router)
+
+# Mount thư mục Frontend để chạy web trực tiếp qua http://127.0.0.1:8000/web/
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/web", StaticFiles(directory=frontend_dir, html=True), name="web")
 
 @app.get("/", tags=["Hệ thống"])
 def root():
