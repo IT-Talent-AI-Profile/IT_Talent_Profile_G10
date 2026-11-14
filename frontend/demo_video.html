@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Mô Phỏng Demo - IT Talent AI Profile</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    @keyframes click-ripple {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .ripple {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.6);
+      pointer-events: none;
+      animation: click-ripple 0.55s ease-out forwards;
+      transform-origin: center;
+    }
+    .screen-grid {
+      background-size: 24px 24px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-transparent text-slate-100 p-1 md:p-3 flex flex-col items-center justify-center font-sans antialiased select-none">
+
+  <!-- Container Player -->
+  <div class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Top Player Header -->
+    <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+        <span class="text-xs font-semibold text-slate-400 ml-2 tracking-wide flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          IT_Talent_AI_Profile_Demo_Master_1080p.mp4
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <span class="flex items-center gap-1.5 text-xs font-medium text-rose-400 bg-rose-950/60 border border-rose-800/60 px-2.5 py-0.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+          SIMULATED LIVE DEMO
+        </span>
+        <span class="text-xs bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded">
+          6/6 Chức Năng S1 & S2
+        </span>
+      </div>
+    </div>
+
+    <!-- Main 16:9 Simulation Canvas Screen -->
+    <div id="video-viewport" class="relative w-full aspect-video bg-slate-950 overflow-hidden screen-grid flex flex-col justify-between">
+      
+      <!-- Virtual Cursor (Mouse Pointer) -->
+      <div id="virtual-cursor" class="absolute z-50 pointer-events-none transition-all duration-700 ease-out flex items-start -top-10 -left-10" style="transform: translate(120px, 160px);">
+        <svg class="w-6 h-6 text-indigo-400 drop-shadow-[0_2px_8px_rgba(99,102,241,0.8)] filter" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 2v18l5-5 4 8 3-1.5-4-8h7L4 2z"/>
+        </svg>
+        <span id="cursor-action-label" class="opacity-0 transition-opacity duration-300 ml-1 mt-3 text-[10px] font-bold bg-indigo-600 text-white px-1.5 py-0.5 rounded shadow">
+          Click
+        </span>
+      </div>
+
+      <!-- Watermark & Resolution info -->
+      <div class="absolute top-3 right-3 z-30 pointer-events-none flex flex-col items-end opacity-60">
+        <span class="text-[11px] font-mono text-cyan-400 font-bold tracking-widest">IT TALENT AI PROFILE</span>
+        <span class="text-[9px] font-mono text-slate-400">1920x1080 • 60 FPS • AI DEMO</span>
+      </div>
+
+      <!-- Toast Notification in Screen -->
+      <div id="screen-toast" class="absolute top-5 left-1/2 -translate-x-1/2 z-40 bg-emerald-500/90 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-lg border border-emerald-400/40 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="screen-toast-msg">Thành công!</span>
+      </div>
+
+      <!-- SCENE RENDERER CONTAINER -->
+      <div id="scene-container" class="relative w-full h-full flex items-center justify-center p-4">
+        <!-- Scenes are dynamically rendered and animated here via JS -->
+      </div>
+
+      <!-- Synchronized Narration / Subtitle Overlay -->
+      <div class="relative z-30 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-6 pb-3 px-6 text-center">
+        <div class="inline-flex items-center gap-2 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-800/60 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+            🎙️ Thuyết Minh Tự Động
+          </span>
+          <span id="narration-scene-tag" class="text-xs text-slate-400 font-medium">Cảnh 1/6: Đăng nhập & Đăng ký</span>
+        </div>
+        <p id="narration-text" class="text-sm md:text-base font-semibold text-slate-100 max-w-3xl mx-auto leading-snug min-h-[48px] flex items-center justify-center">
+          Chào mừng quý thầy cô và hội đồng! Bắt đầu với màn hình Đăng nhập hiện đại, hỗ trợ chọn nhanh tài khoản mẫu 1 chạm và phân quyền doanh nghiệp.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Video Scrubber & Playback Controls Bar -->
+    <div class="bg-slate-950 px-4 py-3 border-t border-slate-800 flex flex-col gap-2.5">
+      
+      <!-- Progress Bar (Scrubber) -->
+      <div class="flex items-center gap-3">
+        <span id="time-current" class="text-xs font-mono text-slate-400 w-10 text-right">00:00</span>
+        <div id="progress-container" class="relative flex-1 h-2 bg-slate-800 rounded-full cursor-pointer group">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full w-0 transition-all duration-100"></div>
+          <div id="progress-thumb" class="absolute top-1/2 -translate-y-1/2 left-0 -ml-1.5 w-3.5 h-3.5 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+        <span id="time-total" class="text-xs font-mono text-slate-400 w-10">02:30</span>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        
+        <!-- Left: Play/Pause/Prev/Next -->
+        <div class="flex items-center space-x-2">
+          <button id="btn-prev" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Cảnh trước">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+
+          <button id="btn-play" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center">
+            <svg id="icon-play" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+
+          <button id="btn-next" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Cảnh tiếp">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <button id="btn-replay" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Phát lại từ đầu">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+        </div>
+
+        <!-- Center: Scene Quick Jump Chips -->
+        <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll py-1">
+          <button onclick="jumpToScene(0)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium transition whitespace-nowrap" data-scene="0">1. Đăng nhập/Đăng ký</button>
+          <button onclick="jumpToScene(1)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="1">2. Hồ sơ 3D & Lộ trình</button>
+          <button onclick="jumpToScene(2)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="2">3. Tóm tắt AI Claude</button>
+          <button onclick="jumpToScene(3)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="3">4. 60 Kỹ năng</button>
+          <button onclick="jumpToScene(4)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="4">5. Chuông & Lời mời</button>
+          <button onclick="jumpToScene(5)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="5">6. Đối sánh Tuyển dụng</button>
+        </div>
+
+        <!-- Right: Speed & Mode -->
+        <div class="flex items-center space-x-2">
+          <select id="speed-select" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500">
+            <option value="1">1.0x Chuẩn</option>
+            <option value="1.5">1.5x Nhanh</option>
+            <option value="2">2.0x Siêu tốc</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JavaScript Simulation Core -->
+  <script>
+    // Total Duration: 150 seconds (2m 30s)
+    const TOTAL_DURATION = 150; 
+    let currentTime = 0;
+    let isPlaying = true;
+    let playbackSpeed = 1.0;
+    let timer = null;
+
+    // 6 Demo Scenes Definitions
+    const scenes = [
+      {
+        id: 0,
+        start: 0,
+        end: 25,
+        tag: "Cảnh 1/6: Đăng nhập & Đăng ký phân quyền [TK-01, TK-02, TK-04]",
+        subtitles: [
+          { at: 0, text: "Chào mừng hội đồng! Đây là màn hình Đăng nhập hiện đại với giao diện SaaS cao cấp, thiết kế responsive trên mọi thiết bị." },
+          { at: 7, text: "Hệ thống hỗ trợ 1 chạm chọn nhanh tài khoản mẫu: Ứng viên (Võ Chí Đức) hoặc Nhà tuyển dụng." },
+          { at: 15, text: "Khi chuyển sang tab Đăng ký Doanh nghiệp, các trường thông tin pháp lý công ty bắt buộc xuất hiện tự động theo yêu cầu TK-04." },
+          { at: 21, text: "Đăng nhập thành công với mã hóa Bcrypt và JWT Token an toàn, chuyển thẳng vào Hồ sơ năng lực." }
+        ],
+        render: () => `
+          <div class="w-full max-w-md bg-slate-900/90 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+            <div class="text-center mb-5">
+              <div class="inline-flex p-2 bg-indigo-950/80 border border-indigo-700/60 rounded-xl mb-2 text-indigo-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0c0 2.473.345 4.866.99 7.132"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white">Đăng Nhập Tài Khoản</h3>
+              <p class="text-xs text-slate-400">IT Talent AI Profile System</p>
+            </div>
+
+            <!-- Quick Account Chips -->
+            <div class="mb-4">
+              <label class="text-[11px] font-semibold text-slate-400 block mb-1.5">⚡ Đăng nhập nhanh 1 chạm (Tài khoản mẫu):</label>
+              <div class="flex gap-2">
+                <button id="demo-btn-candidate" class="flex-1 py-1.5 px-2 bg-indigo-950/70 border border-indigo-700/60 hover:bg-indigo-900 text-indigo-300 text-xs font-medium rounded-lg flex items-center justify-center gap-1 transition">
+                  👤 Ứng viên: Võ Chí Đức
+                </button>
+                <button id="demo-btn-recruiter" class="flex-1 py-1.5 px-2 bg-purple-950/70 border border-purple-700/60 hover:bg-purple-900 text-purple-300 text-xs font-medium rounded-lg flex items-center justify-center gap-1 transition">
+                  🏢 Nhà tuyển dụng
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs text-slate-300 block mb-1">Email / Tài khoản</label>
+                <input id="demo-input-email" type="text" value="chiducofficial@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="text-xs text-slate-300 block mb-1">Mật khẩu</label>
+                <input id="demo-input-pass" type="password" value="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 outline-none">
+              </div>
+              <button id="demo-btn-submit" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition mt-2">
+                Đăng Nhập Ngay →
+              </button>
+            </div>
+          </div>
+        `,
+        actions: [
+          { at: 5, cursor: [420, 180], click: "#demo-btn-candidate", onAction: () => {
+            showToast("Đã nạp thông tin Ứng viên mẫu: chiducofficial@gmail.com");
+          }},
+          { at: 18, cursor: [520, 320], click: "#demo-btn-submit", onAction: () => {
+            showToast("Đăng nhập thành công! Đang chuyển hướng...");
+          }}
+        ]
+      },
+      {
+        id: 1,
+        start: 25,
+        end: 50,
+        tag: "Cảnh 2/6: Hồ sơ năng lực 3D & Lộ trình sự nghiệp [HS-01, HS-03]",
+        subtitles: [
+          { at: 25, text: "Chuyển sang trang Hồ sơ cá nhân (profile.html) với hiệu ứng thẻ 3D Tilt Card tương tác chuyển động theo góc nghiêng chuột." },
+          { at: 32, text: "Khung avatar nổi bật với viền LED Conic Gradient xoay tròn, cùng các huy hiệu định danh chuyên môn." },
+          { at: 40, text: "Đặc biệt là Thước đo Lộ trình Sự nghiệp (Career Progression): hiển thị rõ từ Thực tập sinh lên Junior, Middle và Senior." },
+          { at: 46, text: "Nút 'Chỉnh sửa hồ sơ' tích hợp modal validate chuẩn hóa thông tin cá nhân và liên kết mạng xã hội." }
+        ],
+        render: () => `
+          <div class="w-full max-w-2xl bg-slate-900/90 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur-md flex flex-col md:flex-row gap-6 items-center">
+            
+            <!-- 3D Avatar Card -->
+            <div id="demo-3d-card" class="relative group p-4 bg-slate-950/70 border border-indigo-500/30 rounded-xl flex flex-col items-center text-center shadow-lg transition-transform duration-300">
+              <div class="relative w-24 h-24 mb-3">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 animate-spin" style="animation-duration: 6s; padding: 3px;">
+                  <div class="w-full h-full bg-slate-950 rounded-full"></div>
+                </div>
+                <div class="absolute inset-1.5 rounded-full bg-gradient-to-br from-indigo-700 to-purple-800 flex items-center justify-center text-2xl font-black text-white shadow-inner">
+                  VĐ
+                </div>
+              </div>
+              <h4 class="text-sm font-bold text-white">Võ Chí Đức</h4>
+              <p class="text-[11px] text-indigo-400 font-medium">Fullstack Developer</p>
+              <div class="mt-2 flex gap-1">
+                <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-700 px-1.5 py-0.5 rounded">🟢 Sẵn sàng nhận việc</span>
+              </div>
+            </div>
+
+            <!-- Profile Info & Career Roadmap -->
+            <div class="flex-1 w-full space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Lộ trình thăng tiến sự nghiệp</span>
+                  <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    🎯 Cột mốc hiện tại: <span class="text-indigo-400">Junior Fullstack (65% to Middle)</span>
+                  </h4>
+                </div>
+                <button id="demo-btn-edit-profile" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg transition">
+                  ✏️ Chỉnh sửa hồ sơ
+                </button>
+              </div>
+
+              <!-- Career Timeline Bar -->
+              <div class="relative pt-2 pb-1">
+                <div class="flex justify-between text-[10px] font-semibold text-slate-400 mb-1.5">
+                  <span class="text-emerald-400">✓ Intern</span>
+                  <span class="text-indigo-400 font-bold">● Junior (Hiện tại)</span>
+                  <span class="text-slate-500">○ Middle</span>
+                  <span class="text-slate-500">○ Senior</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-500 rounded-full w-[65%] shadow-sm"></div>
+                </div>
+              </div>
+
+              <!-- Quick stats -->
+              <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+                <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400">Kỹ năng chuẩn</div>
+                  <div class="text-xs font-bold text-cyan-400">12 Skills</div>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400">Điểm đối sánh AI</div>
+                  <div class="text-xs font-bold text-emerald-400">96% Top 1</div>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400">Lời mời làm việc</div>
+                  <div class="text-xs font-bold text-purple-400">01 Lời mời</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 30, cursor: [360, 240], onAction: () => {
+            const card = document.getElementById("demo-3d-card");
+            if(card) card.style.transform = "perspective(500px) rotateY(-12deg) rotateX(6deg)";
+          }},
+          { at: 36, cursor: [440, 240], onAction: () => {
+            const card = document.getElementById("demo-3d-card");
+            if(card) card.style.transform = "perspective(500px) rotateY(12deg) rotateX(-6deg)";
+          }},
+          { at: 42, cursor: [620, 180], click: "#demo-btn-edit-profile", onAction: () => {
+            showToast("Mở Modal Chỉnh Sửa Hồ Sơ Năng Lực [HS-01]");
+          }}
+        ]
+      },
+      {
+        id: 2,
+        start: 50,
+        end: 75,
+        tag: "Cảnh 3/6: Đánh giá & Tóm tắt năng lực AI Claude LLM [AI-01, AI-02, AI-03]",
+        subtitles: [
+          { at: 50, text: "Đây là điểm nhấn công nghệ cốt lõi: Module Đánh giá năng lực tích hợp trí tuệ nhân tạo Claude 3.5 Sonnet." },
+          { at: 57, text: "Hệ thống tự động phân tích dữ liệu kỹ năng, dự án và kinh nghiệm để sinh ra đoạn tóm tắt chuyên môn bằng tiếng Việt chuẩn xác." },
+          { at: 65, text: "Văn bản hiển thị font UTF-8 sắc nét, khống chế chặt chẽ dưới 150 từ theo đúng tiêu chí kiểm thử AI-02." },
+          { at: 71, text: "Bao gồm đánh giá điểm mạnh cốt lõi và khuyến nghị nâng cao kỹ năng DevOps/Cloud để thăng tiến lên Middle." }
+        ],
+        render: () => `
+          <div class="w-full max-w-2xl bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <span class="p-2 bg-gradient-to-tr from-indigo-600 to-purple-600 text-white rounded-xl shadow-md">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </span>
+                <div>
+                  <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                    Tóm Tắt Năng Lực Bằng AI Claude 3.5 Sonnet
+                    <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 px-1.5 py-0.2 rounded font-mono">148 từ (Chuẩn &lt;150 từ)</span>
+                  </h4>
+                  <p class="text-[11px] text-slate-400">Tự động phân tích & tối ưu hóa hồ sơ năng lực tiếng Việt chuẩn UTF-8</p>
+                </div>
+              </div>
+              <button id="demo-btn-regen-ai" class="text-xs bg-indigo-600/80 hover:bg-indigo-600 text-white px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition shadow">
+                ⚡ Tạo lại tóm tắt
+              </button>
+            </div>
+
+            <!-- AI Response Box with streaming effect -->
+            <div class="bg-slate-950/80 border border-indigo-500/30 rounded-xl p-4 text-xs text-slate-200 leading-relaxed font-sans relative">
+              <p id="demo-ai-text" class="mb-2">
+                "Ứng viên Võ Chí Đức là một lập trình viên Fullstack tiềm năng với nền tảng vững vàng về Python (FastAPI), cơ sở dữ liệu MySQL và kiến trúc frontend hiện đại. Sở hữu tư duy giải quyết vấn đề mạch lạc và khả năng xây dựng các API hướng dịch vụ chuẩn hóa RESTful."
+              </p>
+              <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap gap-2 text-[11px]">
+                <span class="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">💪 Điểm mạnh: FastAPI, MySQL, Tailwind CSS</span>
+                <span class="text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">🚀 Đề xuất: Bổ sung Docker & CI/CD pipeline để đạt mốc Middle</span>
+              </div>
+            </div>
+
+            <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400">
+              <span class="flex items-center gap-1">🔒 Kết nối an toàn: Backend AI Client ➔ Anthropic API (Mock/Real Switch)</span>
+              <span class="text-indigo-400 font-mono">Status: 200 OK • latency: 420ms</span>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 55, cursor: [580, 160], click: "#demo-btn-regen-ai", onAction: () => {
+            showToast("Claude 3.5 Sonnet đang phân tích kỹ năng...");
+            const aiText = document.getElementById("demo-ai-text");
+            if(aiText) {
+              aiText.innerHTML = `<span class="text-indigo-400 animate-pulse">⚡ Đang sinh đánh giá mới theo chuẩn 150 từ tiếng Việt...</span>`;
+              setTimeout(() => {
+                aiText.innerHTML = `"Ứng viên Võ Chí Đức là một lập trình viên Fullstack tài năng, thể hiện sự thành thạo vượt trội ở cả backend FastAPI và UI/UX tương tác hiện đại. Thích hợp cho các dự án FinTech và AI Product."`;
+              }, 1200);
+            }
+          }}
+        ]
+      },
+      {
+        id: 3,
+        start: 75,
+        end: 100,
+        tag: "Cảnh 4/6: Quản lý 60 kỹ năng chuẩn hóa & Thanh tiến trình [HS-02]",
+        subtitles: [
+          { at: 75, text: "Tiếp theo là Bảng quản lý kỹ năng chuyên môn (HS-02) được cấu trúc hóa theo 60 kỹ năng IT chuẩn." },
+          { at: 83, text: "Phân chia rõ ràng thành các nhóm: Frontend, Backend, Cơ sở dữ liệu và Cloud / DevOps." },
+          { at: 90, text: "Người dùng có thể đánh giá mức độ từ 1 đến 5 sao, thanh tiến trình tương tác sẽ phản hồi trực quan theo thời gian thực." },
+          { at: 96, text: "Thao tác Thêm/Sửa/Xóa kỹ năng được đồng bộ trực tiếp vào cơ sở dữ liệu MySQL một cách tức thì." }
+        ],
+        render: () => `
+          <div class="w-full max-w-2xl bg-slate-900/90 border border-slate-700/60 rounded-2xl p-5 shadow-2xl backdrop-blur-md">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  🛠️ Quản Lý Kỹ Năng Chuyên Môn
+                  <span class="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-700 px-2 py-0.5 rounded">60 Chuẩn IT</span>
+                </h4>
+                <p class="text-[11px] text-slate-400">Đánh giá sao 1-5 & hiển thị thanh đo năng lực trực quan</p>
+              </div>
+              <button id="demo-btn-add-skill" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition">
+                + Thêm kỹ năng
+              </button>
+            </div>
+
+            <!-- Skills List with progress bar -->
+            <div class="space-y-2.5">
+              
+              <!-- Skill Item 1 -->
+              <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div class="w-36">
+                  <div class="text-xs font-semibold text-white">Python / FastAPI</div>
+                  <div class="text-[10px] text-indigo-400">Backend Development</div>
+                </div>
+                <div class="flex-1 mx-4">
+                  <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                    <span>Thành thạo</span>
+                    <span class="text-cyan-400 font-bold">100%</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-cyan-400 rounded-full w-full"></div>
+                  </div>
+                </div>
+                <div class="text-amber-400 text-xs tracking-widest">★★★★★</div>
+              </div>
+
+              <!-- Skill Item 2 -->
+              <div id="demo-skill-item-2" class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between transition-colors">
+                <div class="w-36">
+                  <div class="text-xs font-semibold text-white">JavaScript / React</div>
+                  <div class="text-[10px] text-purple-400">Frontend UI/UX</div>
+                </div>
+                <div class="flex-1 mx-4">
+                  <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                    <span>Khá</span>
+                    <span id="demo-react-percent" class="text-purple-400 font-bold">80%</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div id="demo-react-bar" class="h-full bg-purple-500 rounded-full w-[80%] transition-all duration-500"></div>
+                  </div>
+                </div>
+                <div id="demo-react-stars" class="text-amber-400 text-xs tracking-widest cursor-pointer">★★★★☆</div>
+              </div>
+
+              <!-- Skill Item 3 -->
+              <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div class="w-36">
+                  <div class="text-xs font-semibold text-white">MySQL Database</div>
+                  <div class="text-[10px] text-emerald-400">Database Engine</div>
+                </div>
+                <div class="flex-1 mx-4">
+                  <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                    <span>Khá</span>
+                    <span class="text-emerald-400 font-bold">80%</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-emerald-500 rounded-full w-[80%]"></div>
+                  </div>
+                </div>
+                <div class="text-amber-400 text-xs tracking-widest">★★★★☆</div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 86, cursor: [630, 240], click: "#demo-react-stars", onAction: () => {
+            showToast("Nâng cấp kỹ năng React lên 5 sao (100%)");
+            const bar = document.getElementById("demo-react-bar");
+            const pct = document.getElementById("demo-react-percent");
+            const stars = document.getElementById("demo-react-stars");
+            if(bar) bar.style.width = "100%";
+            if(pct) { pct.textContent = "100%"; pct.className = "text-emerald-400 font-bold"; }
+            if(stars) stars.textContent = "★★★★★";
+          }},
+          { at: 94, cursor: [630, 140], click: "#demo-btn-add-skill", onAction: () => {
+            showToast("Mở danh mục chọn từ 60 chuẩn kỹ năng IT");
+          }}
+        ]
+      },
+      {
+        id: 4,
+        start: 100,
+        end: 125,
+        tag: "Cảnh 5/6: Chuông thông báo Navbar & Hộp thư Lời mời [HS-03]",
+        subtitles: [
+          { at: 100, text: "Về phía Ứng viên: Hệ thống thông báo được tích hợp trực tiếp tại biểu tượng Chuông (🔔) trên thanh điều hướng Navbar." },
+          { at: 107, text: "Chấm đỏ nhấp nháy phát tín hiệu khi có lời mời phỏng vấn mới từ Doanh nghiệp tuyển dụng." },
+          { at: 114, text: "Click vào chuông mở ra Popup danh sách thông báo 3D Glassmorphism với đầy đủ tên công ty, vị trí ứng tuyển và mức lương." },
+          { at: 120, text: "Ứng viên có thể bấm 'Đồng ý phỏng vấn' hoặc 'Tạm bỏ qua', hệ thống sẽ ghi nhận và phản hồi ngay lập tức." }
+        ],
+        render: () => `
+          <div class="w-full max-w-xl bg-slate-900/90 border border-slate-700/60 rounded-2xl p-6 shadow-2xl backdrop-blur-md relative">
+            
+            <!-- Navbar Mockup -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                <span class="text-xs font-bold text-white">IT Talent AI</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-300">Hồ sơ</span>
+                <span class="text-xs text-slate-300">Việc làm</span>
+                
+                <!-- Notification Bell Button -->
+                <div class="relative">
+                  <button id="demo-nav-bell" class="p-1.5 text-slate-200 hover:text-white bg-slate-800/80 rounded-lg relative transition">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+                    <span id="demo-bell-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></span>
+                  </button>
+                </div>
+
+                <div class="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">Đ</div>
+              </div>
+            </div>
+
+            <!-- Notification Dropdown Panel Mockup -->
+            <div id="demo-notif-dropdown" class="bg-slate-950/95 border border-indigo-500/40 rounded-xl p-4 shadow-xl">
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                  🔔 Thông Báo Mới Nhất
+                  <span class="text-[9px] bg-red-950 text-red-400 border border-red-800 px-1.5 py-0.2 rounded">1 chưa đọc</span>
+                </span>
+                <span class="text-[10px] text-slate-400 hover:text-indigo-400 cursor-pointer">Đánh dấu đã đọc</span>
+              </div>
+
+              <!-- Notification Card -->
+              <div class="bg-indigo-950/40 border border-indigo-700/50 rounded-xl p-3 space-y-2">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">FPT</div>
+                    <div>
+                      <h5 class="text-xs font-bold text-white">FPT Software</h5>
+                      <p class="text-[10px] text-indigo-300">Vị trí: Fullstack Python / FastAPI Engineer</p>
+                    </div>
+                  </div>
+                  <span class="text-[9px] text-slate-400">10 phút trước</span>
+                </div>
+                <p class="text-[11px] text-slate-300">
+                  "Chào bạn Đức, hồ sơ của bạn đạt 96% độ phù hợp với dự án AI của chúng tôi. Chúng tôi trân trọng gửi lời mời bạn tham gia buổi phỏng vấn trực tuyến..."
+                </p>
+                <div class="flex gap-2 pt-1">
+                  <button id="demo-btn-accept-inv" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg shadow transition">
+                    ✓ Đồng ý phỏng vấn
+                  </button>
+                  <button id="demo-btn-ignore-inv" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition">
+                    Tạm bỏ qua
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 108, cursor: [565, 140], click: "#demo-nav-bell", onAction: () => {
+            showToast("Mở Dropdown Thông Báo & Lời Mời Phỏng Vấn");
+          }},
+          { at: 118, cursor: [440, 310], click: "#demo-btn-accept-inv", onAction: () => {
+            showToast("Đã đồng ý lời mời phỏng vấn từ FPT Software!");
+            const btn = document.getElementById("demo-btn-accept-inv");
+            if(btn) {
+              btn.textContent = "✓ Đã Chấp Nhận Lời Mời";
+              btn.className = "flex-1 py-1.5 bg-slate-800 text-emerald-400 font-semibold text-xs rounded-lg";
+            }
+          }}
+        ]
+      },
+      {
+        id: 5,
+        start: 125,
+        end: 150,
+        tag: "Cảnh 6/6: Trung tâm Tuyển dụng JD & Đối sánh AI 96% [JD-01, JD-02, JD-04]",
+        subtitles: [
+          { at: 125, text: "Chuyển sang góc nhìn Nhà tuyển dụng (jobs.html): Bảng điều khiển quản lý tin tuyển dụng với thống kê Hologram 3D trực quan." },
+          { at: 132, text: "Nút '⚡ Xem Đối Sánh AI' kích hoạt thuật toán tính toán độ tương đồng giữa yêu cầu công việc và hồ sơ ứng viên." },
+          { at: 140, text: "Modal hiển thị ứng viên Võ Chí Đức xếp Top 1 với 96% mức độ tương thích kỹ năng, kèm radar phân tích chi tiết." },
+          { at: 146, text: "Toàn bộ 6/6 cụm chức năng Sprint 1 và Sprint 2 đã hoàn thành xuất sắc, sẵn sàng 100% cho buổi nghiệm thu!" }
+        ],
+        render: () => `
+          <div class="w-full max-w-2xl bg-slate-900/90 border border-slate-700/60 rounded-2xl p-5 shadow-2xl backdrop-blur-md">
+            
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  💼 Trung Tâm Quản Lý Tin Tuyển Dụng & Đối Sánh AI
+                </h4>
+                <p class="text-[11px] text-slate-400">Quản lý JD, trạng thái Đang tuyển/Đã đóng và xếp hạng ứng viên AI</p>
+              </div>
+              <button id="demo-btn-new-jd" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow">
+                + Đăng tin mới
+              </button>
+            </div>
+
+            <!-- Job Post Card -->
+            <div class="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 rounded-xl p-3.5 space-y-3 transition">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <h5 class="text-xs font-bold text-white">Senior Python / FastAPI Developer</h5>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-1.5 py-0.2 rounded">Đang tuyển</span>
+                  </div>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Phòng Công nghệ AI • Lương: 25M - 35M VNĐ • Hà Nội/Remote</p>
+                </div>
+                
+                <!-- AI Match Button -->
+                <button id="demo-btn-match-ai" class="text-xs bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-lg shadow-indigo-600/30 flex items-center gap-1 transition">
+                  ⚡ Xem Đối Sánh AI
+                </button>
+              </div>
+
+              <!-- Match Candidates Preview Popup Mockup -->
+              <div id="demo-match-modal" class="bg-slate-900 border border-indigo-500/50 rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between text-[11px] font-bold text-indigo-300">
+                  <span>🏆 Kết Quả Đối Sánh AI (Top Ứng Viên Phù Hợp Nhất)</span>
+                  <span class="text-emerald-400 font-mono">Radar Match Active</span>
+                </div>
+
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">Đ</div>
+                    <div>
+                      <div class="text-xs font-bold text-white">Võ Chí Đức</div>
+                      <div class="text-[10px] text-slate-400">Fullstack • Python, FastAPI, MySQL, React</div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center gap-3">
+                    <div class="text-right">
+                      <span class="text-sm font-extrabold text-emerald-400">96%</span>
+                      <div class="text-[9px] text-emerald-300">Cực kỳ phù hợp</div>
+                    </div>
+                    <button class="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded font-medium hover:bg-indigo-500">
+                      Gửi Lời Mời
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 133, cursor: [610, 160], click: "#demo-btn-match-ai", onAction: () => {
+            showToast("Kích hoạt thuật toán AI Matching đối sánh ứng viên!");
+          }}
+        ]
+      }
+    ];
+
+    // Core Controls
+    function getCurrentScene() {
+      for (let s of scenes) {
+        if (currentTime >= s.start && currentTime < s.end) return s;
+      }
+      return scenes[scenes.length - 1];
+    }
+
+    let activeSceneId = -1;
+
+    function renderActiveScene() {
+      const scene = getCurrentScene();
+      if (activeSceneId !== scene.id) {
+        activeSceneId = scene.id;
+        document.getElementById("scene-container").innerHTML = scene.render();
+        document.getElementById("narration-scene-tag").textContent = scene.tag;
+        
+        // Update scene chips
+        document.querySelectorAll(".scene-chip").forEach(chip => {
+          const sId = parseInt(chip.getAttribute("data-scene"));
+          if(sId === scene.id) {
+            chip.className = "scene-chip text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium transition whitespace-nowrap shadow";
+          } else {
+            chip.className = "scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
+          }
+        });
+      }
+
+      // Check actions in current scene
+      if (scene.actions) {
+        scene.actions.forEach(act => {
+          if (currentTime === act.at) {
+            moveCursor(act.cursor[0], act.cursor[1]);
+            if (act.click) {
+              setTimeout(() => {
+                triggerClick(act.cursor[0], act.cursor[1], act.click);
+                if (act.onAction) act.onAction();
+              }, 400);
+            } else if (act.onAction) {
+              act.onAction();
+            }
+          }
+        });
+      }
+
+      // Subtitles
+      if (scene.subtitles) {
+        let bestSub = scene.subtitles[0].text;
+        for (let sub of scene.subtitles) {
+          if (currentTime >= sub.at) bestSub = sub.text;
+        }
+        document.getElementById("narration-text").textContent = bestSub;
+      }
+    }
+
+    function moveCursor(x, y) {
+      const cursor = document.getElementById("virtual-cursor");
+      cursor.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function triggerClick(x, y, selector) {
+      const viewport = document.getElementById("video-viewport");
+      const ripple = document.createElement("div");
+      ripple.className = "ripple";
+      ripple.style.left = `${x - 4}px`;
+      ripple.style.top = `${y - 4}px`;
+      viewport.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+
+      const label = document.getElementById("cursor-action-label");
+      label.classList.remove("opacity-0");
+      setTimeout(() => label.classList.add("opacity-0"), 500);
+
+      if (selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+          el.classList.add("scale-95");
+          setTimeout(() => el.classList.remove("scale-95"), 200);
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("screen-toast");
+      const text = document.getElementById("screen-toast-msg");
+      text.textContent = msg;
+      toast.classList.remove("opacity-0", "translate-y-2");
+      toast.classList.add("opacity-100", "translate-y-0");
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        toast.classList.remove("opacity-100", "translate-y-0");
+      }, 2500);
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updatePlaybackUI() {
+      document.getElementById("time-current").textContent = formatTime(currentTime);
+      const pct = (currentTime / TOTAL_DURATION) * 100;
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+      document.getElementById("progress-thumb").style.left = `${pct}%`;
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+      currentTime += 1;
+      if (currentTime >= TOTAL_DURATION) {
+        currentTime = 0; // Loop
+      }
+      updatePlaybackUI();
+      renderActiveScene();
+    }
+
+    function setPlaying(play) {
+      isPlaying = play;
+      document.getElementById("icon-play").classList.toggle("hidden", isPlaying);
+      document.getElementById("icon-pause").classList.toggle("hidden", !isPlaying);
+      if (isPlaying) {
+        clearInterval(timer);
+        timer = setInterval(tick, 1000 / playbackSpeed);
+      } else {
+        clearInterval(timer);
+      }
+    }
+
+    function jumpToScene(sceneId) {
+      const target = scenes.find(s => s.id === sceneId);
+      if (target) {
+        currentTime = target.start;
+        updatePlaybackUI();
+        renderActiveScene();
+      }
+    }
+
+    // Event Listeners
+    document.getElementById("btn-play").addEventListener("click", () => setPlaying(!isPlaying));
+    document.getElementById("btn-replay").addEventListener("click", () => {
+      currentTime = 0;
+      updatePlaybackUI();
+      renderActiveScene();
+      setPlaying(true);
+    });
+
+    document.getElementById("btn-prev").addEventListener("click", () => {
+      const current = getCurrentScene();
+      const prevId = Math.max(0, current.id - 1);
+      jumpToScene(prevId);
+    });
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      const current = getCurrentScene();
+      const nextId = Math.min(scenes.length - 1, current.id + 1);
+      jumpToScene(nextId);
+    });
+
+    document.getElementById("speed-select").addEventListener("change", (e) => {
+      playbackSpeed = parseFloat(e.target.value);
+      if (isPlaying) {
+        clearInterval(timer);
+        timer = setInterval(tick, 1000 / playbackSpeed);
+      }
+    });
+
+    document.getElementById("progress-container").addEventListener("click", (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      currentTime = Math.floor(pct * TOTAL_DURATION);
+      updatePlaybackUI();
+      renderActiveScene();
+    });
+
+    // Initialize
+    updatePlaybackUI();
+    renderActiveScene();
+    timer = setInterval(tick, 1000 / playbackSpeed);
+  </script>
+</body>
+</html>

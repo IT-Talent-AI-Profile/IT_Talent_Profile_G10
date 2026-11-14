@@ -1,7 +1,10 @@
+import os
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from app.models.user import User
 from app.models.profile import Profile
 from app.models.profile_skill import ProfileSkill
+from app.models.cv_file import CvFile
 from app.models.skill import Skill
 from app.schemas.profile import ProfileUpdate, ProfileSkillIn, ProfileSkillOut, ProfileOut
 from app.schemas.skill import SkillOut
@@ -152,3 +155,36 @@ def get_all_skills(db: Session) -> list[SkillOut]:
         SkillOut(id=s.id, name=s.name, group=s.skill_group)
         for s in skills
     ]
+
+
+def delete_my_profile_and_account(db: Session, user_id: int) -> dict:
+    """
+    Xóa hồ sơ và toàn bộ tài khoản của ứng viên (HS-04):
+    1. Kiểm tra tài khoản người dùng và hồ sơ.
+    2. Xóa các file CV vật lý lưu trong thư mục uploads/ (nếu có) để tránh file mồ côi.
+    3. Xóa User khỏi database -> Kích hoạt xóa dây chuyền (CASCADE) xóa profiles,
+       profile_skills, cv_files trong DB.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tài khoản người dùng"
+        )
+
+    # Xóa các file CV vật lý liên quan trong thư mục uploads nếu có
+    if user.profile:
+        cv_files = db.query(CvFile).filter(CvFile.profile_id == user.profile.id).all()
+        for cf in cv_files:
+            if cf.file_path and os.path.exists(cf.file_path):
+                try:
+                    os.remove(cf.file_path)
+                except OSError:
+                    pass
+
+    # Xóa user (database và SQLAlchemy relationship sẽ tự động cascade xóa profiles, profile_skills, cv_files)
+    db.delete(user)
+    db.commit()
+
+    return {"message": "Đã xóa hồ sơ và tài khoản thành công"}
+

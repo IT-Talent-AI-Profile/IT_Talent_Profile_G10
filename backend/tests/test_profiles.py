@@ -171,6 +171,22 @@ def test_add_profile_skill_invalid(auth_headers):
     }, headers=auth_headers["candidate"])
     assert res_404.status_code == 404
 
+    # proficiency = 0 -> 422 (KT-01)
+    res_0 = client.post("/profiles/me/skills", json={
+        "skill_id": 1,
+        "proficiency": 0,
+        "years_used": 1.0
+    }, headers=auth_headers["candidate"])
+    assert res_0.status_code == 422
+
+    # proficiency = 6 -> 422 (KT-01)
+    res_6 = client.post("/profiles/me/skills", json={
+        "skill_id": 1,
+        "proficiency": 6,
+        "years_used": 1.0
+    }, headers=auth_headers["candidate"])
+    assert res_6.status_code == 422
+
     # proficiency = 7 -> 422
     res_422 = client.post("/profiles/me/skills", json={
         "skill_id": 1,
@@ -199,3 +215,83 @@ def test_delete_profile_skill(auth_headers, db):
     # Xóa lại lần nữa -> 404
     del_again = client.delete(f"/profiles/me/skills/{skill.id}", headers=auth_headers["candidate"])
     assert del_again.status_code == 404
+
+
+# ==========================================
+# TEST TASK [HS-04]: Xóa hồ sơ và tài khoản
+# ==========================================
+def test_delete_profile_me_unauthorized():
+    res = client.delete("/profiles/me")
+    assert res.status_code in (401, 403)
+
+
+def test_delete_profile_me_recruiter_forbidden(auth_headers):
+    res = client.delete("/profiles/me", headers=auth_headers["recruiter"])
+    assert res.status_code == 403
+
+
+def test_delete_profile_me_cascade_and_orphan_cleanup(db):
+    import os
+    from app.models.cv_file import CvFile
+    from app.models.profile_skill import ProfileSkill
+
+    # 1. Tạo user ứng viên riêng biệt để test xóa
+    del_user = User(email="test_delete_hs04@test.com", password_hash="hash", role="candidate")
+    db.add(del_user)
+    db.commit()
+    db.refresh(del_user)
+
+    del_profile = Profile(
+        user_id=del_user.id,
+        full_name="Ứng viên Chuẩn Bị Xóa",
+        desired_position="DevOps",
+        is_public=True
+    )
+    db.add(del_profile)
+    db.commit()
+    db.refresh(del_profile)
+
+    # 2. Thêm 1 kỹ năng vào profile
+    skill = db.query(Skill).first()
+    ps = ProfileSkill(profile_id=del_profile.id, skill_id=skill.id, proficiency=4, years_used=1.5)
+    db.add(ps)
+
+    # 3. Tạo 1 file CV vật lý giả trong thư mục uploads và 1 dòng cv_files
+    upload_dir = "uploads"
+    os.makedirs(upload_dir, exist_ok=True)
+    dummy_file_path = os.path.join(upload_dir, f"test_cv_hs04_{del_user.id}.pdf")
+    with open(dummy_file_path, "wb") as f:
+        f.write(b"%PDF-1.4 dummy content for HS-04 cascade test")
+
+    cv_record = CvFile(
+        profile_id=del_profile.id,
+        file_name="test_cv_hs04.pdf",
+        file_path=dummy_file_path,
+        file_size=len(b"%PDF-1.4 dummy content for HS-04 cascade test"),
+        status="pending"
+    )
+    db.add(cv_record)
+    db.commit()
+
+    assert os.path.exists(dummy_file_path), "File PDF giả lập phải tồn tại trước khi xóa"
+
+    # 4. Tạo token và gọi DELETE /profiles/me
+    del_user_id = del_user.id
+    del_profile_id = del_profile.id
+    token = create_token({"user_id": del_user_id, "sub": str(del_user_id), "role": "candidate"})
+    headers = {"Authorization": f"Bearer {token}"}
+
+    res = client.delete("/profiles/me", headers=headers)
+    assert res.status_code == 200
+    assert "thành công" in res.json()["message"].lower()
+
+    # 5. Kiểm tra file mồ côi đã được dọn sạch khỏi ổ đĩa
+    assert not os.path.exists(dummy_file_path), "File PDF mồ côi trong uploads/ phải bị xóa theo"
+
+    # 6. Kiểm tra toàn bộ dữ liệu trong DB đã bị xóa dây chuyền (CASCADE)
+    db.commit()
+    assert db.query(User).filter(User.id == del_user_id).first() is None
+    assert db.query(Profile).filter(Profile.id == del_profile_id).first() is None
+    assert db.query(ProfileSkill).filter(ProfileSkill.profile_id == del_profile_id).count() == 0
+    assert db.query(CvFile).filter(CvFile.profile_id == del_profile_id).count() == 0
+

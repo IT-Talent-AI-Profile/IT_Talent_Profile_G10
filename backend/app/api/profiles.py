@@ -9,6 +9,7 @@ from app.services.profile_service import (
     update_my_profile,
     add_or_update_profile_skill,
     remove_profile_skill,
+    delete_my_profile_and_account,
 )
 
 router = APIRouter(prefix="/profiles", tags=["Hồ sơ ứng viên (Profiles)"])
@@ -69,3 +70,17 @@ def delete_skill_from_profile(
     - Trả lại hồ sơ mới nhất
     """
     return remove_profile_skill(db, current_user.id, skill_id)
+
+
+@router.delete("/me", summary="Xóa hồ sơ và tài khoản ứng viên (HS-04)")
+def delete_my_account_and_profile(
+    current_user: User = Depends(get_candidate),
+    db: Session = Depends(get_db)
+):
+    """
+    Xóa vĩnh viễn hồ sơ và tài khoản của ứng viên:
+    - Xóa các file CV vật lý trong thư mục uploads/ nếu có (tránh file mồ côi)
+    - Xóa tài khoản người dùng và tự động cascade xóa toàn bộ dữ liệu liên quan
+    """
+    return delete_my_profile_and_account(db, current_user.id)
+
