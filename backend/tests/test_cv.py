@@ -110,6 +110,12 @@ def test_cv_upload_get_and_confirm_flow(cv_test_context):
     assert evaluation.json()["level"] == "Middle"
     assert evaluation.json()["groups"]["Backend"] == 68.0
 
+    recalculated = client.post("/evaluation/me/recalculate")
+    assert recalculated.status_code == 200, recalculated.text
+    assert recalculated.json()["total_score"] == 68.0
+    assert recalculated.json()["level"] == "Middle"
+    assert recalculated.json()["groups"]["Backend"] == 68.0
+
     cv_record = db.query(cv_service.CvFile).filter_by(id=cv_id).one()
     assert cv_record.status == "confirmed"
     stored_file = cv_service.UPLOAD_DIR / Path(cv_record.file_path).name
