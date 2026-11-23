@@ -264,18 +264,32 @@ def confirm_cv(
         )
 
     try:
-        db.query(ProfileSkill).filter(ProfileSkill.profile_id == profile.id).delete(
-            synchronize_session=False
-        )
-        for item in request.skills:
-            db.add(
-                ProfileSkill(
-                    profile_id=profile.id,
-                    skill_id=item.skill_id,
-                    proficiency=item.proficiency,
-                    years_used=item.years_used,
-                )
+        existing_skills = (
+            db.query(ProfileSkill)
+            .filter(
+                ProfileSkill.profile_id == profile.id,
+                ProfileSkill.skill_id.in_(skill_ids),
             )
+            .all()
+            if skill_ids else []
+        )
+        existing_by_skill_id = {
+            item.skill_id: item for item in existing_skills
+        }
+        for item in request.skills:
+            existing = existing_by_skill_id.get(item.skill_id)
+            if existing is None:
+                db.add(
+                    ProfileSkill(
+                        profile_id=profile.id,
+                        skill_id=item.skill_id,
+                        proficiency=item.proficiency,
+                        years_used=item.years_used,
+                    )
+                )
+            else:
+                existing.proficiency = item.proficiency
+                existing.years_used = item.years_used
 
         profile.years_experience = request.years_experience
         profile.education = request.education
