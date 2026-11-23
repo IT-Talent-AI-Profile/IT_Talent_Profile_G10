@@ -126,7 +126,7 @@
       </div>
     </div>
 
-    <!-- MAIN 16:9 SIMULATION CANVAS SCREEN -->
+    <!-- MAIN 16:9 SIMULATION CANVAS SCREEN (HOÀN TOÀN THÔNG THOÁNG, KHÔNG BỊ CHE KHUẤT) -->
     <div id="video-viewport" class="relative w-full aspect-[16/9] bg-slate-950 overflow-hidden screen-grid flex flex-col justify-between">
       
       <!-- Virtual Cursor (Mouse Pointer) -->
@@ -151,31 +151,13 @@
         <span id="screen-toast-msg">Thao tác thành công!</span>
       </div>
 
-      <!-- DEDICATED ALGORITHM & LOGIC FLOATING CARD (VIETSUB POPUP) -->
-      <div id="algo-panel" class="absolute top-3 right-4 z-30 w-80 md:w-96 bg-slate-950/95 border border-indigo-500/50 rounded-xl p-3.5 shadow-2xl backdrop-blur-md transition-all duration-500 transform translate-x-0">
-        <div class="flex items-center justify-between border-b border-indigo-500/30 pb-2 mb-2">
-          <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            🧠 LOGIC & THUẬT TOÁN ĐÃ ÁP DỤNG
-          </span>
-          <span id="algo-badge" class="text-[10px] bg-indigo-900/80 text-indigo-300 px-2 py-0.5 rounded font-mono font-bold">AUTH</span>
-        </div>
-        <div id="algo-action-title" class="text-xs font-bold text-white mb-1.5 flex items-center gap-1">
-          <span>🎯 Thao tác:</span> <span class="text-emerald-400 font-semibold" id="algo-action-text">Khởi động hệ thống</span>
-        </div>
-        <div id="algo-content" class="text-[11px] text-slate-300 leading-relaxed font-sans space-y-1.5">
-          <!-- Updated dynamically per action -->
-          <p>Hệ thống tự động kích hoạt tiến trình mô phỏng các thao tác click trực tiếp và giải thích chi tiết thuật toán backend.</p>
-        </div>
-      </div>
-
-      <!-- SCENE RENDERER CONTAINER (SIMULATED PAGES RENDER HERE) -->
+      <!-- SCENE RENDERER CONTAINER (SIMULATED PAGES RENDER HERE - 100% UNBLOCKED) -->
       <div id="scene-container" class="relative w-full h-full flex items-center justify-center p-2 md:p-6 overflow-hidden">
         <!-- Scenes are dynamically rendered and animated here via JS -->
       </div>
 
-      <!-- SYNCHRONIZED NARRATION / SUBTITLE OVERLAY AT BOTTOM -->
-      <div class="relative z-20 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent pt-6 pb-3 px-6 text-center">
+      <!-- SYNCHRONIZED NARRATION / SUBTITLE OVERLAY AT BOTTOM OF SCREEN -->
+      <div class="relative z-20 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent pt-6 pb-2.5 px-6 text-center">
         <div class="inline-flex items-center gap-2 mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/90 px-2.5 py-0.5 rounded border border-indigo-700/60 flex items-center gap-1.5 shadow">
             <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
@@ -183,11 +165,42 @@
           </span>
           <span id="narration-scene-tag" class="text-xs text-slate-400 font-semibold">Cảnh 1/10</span>
         </div>
-        <p id="narration-text" class="text-xs md:text-sm font-semibold text-slate-100 max-w-4xl mx-auto leading-relaxed min-h-[44px] flex items-center justify-center">
+        <p id="narration-text" class="text-xs md:text-sm font-semibold text-slate-100 max-w-4xl mx-auto leading-relaxed min-h-[38px] flex items-center justify-center">
           Chào mừng hội đồng nghiệm thu! Bắt đầu từ trang Landing Page, con trỏ chuột nhấn vào nút 'Bắt đầu trải nghiệm ngay'.
         </p>
       </div>
 
+    </div>
+
+    <!-- DEDICATED ALGORITHM & LOGIC PANEL (ĐẶT BÊN DƯỚI KHUNG VIDEO - KHÔNG BAO GIỜ CHE KHUẤT MÀN HÌNH) -->
+    <div id="algo-panel" class="bg-slate-950/95 px-5 py-3 border-t border-slate-800 transition-all duration-300">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="text-xs font-black text-indigo-400 tracking-wider flex items-center gap-1.5">
+            <span>🧠</span> LOGIC & THUẬT TOÁN ĐÃ ÁP DỤNG
+          </span>
+          <span id="algo-badge" class="text-[10px] bg-indigo-900/80 text-indigo-300 border border-indigo-700/60 px-2 py-0.5 rounded font-mono font-bold">
+            AUTH
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <span class="text-slate-500 font-semibold">🎯 Thao tác vừa thực hiện:</span>
+            <span id="algo-action-text" class="text-emerald-400 font-bold">Khởi động hệ thống</span>
+          </div>
+          <button onclick="toggleAlgoPanel()" class="text-[10px] text-slate-400 hover:text-white bg-slate-800 border border-slate-700 px-2 py-0.5 rounded transition">
+            Ẩn/Hiện
+          </button>
+        </div>
+      </div>
+
+      <div id="algo-content-container" class="bg-slate-900/90 border border-slate-800/90 rounded-xl p-3 text-xs text-slate-300 leading-relaxed font-sans shadow-inner">
+        <div id="algo-content">
+          <p>Hệ thống tự động kích hoạt tiến trình mô phỏng các thao tác click trực tiếp trên giao diện và giải thích chi tiết logic backend bên dưới.</p>
+        </div>
+      </div>
     </div>
 
     <!-- VIDEO SCRUBBER & PLAYBACK CONTROLS BAR -->
@@ -377,7 +390,7 @@
             if (passInput) passInput.value = "12345678";
             showToast("Đã nạp tài khoản mẫu: nguyen.senior@example.com");
             updateAlgoPanel("CHỌN TÀI KHOẢN MẪU", "Nạp dữ liệu Ứng viên Senior", `
-              <p>• Email: <code class="text-indigo-400">nguyen.senior@example.com</code></p>
+              <p>• Email: <code class="text-indigo-400 font-mono">nguyen.senior@example.com</code></p>
               <p>• Hồ sơ đã được thiết lập sẵn trong CSDL MySQL với 6 năm kinh nghiệm thực chiến.</p>
             `);
           }},
@@ -1446,8 +1459,15 @@
       if (cEl) cEl.innerHTML = htmlContent;
 
       if (panel) {
-        panel.classList.add("border-cyan-400", "scale-[1.02]");
-        setTimeout(() => panel.classList.remove("border-cyan-400", "scale-[1.02]"), 600);
+        panel.classList.add("bg-indigo-950/60");
+        setTimeout(() => panel.classList.remove("bg-indigo-950/60"), 500);
+      }
+    }
+
+    function toggleAlgoPanel() {
+      const container = document.getElementById("algo-content-container");
+      if (container) {
+        container.classList.toggle("hidden");
       }
     }
 
