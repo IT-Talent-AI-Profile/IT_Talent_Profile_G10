@@ -1,3 +1,7 @@
+from fastapi import HTTPException
+from app.models import Profile, ProfileSkill
+
+PAGE_SIZE = 10
 MIN_PROFICIENCY = 3
 
 
@@ -28,3 +32,71 @@ def calc_match(profile, job):
     years_score = 20 if min_years == 0 else 20 * min(years / min_years, 1)
     percent = round(required_score + preferred_score + years_score, 1)
     return percent, matched, missing
+
+
+def parse_skill_ids(text):
+    ids = []
+    for part in text.split(","):
+        part = part.strip()
+        if part == "":
+            continue
+        if not part.isdigit():
+            raise HTTPException(status_code=422, detail="skill_ids phải là các số cách nhau bằng dấu phẩy, ví dụ 1,2")
+        ids.append(int(part))
+    return ids
+
+
+def candidate_to_item(profile):
+    return {
+        "id": profile.id,
+        "full_name": profile.full_name,
+        "desired_position": profile.desired_position,
+        "years_experience": profile.years_experience or 0,
+        "level": profile.level,
+        "total_score": profile.total_score,
+    }
+
+
+def search_candidates(db, skill_ids_text, level, page):
+    query = db.query(Profile).filter(Profile.is_public == True)
+    for skill_id in set(parse_skill_ids(skill_ids_text)):
+        query = query.filter(Profile.skills.any(ProfileSkill.skill_id == skill_id))
+    if level != "":
+        query = query.filter(Profile.level == level)
+    total = query.count()
+    profiles = query.order_by(Profile.total_score.desc(), Profile.id).offset((page - 1) * PAGE_SIZE).limit(PAGE_SIZE).all()
+    return {
+        "total": total,
+        "page": page,
+        "page_size": PAGE_SIZE,
+        "items": [candidate_to_item(profile) for profile in profiles],
+    }
+
+
+def get_candidate_detail(db, profile_id):
+    profile = db.query(Profile).filter(Profile.id == profile_id, Profile.is_public == True).first()
+    if profile is None:
+        raise HTTPException(status_code=404, detail="Không tìm thấy hồ sơ ứng viên")
+    return {
+        "id": profile.id,
+        "full_name": profile.full_name,
+        "desired_position": profile.desired_position,
+        "years_experience": profile.years_experience or 0,
+        "education": profile.education,
+        "experience": profile.experience,
+        "github_url": profile.github_url,
+        "is_public": profile.is_public,
+        "level": profile.level,
+        "total_score": profile.total_score,
+        "ai_summary": profile.ai_summary,
+        "skills": [
+            {
+                "skill_id": item.skill_id,
+                "name": item.skill.name,
+                "group": item.skill.skill_group,
+                "proficiency": item.proficiency,
+                "years_used": item.years_used or 0,
+            }
+            for item in profile.skills
+        ],
+    }
