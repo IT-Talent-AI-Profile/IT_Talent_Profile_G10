@@ -133,7 +133,7 @@ def test_pdf_extracts_text_from_multiple_pages():
 
 
 def test_pdf_no_text_scanned_image():
-    with pytest.raises(PdfNoTextError, match="Không trích xuất được văn bản"):
+    with pytest.raises(PdfNoTextError, match="tối thiểu 50 ký tự"):
         extract_pdf_text(create_blank_pdf())
 
 
