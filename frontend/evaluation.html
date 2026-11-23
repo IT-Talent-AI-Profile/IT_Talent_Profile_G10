@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo Cáo Đánh Giá Năng Lực AI - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --hero-bg: radial-gradient(130% 120% at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    }
+
+    body {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 30%, rgba(168, 85, 247, 0.06) 0px, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* 3D HERO HEADER */
+    .hero-3d-wrapper {
+      perspective: 1200px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero-3d-card {
+      background: var(--hero-bg);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-blob {
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-glow-blob-2 {
+      position: absolute;
+      bottom: -60px;
+      left: 15%;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .hero-identity {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .avatar-3d-container {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .hero-meta h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px 0;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-meta p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13.5px;
+    }
+
+    .hero-badges-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge-level {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .lvl-intern { background: #0284c7; color: #fff; }
+    .lvl-junior { background: #16a34a; color: #fff; }
+    .lvl-middle { background: #d97706; color: #fff; }
+    .lvl-senior { background: #9333ea; color: #fff; }
+
+    /* CARDS */
+    .card-3d {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    /* SCORE BANNER GRID */
+    .score-summary-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .total-score-circle-box {
+      background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 100%);
+      border: 1.5px solid #c7d2fe;
+      border-radius: var(--radius-xl);
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.08);
+    }
+
+    .score-giant-number {
+      font-size: 52px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    /* CAREER PROGRESSION ROADMAP */
+    .roadmap-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      margin: 16px 0 10px 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .roadmap-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .roadmap-steps-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .roadmap-step.active {
+      color: #4f46e5;
+      font-weight: 800;
+    }
+
+    /* GROUPS GRID */
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .group-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: all 0.2s ease;
+    }
+
+    .group-card:hover {
+      border-color: #c7d2fe;
+      background: #ffffff;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .group-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .group-score {
+      font-size: 16px;
+      font-weight: 800;
+      color: #4f46e5;
+    }
+
+    .group-bar-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .group-bar-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #6366f1, #3b82f6);
+    }
+
+    /* AI SUMMARY CARD */
+    .ai-summary-card {
+      background: linear-gradient(145deg, #ffffff 0%, #fdf4ff 100%);
+      border: 1.5px solid #f0abfc;
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .ai-pill-verified {
+      font-size: 11px;
+      font-weight: 700;
+      background: #fdf2f8;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+      padding: 3px 12px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* EMPTY STATE (DoD Requirement) */
+    .empty-state-box {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      background: #ffffff;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: var(--radius-xl);
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .score-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 1300px; width: 95%; padding-bottom: 60px;">
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <!-- 1. 3D HERO HEADER -->
+    <div class="hero-3d-wrapper">
+      <div class="hero-3d-card">
+        <div class="hero-glow-blob"></div>
+        <div class="hero-glow-blob-2"></div>
+        <div class="hero-content">
+          <div class="hero-identity">
+            <div class="avatar-3d-container" id="avatarLetter">U</div>
+            <div class="hero-meta">
+              <h1 id="candFullName">Báo Cáo Đánh Giá Năng Lực AI</h1>
+              <p id="candDesiredRole">Phân tích đa chiều về trình độ chuyên môn, điểm số theo từng nhóm kỹ năng và nhận định từ LLM</p>
+              <div class="hero-badges-row">
+                <span id="badgeLevel" class="badge-level lvl-intern">Intern</span>
+                <span style="font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.15); color: #fff; padding: 3px 10px; border-radius: 9999px;" id="badgeExp">0.0 năm EXP</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="profile.html" class="btn secondary" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); font-size: 13px;">
+              <span>👤</span> Trang Hồ Sơ
+            </a>
+            <a href="upload_cv.html" class="btn secondary" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); font-size: 13px;">
+              <span>📄</span> Tải Lên CV
+            </a>
+            <button type="button" class="btn" id="btnReevaluate" onclick="reEvaluateProfile()" style="padding: 10px 20px; font-size: 13px; background: linear-gradient(135deg, #06b6d4, #3b82f6);">
+              <span>⚡</span> Đánh Giá Lại Bằng AI
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EMPTY STATE (DoD: Nếu hồ sơ chưa có kỹ năng thì hiện thông báo hướng dẫn thêm kỹ năng) -->
+    <div class="empty-state-box" id="emptyStateBox">
+      <div style="font-size: 50px; margin-bottom: 14px;">💡</div>
+      <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 800; color: #0f172a;">Hồ Sơ Của Bạn Chưa Có Kỹ Năng Nào</h3>
+      <p style="margin: 0 0 24px 0; font-size: 14px; color: #64748b; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Hệ thống AI cần danh sách kỹ năng chuyên môn và số năm kinh nghiệm để tiến hành chấm điểm và xếp cấp độ. Hãy bổ sung kỹ năng ngay bây giờ!
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="profile.html" class="btn" style="padding: 10px 22px; font-size: 13.5px;">
+          <span>➕</span> Thêm Kỹ Năng Thủ Công
+        </a>
+        <a href="upload_cv.html" class="btn secondary" style="padding: 10px 22px; font-size: 13.5px;">
+          <span>📄</span> Quét CV PDF Tự Động
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. MAIN EVALUATION REPORT (Appears when profile has data) -->
+    <div id="evaluationReport">
+
+      <!-- Overall Score & Roadmap -->
+      <div class="card-3d">
+        <div class="score-summary-grid">
+          
+          <div class="total-score-circle-box">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 6px;">
+              Điểm Tổng Hợp AI
+            </div>
+            <div class="score-giant-number" id="totalScoreNumber">0.0</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: #4338ca;" id="totalScoreLabel">Thang điểm 100</div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #0f172a;">
+                Lộ Trình Cấp Bậc Chuyên Môn
+              </h2>
+              <span style="font-size: 14px; font-weight: 800; color: #4f46e5;" id="currentLevelText">Junior</span>
+            </div>
+            
+            <p style="margin: 4px 0 16px 0; font-size: 13.5px; color: #64748b;">
+              Cấp độ được tính toán kết hợp giữa số năm kinh nghiệm thực tế và điểm số kỹ năng chuyên môn.
+            </p>
+
+            <div class="roadmap-track">
+              <div class="roadmap-fill" id="roadmapFill" style="width: 25%;"></div>
+            </div>
+
+            <div class="roadmap-steps-row">
+              <span class="roadmap-step" id="stepIntern">🌱 Intern (&lt; 1 năm)</span>
+              <span class="roadmap-step" id="stepJunior">🌿 Junior (1-2 năm)</span>
+              <span class="roadmap-step" id="stepMiddle">⚡ Middle (2-5 năm)</span>
+              <span class="roadmap-step" id="stepSenior">👑 Senior (&ge; 5 năm &ge; 75đ)</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- AI Summary Box -->
+      <div class="ai-summary-card" id="aiSummaryCard">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #86198f; display: flex; align-items: center; gap: 8px;">
+            <span>🤖</span> Nhận Định & Khuyến Nghị Phát Triển Từ AI
+          </h3>
+          <span class="ai-pill-verified">✨ Claude 3.5 Sonnet Analysis</span>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.65; color: #334155; white-space: pre-wrap;" id="aiSummaryText">
+          Đang nạp nhận định từ mô hình AI...
+        </p>
+      </div>
+
+      <!-- Skill Groups Breakdown -->
+      <div class="card-3d">
+        <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 18px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            <span>📊</span> Đánh Giá Chi Tiết Theo Từng Nhóm Kỹ Năng
+          </h2>
+          <p style="margin: 0; font-size: 13px; color: #64748b;">
+            Điểm số của từng nhóm được tính theo công thức: (Mức thành thạo &times; 12) + (Số năm sử dụng &times; 8).
+          </p>
+        </div>
+
+        <div class="groups-grid" id="groupsGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Skills Details Table -->
+      <div class="card-3d">
+        <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 18px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            <span>📋</span> Danh Sách Kỹ Năng Đã Xác Thực Trong Hồ Sơ
+          </h2>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #f8fafc; text-align: left; font-size: 12px; color: #64748b; text-transform: uppercase; border-bottom: 1.5px solid #e2e8f0;">
+                <th style="padding: 12px 16px;">Kỹ Năng</th>
+                <th style="padding: 12px 16px;">Nhóm Chuyên Môn</th>
+                <th style="padding: 12px 16px;">Mức Thành Thạo</th>
+                <th style="padding: 12px 16px;">Số Năm Sử Dụng</th>
+                <th style="padding: 12px 16px; text-align: right;">Điểm Quy Đổi</th>
+              </tr>
+            </thead>
+            <tbody id="skillsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/config.js"></script>
+  <script>
+    function esc(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 5000);
+    }
+
+    function showSuccess(msg) {
+      const el = document.getElementById("success");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 4000);
+    }
+
+    async function loadEvaluation() {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Load Profile & Evaluation concurrently
+      try {
+        const [profile, evaluation] = await Promise.all([
+          api("/profiles/me"),
+          api("/evaluation/me")
+        ]);
+
+        if (!profile || !evaluation) return;
+
+        // Render Candidate info
+        document.getElementById("candFullName").textContent = profile.full_name || "Ứng Viên";
+        document.getElementById("avatarLetter").textContent = profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U";
+        document.getElementById("candDesiredRole").textContent = profile.desired_position ? `Vị trí mong muốn: ${profile.desired_position}` : "Chưa cập nhật vị trí mong muốn";
+        document.getElementById("badgeExp").textContent = `${profile.years_experience || 0} năm kinh nghiệm`;
+
+        // Check empty state
+        if (!profile.skills || profile.skills.length === 0) {
+          document.getElementById("emptyStateBox").style.display = "block";
+          document.getElementById("evaluationReport").style.display = "none";
+          return;
+        }
+
+        document.getElementById("emptyStateBox").style.display = "none";
+        document.getElementById("evaluationReport").style.display = "block";
+
+        // Render Score & Level
+        const score = evaluation.total_score != null ? evaluation.total_score : profile.total_score || 0;
+        const level = evaluation.level || profile.level || "Intern";
+        document.getElementById("totalScoreNumber").textContent = score.toFixed(1);
+        document.getElementById("currentLevelText").textContent = `Cấp độ: ${level}`;
+
+        // Level badge class
+        const badgeLvl = document.getElementById("badgeLevel");
+        badgeLvl.textContent = level;
+        badgeLvl.className = `badge-level lvl-${level.toLowerCase()}`;
+
+        // Update Roadmap
+        updateRoadmap(level);
+
+        // Render AI Summary
+        const summary = evaluation.summary || profile.ai_summary;
+        if (summary) {
+          document.getElementById("aiSummaryText").textContent = summary;
+          document.getElementById("aiSummaryCard").style.display = "block";
+        } else {
+          document.getElementById("aiSummaryText").textContent = "Chưa có bản tóm tắt AI. Hãy bấm nút 'Đánh Giá Lại Bằng AI' để tạo mới.";
+        }
+
+        // Render Groups Breakdown
+        renderGroupsBreakdown(evaluation.groups || {});
+
+        // Render Skills Table
+        renderSkillsTable(profile.skills || []);
+
+      } catch (err) {
+        showError("Lỗi kết nối khi tải báo cáo đánh giá: " + err.message);
+      }
+    }
+
+    function updateRoadmap(level) {
+      const fill = document.getElementById("roadmapFill");
+      const steps = {
+        "Intern": { w: "25%", id: "stepIntern" },
+        "Junior": { w: "50%", id: "stepJunior" },
+        "Middle": { w: "75%", id: "stepMiddle" },
+        "Senior": { w: "100%", id: "stepSenior" }
+      };
+
+      ['stepIntern', 'stepJunior', 'stepMiddle', 'stepSenior'].forEach(id => {
+        document.getElementById(id).classList.remove("active");
+      });
+
+      const target = steps[level] || steps["Intern"];
+      fill.style.width = target.w;
+      document.getElementById(target.id).classList.add("active");
+    }
+
+    function renderGroupsBreakdown(groups) {
+      const container = document.getElementById("groupsGrid");
+      const groupKeys = Object.keys(groups);
+
+      if (groupKeys.length === 0) {
+        container.innerHTML = '<div style="color: #94a3b8; font-size: 13.5px;">Chưa có dữ liệu phân nhóm kỹ năng.</div>';
+        return;
+      }
+
+      container.innerHTML = groupKeys.map(k => {
+        const val = groups[k] || 0;
+        return `
+          <div class="group-card">
+            <div class="group-header">
+              <span class="group-name">🏷️ ${esc(k)}</span>
+              <span class="group-score">${val.toFixed(1)} / 100</span>
+            </div>
+            <div class="group-bar-track">
+              <div class="group-bar-fill" style="width: ${Math.min(val, 100)}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSkillsTable(skills) {
+      const tbody = document.getElementById("skillsTableBody");
+      if (skills.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Chưa có kỹ năng nào</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = skills.map(s => {
+        // Skill score = (proficiency * 12) + (min(years_used, 5) * 8)
+        const yearsCapped = Math.min(s.years_used || 0, 5);
+        const skillScore = Math.min((s.proficiency * 12) + (yearsCapped * 8), 100);
+        const stars = "★".repeat(s.proficiency) + "☆".repeat(5 - s.proficiency);
+
+        return `
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 12px 16px; font-weight: 700; color: #0f172a;">${esc(s.name)}</td>
+            <td style="padding: 12px 16px;"><span style="background: #eef2ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${esc(s.group || "Chung")}</span></td>
+            <td style="padding: 12px 16px; color: #f59e0b; font-weight: 700;">${stars} (${s.proficiency}/5)</td>
+            <td style="padding: 12px 16px; color: #475569; font-weight: 600;">${s.years_used || 0} năm</td>
+            <td style="padding: 12px 16px; text-align: right; font-weight: 800; color: #059669;">${skillScore.toFixed(1)} đ</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function reEvaluateProfile() {
+      const btn = document.getElementById("btnReevaluate");
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> Đang đánh giá lại...`;
+
+      try {
+        const data = await api("/evaluation/me");
+        if (data) {
+          showSuccess("Hệ thống AI đã tính toán lại toàn bộ điểm và cấp độ thành công!");
+          await loadEvaluation();
+        }
+      } catch (err) {
+        showError("Không thể đánh giá lại: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡</span> Đánh Giá Lại Bằng AI`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadEvaluation();
+    });
+  </script>
+</body>
+</html>
