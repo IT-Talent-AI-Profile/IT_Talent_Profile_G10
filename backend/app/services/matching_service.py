@@ -100,3 +100,49 @@ def get_candidate_detail(db, profile_id):
             for item in profile.skills
         ],
     }
+
+
+def get_job_matches(db, current_user, job_id, page=1):
+    from app.models.job import Job
+
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None or job.recruiter_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Tin tuyển dụng không tồn tại")
+
+    if not job.is_open:
+        raise HTTPException(status_code=400, detail="Tin tuyển dụng đã đóng")
+
+    if page < 1:
+        raise HTTPException(status_code=422, detail="page phải từ 1 trở lên")
+
+    profiles = db.query(Profile).filter(Profile.is_public == True).all()
+
+    match_items = []
+    for profile in profiles:
+        percent, matched, missing = calc_match(profile, job)
+        match_items.append({
+            "id": profile.id,
+            "full_name": profile.full_name,
+            "desired_position": profile.desired_position,
+            "years_experience": profile.years_experience or 0,
+            "level": profile.level,
+            "total_score": profile.total_score,
+            "match_percent": percent,
+            "matched_skills": matched,
+            "missing_skills": missing,
+        })
+
+    match_items.sort(key=lambda x: (-x["match_percent"], -(x["total_score"] or 0), x["id"]))
+
+    total = len(match_items)
+    start = (page - 1) * PAGE_SIZE
+    end = start + PAGE_SIZE
+    items = match_items[start:end]
+
+    return {
+        "job": job.title,
+        "total": total,
+        "page": page,
+        "page_size": PAGE_SIZE,
+        "items": items,
+    }

@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đối Sánh Ứng Viên AI - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --hero-bg: radial-gradient(130% 120% at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    }
+
+    body {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 30%, rgba(168, 85, 247, 0.06) 0px, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* 3D HERO HEADER */
+    .hero-3d-wrapper {
+      perspective: 1200px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero-3d-card {
+      background: var(--hero-bg);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-blob {
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-glow-blob-2 {
+      position: absolute;
+      bottom: -60px;
+      left: 20%;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .hero-identity {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .avatar-3d-container {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      font-size: 32px;
+    }
+
+    .hero-meta h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px 0;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-meta p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13.5px;
+    }
+
+    .hero-stats-3d {
+      display: flex;
+      gap: 14px;
+    }
+
+    .stat-card-3d {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      min-width: 130px;
+      text-align: center;
+    }
+
+    .stat-label-3d {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .stat-value-3d {
+      font-size: 22px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-top: 4px;
+    }
+
+    /* JOB SELECTION & OVERVIEW CARD */
+    .job-overview-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .job-select-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .job-select-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 600px;
+    }
+
+    .job-select-control select {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid #cbd5e1;
+      font-weight: 600;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .job-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .job-info-pill {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+    }
+
+    .job-info-pill .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .job-info-pill .val {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* CLOSED JOB WARNING ALERT */
+    .closed-warning-banner {
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-top: 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      color: #991b1b;
+      font-weight: 600;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MATCH LIST / RANKING CARDS */
+    .rank-list-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .match-candidate-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+      transition: all 0.25s ease;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: center;
+      position: relative;
+    }
+
+    .match-candidate-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      border-color: #cbd5e1;
+    }
+
+    /* RANK BADGE */
+    .rank-number-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .rank-top1 {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #b45309;
+      border: 1.5px solid #f59e0b;
+    }
+
+    .rank-top2 {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: #475569;
+      border: 1.5px solid #94a3b8;
+    }
+
+    .rank-top3 {
+      background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+      color: #c2410c;
+      border: 1.5px solid #fb923c;
+    }
+
+    .rank-standard {
+      background: #f8fafc;
+      color: #64748b;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    /* CANDIDATE INFO */
+    .cand-main-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cand-name-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .cand-name-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .cand-meta-tags {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .badge-level {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+    }
+
+    .lvl-intern { background: #e0f2fe; color: #0284c7; }
+    .lvl-junior { background: #dcfce7; color: #16a34a; }
+    .lvl-middle { background: #fef3c7; color: #d97706; }
+    .lvl-senior { background: #f3e8ff; color: #9333ea; }
+
+    /* MATCH BAR & SKILL PILLS */
+    .match-percent-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .match-percent-track {
+      flex: 1;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+      max-width: 260px;
+    }
+
+    .match-percent-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .match-percent-label {
+      font-size: 15px;
+      font-weight: 900;
+      min-width: 50px;
+    }
+
+    .skills-breakdown-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .skill-badge-matched {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .skill-badge-missing {
+      background: #fff1f2;
+      color: #be123c;
+      border: 1px solid #fecdd3;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ACTION BUTTONS */
+    .match-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 160px;
+    }
+
+    /* PAGINATION */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 14px 24px;
+      margin-bottom: 40px;
+    }
+
+    /* MODAL */
+    .modal-backdrop-3d {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-3d-card {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.3);
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px) scale(0.97); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-header-3d {
+      padding: 20px 28px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header-3d h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .modal-body-3d {
+      padding: 24px 28px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      .match-candidate-card {
+        grid-template-columns: 1fr;
+      }
+      .match-actions {
+        flex-direction: row;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 1600px; width: 95%; padding-bottom: 60px;">
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <!-- 1. 3D HERO HEADER -->
+    <div class="hero-3d-wrapper">
+      <div class="hero-3d-card">
+        <div class="hero-glow-blob"></div>
+        <div class="hero-glow-blob-2"></div>
+        <div class="hero-content">
+          <div class="hero-identity">
+            <div class="avatar-3d-container">⚡</div>
+            <div class="hero-meta">
+              <h1>Bảng Xếp Hạng Đối Sánh Ứng Viên AI</h1>
+              <p>Thuật toán đối sánh đa tiêu chí: Phân tích độ khớp kỹ năng thực tế, số năm kinh nghiệm và điểm đánh giá năng lực AI</p>
+            </div>
+          </div>
+          <div class="hero-stats-3d">
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Ứng Viên Phù Hợp</div>
+              <div class="stat-value-3d" id="statMatchCount">0</div>
+            </div>
+            <div class="stat-card-3d">
+              <div class="stat-label-3d">Khớp Cao Nhất</div>
+              <div class="stat-value-3d" id="statTopPercent">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. JOB SELECTOR & OVERVIEW CARD -->
+    <div class="job-overview-card">
+      <div class="job-select-row">
+        <div class="job-select-control">
+          <label style="font-weight: 700; font-size: 13px; text-transform: uppercase; color: #475569; white-space: nowrap;">Vị Trí Tuyển Dụng:</label>
+          <select id="jobSelector" onchange="onJobChange()">
+            <option value="">-- Đang tải danh sách tin tuyển dụng... --</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <a href="jobs.html" class="btn secondary" style="padding: 9px 16px; font-size: 13px;"><span>📋</span> Quản Lý Tin Tuyển Dụng</a>
+          <a href="candidates.html" class="btn secondary" style="padding: 9px 16px; font-size: 13px;"><span>🔍</span> Tìm Kiếm Ứng Viên</a>
+        </div>
+      </div>
+
+      <!-- Closed Job Warning Alert (DoD Requirement) -->
+      <div id="closedWarningBanner" class="closed-warning-banner">
+        <span style="font-size: 20px;">⚠️</span>
+        <div>
+          <div style="font-size: 14px; font-weight: 800;">Tin tuyển dụng này đã đóng!</div>
+          <div style="font-size: 13px; font-weight: 500; opacity: 0.9;">Hệ thống đã khóa đối sánh mới cho vị trí này. Vui lòng mở lại tin tuyển dụng trong trang quản lý nếu muốn tiếp tục lọc ứng viên.</div>
+        </div>
+      </div>
+
+      <!-- Job Overview Meta -->
+      <div class="job-details-grid" id="jobDetailsGrid" style="display: none;">
+        <div class="job-info-pill">
+          <div class="label">Tiêu Đề Vị Trí</div>
+          <div class="val" id="jobDetailTitle">-</div>
+        </div>
+        <div class="job-info-pill">
+          <div class="label">Trạng Thái Tuyển Dụng</div>
+          <div class="val" id="jobDetailStatus">-</div>
+        </div>
+        <div class="job-info-pill">
+          <div class="label">Yêu Cầu Kinh Nghiệm</div>
+          <div class="val" id="jobDetailExp">-</div>
+        </div>
+        <div class="job-info-pill">
+          <div class="label">Kỹ Năng Đã Gắn Cho JD</div>
+          <div class="val" id="jobDetailSkills" style="font-weight: 500; font-size: 13px;">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MATCHING RESULTS LIST -->
+    <div id="rankListWrapper" class="rank-list-wrapper">
+      <div style="text-align: center; padding: 50px 20px; background: #fff; border-radius: var(--radius-lg); border: 1px dashed #cbd5e1; color: #64748b;">
+        <div style="font-size: 36px; margin-bottom: 10px;">⏳</div>
+        <div style="font-size: 15px; font-weight: 600;">Đang tải dữ liệu đối sánh từ AI engine...</div>
+      </div>
+    </div>
+
+    <!-- 4. PAGINATION -->
+    <div class="pagination-bar" id="paginationBar" style="display: none;">
+      <div style="font-size: 13.5px; color: #475569; font-weight: 600;">
+        Hiển thị <span id="pageRangeText">0</span> trên tổng số <span id="pageTotalText">0</span> ứng viên
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn secondary" id="btnPrevPage" onclick="changePage(-1)" style="padding: 8px 16px; font-size: 13px;">← Trang trước</button>
+        <span id="pageIndicator" style="display: flex; align-items: center; padding: 0 12px; font-weight: 700; font-size: 13.5px; color: #1e293b;">1</span>
+        <button type="button" class="btn secondary" id="btnNextPage" onclick="changePage(1)" style="padding: 8px 16px; font-size: 13px;">Trang sau →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CANDIDATE DETAIL MODAL -->
+  <div class="modal-backdrop-3d" id="candidateModal">
+    <div class="modal-3d-card">
+      <div class="modal-header-3d">
+        <h3 id="modalCandTitle">Chi Tiết Hồ Sơ Ứng Viên</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCandidateModal()">✕</button>
+      </div>
+      <div class="modal-body-3d" id="modalCandBody">
+        <div style="text-align: center; padding: 40px; color: #64748b;">Đang tải chi tiết...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script>
+    // State management
+    let jobsList = [];
+    let currentJobId = null;
+    let currentJobObj = null;
+    let currentPage = 1;
+    let totalItems = 0;
+    const pageSize = 10;
+
+    function esc(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 5000);
+    }
+
+    function showSuccess(msg) {
+      const el = document.getElementById("success");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 4000);
+    }
+
+    // Load available jobs for recruiter
+    async function loadJobsList() {
+      const data = await api("/jobs");
+      if (!data) return;
+      jobsList = data;
+
+      const sel = document.getElementById("jobSelector");
+      sel.innerHTML = "";
+
+      if (jobsList.length === 0) {
+        sel.innerHTML = '<option value="">(Bạn chưa đăng tin tuyển dụng nào)</option>';
+        renderEmptyState("Bạn chưa có tin tuyển dụng nào. Hãy tạo tin tuyển dụng mới để đối sánh ứng viên!");
+        return;
+      }
+
+      jobsList.forEach(j => {
+        const opt = document.createElement("option");
+        opt.value = j.id;
+        opt.textContent = `${j.title} ${j.is_open ? '🟢 [Đang mở]' : '🔒 [Đã đóng]'}`;
+        sel.appendChild(opt);
+      });
+
+      // Check if job_id was supplied in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramJobId = urlParams.get("job_id");
+      if (paramJobId && jobsList.some(j => j.id == paramJobId)) {
+        currentJobId = parseInt(paramJobId);
+        sel.value = currentJobId;
+      } else {
+        currentJobId = jobsList[0].id;
+        sel.value = currentJobId;
+      }
+
+      updateJobOverview();
+      loadMatches(currentPage);
+    }
+
+    function onJobChange() {
+      const sel = document.getElementById("jobSelector");
+      currentJobId = parseInt(sel.value);
+      currentPage = 1;
+      
+      // Update browser URL without reloading
+      const url = new URL(window.location);
+      url.searchParams.set("job_id", currentJobId);
+      window.history.replaceState({}, "", url);
+
+      updateJobOverview();
+      loadMatches(currentPage);
+    }
+
+    function updateJobOverview() {
+      currentJobObj = jobsList.find(j => j.id === currentJobId);
+      if (!currentJobObj) return;
+
+      const grid = document.getElementById("jobDetailsGrid");
+      const warn = document.getElementById("closedWarningBanner");
+      grid.style.display = "grid";
+
+      document.getElementById("jobDetailTitle").textContent = currentJobObj.title;
+      document.getElementById("jobDetailExp").textContent = `≥ ${currentJobObj.min_years} năm`;
+
+      if (currentJobObj.is_open) {
+        document.getElementById("jobDetailStatus").innerHTML = '<span style="color: #16a34a; font-weight: 800;">🟢 Đang tuyển dụng (Mở)</span>';
+        warn.style.display = "none";
+      } else {
+        document.getElementById("jobDetailStatus").innerHTML = '<span style="color: #dc2626; font-weight: 800;">🔒 Đã đóng tuyển dụng</span>';
+        warn.style.display = "flex";
+      }
+
+      if (currentJobObj.skills && currentJobObj.skills.length > 0) {
+        document.getElementById("jobDetailSkills").innerHTML = currentJobObj.skills.map(s => 
+          `<span style="display: inline-block; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; margin: 2px 4px 2px 0; font-size: 11.5px; font-weight: 600;">${esc(s.skill_name || s.name || 'Kỹ năng')}${s.is_required ? ' *' : ''}</span>`
+        ).join("");
+      } else {
+        document.getElementById("jobDetailSkills").innerHTML = '<span style="color: #94a3b8; font-style: italic;">Chưa gắn kỹ năng nào cho JD này</span>';
+      }
+    }
+
+    async function loadMatches(page) {
+      if (!currentJobId) return;
+
+      const container = document.getElementById("rankListWrapper");
+      container.innerHTML = `
+        <div style="text-align: center; padding: 50px 20px; background: #fff; border-radius: var(--radius-lg); border: 1px dashed #cbd5e1; color: #64748b;">
+          <div style="font-size: 32px; margin-bottom: 8px;">⚡</div>
+          <div style="font-size: 15px; font-weight: 600;">Hệ thống AI đang xếp hạng ứng viên cho vị trí này...</div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/jobs/${currentJobId}/matches?page=${page}`, {
+          headers: authHeaders()
+        });
+
+        if (res.status === 400) {
+          // Closed job response
+          const errData = await res.json();
+          document.getElementById("closedWarningBanner").style.display = "flex";
+          renderClosedState(errData.detail || "Tin tuyển dụng này đã đóng.");
+          document.getElementById("statMatchCount").textContent = "0";
+          document.getElementById("statTopPercent").textContent = "0%";
+          document.getElementById("paginationBar").style.display = "none";
+          return;
+        }
+
+        if (res.status === 401) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        if (res.status === 403) {
+          showError("Bạn không có quyền xem thông tin đối sánh của nhà tuyển dụng.");
+          return;
+        }
+
+        if (res.status === 404) {
+          showError("Tin tuyển dụng không tồn tại hoặc không thuộc quyền quản lý của bạn.");
+          renderEmptyState("Không tìm thấy tin tuyển dụng.");
+          return;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          showError(errData.detail || "Không thể tải kết quả đối sánh.");
+          return;
+        }
+
+        const data = await res.json();
+        totalItems = data.total;
+        currentPage = data.page;
+
+        document.getElementById("statMatchCount").textContent = totalItems;
+        if (data.items.length > 0) {
+          document.getElementById("statTopPercent").textContent = `${data.items[0].match_percent}%`;
+        } else {
+          document.getElementById("statTopPercent").textContent = "0%";
+        }
+
+        renderMatchCards(data.items, (page - 1) * pageSize);
+        renderPagination();
+
+      } catch (err) {
+        showError("Lỗi kết nối khi tải danh sách đối sánh: " + err.message);
+      }
+    }
+
+    function renderClosedState(msg) {
+      const container = document.getElementById("rankListWrapper");
+      container.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: var(--radius-lg); border: 1.5px solid #fecaca; color: #991b1b;">
+          <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
+          <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 800;">${esc(msg)}</h3>
+          <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">Hệ thống không đối sánh ứng viên cho tin tuyển dụng ở trạng thái Đóng.</p>
+          <a href="jobs.html" class="btn" style="padding: 10px 20px; font-size: 13.5px;">Quay lại Quản Lý Tin để mở lại</a>
+        </div>
+      `;
+    }
+
+    function renderEmptyState(msg) {
+      const container = document.getElementById("rankListWrapper");
+      container.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: var(--radius-lg); border: 1px dashed #cbd5e1; color: #64748b;">
+          <div style="font-size: 42px; margin-bottom: 12px;">🔎</div>
+          <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 800; color: #334155;">Chưa có ứng viên phù hợp</h3>
+          <p style="margin: 0; font-size: 14px;">${esc(msg)}</p>
+        </div>
+      `;
+      document.getElementById("paginationBar").style.display = "none";
+    }
+
+    function renderMatchCards(items, rankOffset) {
+      const container = document.getElementById("rankListWrapper");
+
+      if (items.length === 0) {
+        renderEmptyState("Không có ứng viên nào đáp ứng tiêu chí hoặc hệ thống chưa tìm thấy hồ sơ công khai phù hợp.");
+        return;
+      }
+
+      container.innerHTML = items.map((cand, idx) => {
+        const rank = rankOffset + idx + 1;
+        let rankClass = "rank-standard";
+        let rankIcon = `#${rank}`;
+        if (rank === 1) { rankClass = "rank-top1"; rankIcon = "🥇 1"; }
+        else if (rank === 2) { rankClass = "rank-top2"; rankIcon = "🥈 2"; }
+        else if (rank === 3) { rankClass = "rank-top3"; rankIcon = "🥉 3"; }
+
+        // Level pill styling
+        const level = cand.level || "Intern";
+        let lvlClass = "lvl-intern";
+        if (level === "Junior") lvlClass = "lvl-junior";
+        if (level === "Middle") lvlClass = "lvl-middle";
+        if (level === "Senior") lvlClass = "lvl-senior";
+
+        // Match percent bar gradient
+        const pct = cand.match_percent;
+        let fillGradient = "linear-gradient(90deg, #f59e0b, #eab308)";
+        let pctColor = "#d97706";
+        if (pct >= 80) {
+          fillGradient = "linear-gradient(90deg, #10b981, #059669)";
+          pctColor = "#059669";
+        } else if (pct >= 50) {
+          fillGradient = "linear-gradient(90deg, #6366f1, #3b82f6)";
+          pctColor = "#4f46e5";
+        }
+
+        // Matched vs missing skills
+        const matchedBadges = cand.matched_skills.map(s => 
+          `<span class="skill-badge-matched">✓ ${esc(s)}</span>`
+        ).join("");
+
+        const missingBadges = cand.missing_skills.map(s => 
+          `<span class="skill-badge-missing">✕ ${esc(s)}</span>`
+        ).join("");
+
+        return `
+          <div class="match-candidate-card">
+            <!-- Rank Indicator -->
+            <div class="rank-number-box ${rankClass}">
+              <span>${rankIcon}</span>
+            </div>
+
+            <!-- Candidate Details & Matching Progress -->
+            <div class="cand-main-info">
+              <div class="cand-name-row">
+                <h3 class="cand-name-title">${esc(cand.full_name)}</h3>
+                <div class="cand-meta-tags">
+                  <span class="badge-level ${lvlClass}">${esc(level)}</span>
+                  <span style="font-size: 12.5px; color: #64748b; font-weight: 600;">💼 ${cand.years_experience} năm kinh nghiệm</span>
+                  <span style="font-size: 12.5px; color: #4338ca; font-weight: 700; background: #eef2ff; padding: 2px 8px; border-radius: 4px;">
+                    ⭐ AI Score: ${cand.total_score != null ? cand.total_score.toFixed(1) : "N/A"}/100
+                  </span>
+                </div>
+              </div>
+
+              <!-- Match Bar -->
+              <div class="match-percent-container">
+                <span style="font-size: 13px; font-weight: 700; color: #334155;">Độ phù hợp:</span>
+                <div class="match-percent-track">
+                  <div class="match-percent-fill" style="width: ${pct}%; background: ${fillGradient};"></div>
+                </div>
+                <span class="match-percent-label" style="color: ${pctColor};">${pct}%</span>
+              </div>
+
+              <!-- Skills Breakdown -->
+              <div>
+                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Đối Sánh Kỹ Năng:</div>
+                <div class="skills-breakdown-row">
+                  ${matchedBadges || '<span style="font-size: 12px; color: #94a3b8;">Không có kỹ năng khớp</span>'}
+                  ${missingBadges}
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="match-actions">
+              <button type="button" class="btn" style="padding: 9px 16px; font-size: 13px;" onclick="viewCandidate(${cand.id})">
+                <span>👤</span> Xem Hồ Sơ
+              </button>
+              <button type="button" class="btn secondary" style="padding: 9px 16px; font-size: 13px;" onclick="inviteCandidate('${esc(cand.full_name)}')">
+                <span>💌</span> Mời Phỏng Vấn
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderPagination() {
+      const bar = document.getElementById("paginationBar");
+      if (totalItems <= pageSize) {
+        bar.style.display = "none";
+        return;
+      }
+      bar.style.display = "flex";
+
+      const start = (currentPage - 1) * pageSize + 1;
+      const end = Math.min(currentPage * pageSize, totalItems);
+      document.getElementById("pageRangeText").textContent = `${start}-${end}`;
+      document.getElementById("pageTotalText").textContent = totalItems;
+
+      const totalPages = Math.ceil(totalItems / pageSize);
+      document.getElementById("pageIndicator").textContent = `Trang ${currentPage} / ${totalPages}`;
+
+      document.getElementById("btnPrevPage").disabled = (currentPage <= 1);
+      document.getElementById("btnNextPage").disabled = (currentPage >= totalPages);
+    }
+
+    function changePage(delta) {
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const nextPage = currentPage + delta;
+      if (nextPage >= 1 && nextPage <= totalPages) {
+        currentPage = nextPage;
+        loadMatches(currentPage);
+        window.scrollTo({ top: 300, behavior: 'smooth' });
+      }
+    }
+
+    // Modal view for candidate profile
+    async function viewCandidate(profileId) {
+      const modal = document.getElementById("candidateModal");
+      const body = document.getElementById("modalCandBody");
+      const title = document.getElementById("modalCandTitle");
+      
+      modal.style.display = "flex";
+      body.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;">Đang tải hồ sơ...</div>';
+
+      const cand = await api(`/candidates/${profileId}`);
+      if (!cand) {
+        body.innerHTML = '<div style="color: #dc2626; padding: 20px;">Không thể tải thông tin ứng viên.</div>';
+        return;
+      }
+
+      title.textContent = `Hồ Sơ: ${cand.full_name}`;
+
+      const skillsHtml = cand.skills && cand.skills.length > 0
+        ? cand.skills.map(s => `
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="color: #1e293b; font-size: 13.5px;">${esc(s.skill_name || s.name)}</strong>
+                <span style="font-size: 11.5px; color: #64748b; margin-left: 6px;">(${s.years_experience || 0} năm EXP)</span>
+              </div>
+              <div style="color: #f59e0b; font-size: 12px; font-weight: 700;">★ ${s.proficiency}/5</div>
+            </div>
+          `).join("")
+        : '<div style="color: #94a3b8; font-size: 13px;">Chưa cập nhật kỹ năng chi tiết</div>';
+
+      body.innerHTML = `
+        <div style="display: flex; gap: 18px; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;">
+            ${cand.full_name ? esc(cand.full_name.charAt(0).toUpperCase()) : "U"}
+          </div>
+          <div>
+            <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #0f172a;">${esc(cand.full_name)}</h2>
+            <div style="font-size: 14px; color: #4f46e5; font-weight: 600;">🎯 ${esc(cand.desired_position || "Chưa thiết lập vị trí mong muốn")}</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <div>
+            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Cấp Độ Đánh Giá</label>
+            <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 4px;">${esc(cand.level || "Intern")}</div>
+          </div>
+          <div>
+            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Điểm Năng Lực AI</label>
+            <div style="font-size: 14px; font-weight: 800; color: #38bdf8; margin-top: 4px;">${cand.total_score != null ? cand.total_score.toFixed(1) : "0.0"}/100</div>
+          </div>
+          <div>
+            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Tổng Số Năm Kinh Nghiệm</label>
+            <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 4px;">${cand.years_experience} năm</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Kinh Nghiệm Thực Tế</label>
+          <div style="font-size: 13.5px; color: #334155; margin-top: 4px; line-height: 1.5; white-space: pre-wrap;">${esc(cand.experience || "Chưa có mô tả kinh nghiệm.")}</div>
+        </div>
+
+        <div>
+          <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 8px; display: block;">Kỹ Năng Đã Xác Thực</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px;">
+            ${skillsHtml}
+          </div>
+        </div>
+
+        <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn secondary" onclick="closeCandidateModal()">Đóng</button>
+          <button type="button" class="btn btn-success" onclick="inviteCandidate('${esc(cand.full_name)}')">
+            <span>💌</span> Mời Phỏng Vấn
+          </button>
+        </div>
+      `;
+    }
+
+    function closeCandidateModal() {
+      document.getElementById("candidateModal").style.display = "none";
+    }
+
+    function inviteCandidate(name) {
+      showSuccess(`Đã gửi lời mời phỏng vấn và thư tuyển dụng tới ứng viên ${name}!`);
+      closeCandidateModal();
+    }
+
+    // Initialize page
+    window.addEventListener("DOMContentLoaded", () => {
+      loadJobsList();
+    });
+  </script>
+</body>
+</html>
