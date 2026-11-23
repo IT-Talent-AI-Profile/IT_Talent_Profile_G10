@@ -65,7 +65,7 @@ def cv_test_context(tmp_path, monkeypatch):
 
 def test_cv_upload_get_and_confirm_flow(cv_test_context):
     client, db, candidate, profile, python, fastapi = cv_test_context
-    pdf = create_text_pdf(["Backend Developer", "Experience with Python and FastAPI"])
+    pdf = create_text_pdf(["Backend Developer with Python and FastAPI experience across production services, REST APIs, SQL databases and cloud deployment projects"])
 
     upload = client.post(
         "/cv/upload",
