@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IT Talent AI Profile — Final Demo</title>
+<script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-dark:#0f172a;--bg-card:#1e293b;--accent:#3b82f6;--accent2:#8b5cf6;
+  --success:#10b981;--warn:#f59e0b;--danger:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-dark);color:var(--text);overflow:hidden;height:100vh;width:100vw}
+/* Title bar */
+.title-bar{height:32px;background:#0a0f1e;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid #1e293b;user-select:none}
+.title-bar .dot{width:12px;height:12px;border-radius:50%}
+.title-bar .dot.r{background:#ef4444}.title-bar .dot.y{background:#f59e0b}.title-bar .dot.g{background:#22c55e}
+.title-bar .file-name{flex:1;text-align:center;font-size:12px;color:#94a3b8;font-family:'JetBrains Mono',monospace}
+/* Player container */
+.player-wrap{position:relative;width:100%;height:calc(100vh - 32px);display:flex;flex-direction:column;background:#0f172a}
+.viewport{flex:1;position:relative;overflow:hidden;background:linear-gradient(135deg,#0f172a 0%,#1a1033 50%,#0f172a 100%)}
+/* Watermark */
+.watermark{position:absolute;top:16px;right:20px;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.08);z-index:5;pointer-events:none;text-transform:uppercase}
+/* Badge */
+.demo-badge{position:absolute;top:16px;left:20px;z-index:10;display:flex;gap:8px;align-items:center}
+.demo-badge .chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px}
+/* Subtitle bar */
+.subtitle-bar{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);width:80%;max-width:900px;z-index:20;text-align:center;pointer-events:none}
+.subtitle-text{display:inline-block;background:rgba(0,0,0,.85);color:#fff;padding:10px 24px;border-radius:8px;font-size:15px;line-height:1.6;font-weight:400;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);max-width:100%;transition:opacity .3s}
+.subtitle-text code{font-family:'JetBrains Mono',monospace;background:rgba(59,130,246,.25);color:#93c5fd;padding:1px 6px;border-radius:4px;font-size:13px}
+/* Controls */
+.controls{height:64px;background:rgba(15,23,42,.95);border-top:1px solid #1e293b;display:flex;align-items:center;padding:0 20px;gap:16px;z-index:30;backdrop-filter:blur(12px)}
+.progress-wrap{flex:1;height:6px;background:#334155;border-radius:3px;cursor:pointer;position:relative;overflow:visible}
+.progress-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#8b5cf6);border-radius:3px;transition:width .15s linear;position:relative}
+.progress-fill::after{content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(59,130,246,.5);opacity:0;transition:opacity .2s}
+.progress-wrap:hover .progress-fill::after{opacity:1}
+.ctrl-btn{background:none;border:none;color:#e2e8f0;cursor:pointer;font-size:18px;padding:6px;border-radius:6px;transition:all .15s}
+.ctrl-btn:hover{background:#334155;color:#fff}
+.ctrl-btn.play-btn{font-size:24px}
+.time-display{font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;min-width:100px;text-align:center}
+.speed-btn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;background:#334155;border:1px solid #475569;color:#e2e8f0;cursor:pointer}
+.speed-btn:hover{border-color:#3b82f6}
+/* Scene chips */
+.scene-chips{height:48px;background:#0a0f1e;border-top:1px solid #1e293b;display:flex;align-items:center;gap:6px;padding:0 16px;overflow-x:auto;z-index:30}
+.scene-chips::-webkit-scrollbar{height:0}
+.scene-chip{flex-shrink:0;padding:4px 14px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #334155;color:#94a3b8;background:#1e293b;transition:all .2s;white-space:nowrap}
+.scene-chip:hover{border-color:#3b82f6;color:#e2e8f0}
+.scene-chip.active{background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-color:transparent;color:#fff}
+.scene-chip.part-label{background:transparent;border:none;color:#64748b;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:default;font-size:10px}
+/* Virtual cursor */
+.vcursor{position:absolute;z-index:100;pointer-events:none;transition:left .6s cubic-bezier(.4,0,.2,1),top .6s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.vcursor svg{width:24px;height:24px}
+.click-ripple{position:absolute;z-index:99;width:40px;height:40px;border-radius:50%;border:2px solid rgba(59,130,246,.6);animation:rippleOut .6s ease-out forwards;pointer-events:none}
+@keyframes rippleOut{0%{transform:scale(.5);opacity:1}100%{transform:scale(2);opacity:0}}
+/* Scene content shared styles */
+.scene-container{width:100%;height:100%;position:absolute;top:0;left:0;display:flex;align-items:center;justify-content:center;padding:40px}
+/* Login scene */
+.login-card{width:420px;background:linear-gradient(145deg,#1e293b,#0f172a);border:1px solid #334155;border-radius:20px;padding:40px;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.login-card h2{font-size:28px;font-weight:800;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-card .subtitle{text-align:center;color:#64748b;font-size:13px;margin-bottom:28px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px}
+.form-input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:14px;outline:none;transition:border .2s}
+.form-input:focus{border-color:#3b82f6}
+.login-btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-top:8px;transition:all .2s}
+.login-btn.primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff}
+.login-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(59,130,246,.3)}
+.quick-login{display:flex;gap:8px;margin-top:16px}
+.quick-login button{flex:1;padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.quick-login button:hover{border-color:#3b82f6;color:#e2e8f0}
+/* Profile 3D card */
+.profile-3d{width:380px;border-radius:20px;padding:32px;background:linear-gradient(145deg,#1e293b,#162032);border:1px solid #334155;box-shadow:0 20px 60px rgba(0,0,0,.5);transform:perspective(800px) rotateY(-5deg) rotateX(3deg);transition:transform .3s}
+.profile-3d:hover{transform:perspective(800px) rotateY(0) rotateX(0)}
+.avatar-led{width:100px;height:100px;border-radius:50%;margin:0 auto 16px;background:conic-gradient(#3b82f6,#8b5cf6,#ec4899,#f59e0b,#10b981,#3b82f6);padding:3px;animation:ledSpin 3s linear infinite}
+.avatar-led img,.avatar-led .av-inner{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#3b82f6}
+@keyframes ledSpin{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.career-bar{display:flex;align-items:center;gap:0;margin-top:20px;position:relative}
+.career-step{flex:1;text-align:center;position:relative;z-index:1}
+.career-step .dot{width:28px;height:28px;border-radius:50%;background:#334155;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #475569;transition:all .3s}
+.career-step .dot.filled{background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-color:#3b82f6;color:#fff}
+.career-step .dot.current{background:linear-gradient(135deg,#8b5cf6,#ec4899);border-color:#8b5cf6;box-shadow:0 0 16px rgba(139,92,246,.5);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 16px rgba(139,92,246,.3)}50%{box-shadow:0 0 24px rgba(139,92,246,.6)}}
+.career-step span{font-size:10px;color:#64748b;font-weight:600}
+.career-line{position:absolute;top:14px;left:12.5%;right:12.5%;height:2px;background:#334155;z-index:0}
+.career-line-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#8b5cf6);transition:width .5s}
+/* Skills table */
+.skills-panel{width:700px;max-height:420px;overflow-y:auto;background:#1e293b;border-radius:16px;border:1px solid #334155;padding:20px}
+.skills-panel::-webkit-scrollbar{width:6px}.skills-panel::-webkit-scrollbar-thumb{background:#475569;border-radius:3px}
+.skill-group-header{font-size:13px;font-weight:700;color:#8b5cf6;margin:12px 0 8px;display:flex;align-items:center;gap:8px}
+.skill-group-header::before{content:'';width:4px;height:16px;background:#8b5cf6;border-radius:2px}
+.skill-row{display:flex;align-items:center;padding:6px 12px;border-radius:8px;margin-bottom:4px;transition:background .2s}
+.skill-row:hover{background:#334155}
+.skill-name{flex:1;font-size:13px;font-weight:500}
+.stars{display:flex;gap:2px;margin-right:12px}
+.stars .star{font-size:14px}
+.stars .star.on{color:#f59e0b}.stars .star.off{color:#334155}
+.skill-bar{width:120px;height:6px;background:#334155;border-radius:3px;overflow:hidden;margin-right:12px}
+.skill-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.skill-score{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:35px;text-align:right}
+/* CV Upload */
+.cv-upload-zone{width:500px;border:2px dashed #475569;border-radius:20px;padding:48px;text-align:center;background:#1e293b;transition:all .3s}
+.cv-upload-zone.active{border-color:#3b82f6;background:rgba(59,130,246,.05)}
+.cv-upload-zone .icon{font-size:48px;margin-bottom:16px}
+/* Radar chart (CSS only) */
+.radar-wrap{width:300px;height:300px;position:relative;margin:0 auto}
+/* Eval panel */
+.eval-panel{width:600px;background:#1e293b;border-radius:16px;border:1px solid #334155;padding:28px;overflow:hidden}
+.eval-group{display:flex;align-items:center;margin-bottom:12px;gap:12px}
+.eval-group .label{width:100px;font-size:12px;font-weight:600;color:#94a3b8;text-align:right}
+.eval-group .bar{flex:1;height:20px;background:#0f172a;border-radius:10px;overflow:hidden;position:relative}
+.eval-group .bar-fill{height:100%;border-radius:10px;transition:width 1s ease}
+.eval-group .val{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:40px}
+.level-badge{display:inline-flex;padding:8px 24px;border-radius:12px;font-size:18px;font-weight:800;letter-spacing:1px}
+/* AI summary */
+.ai-summary-card{width:560px;background:linear-gradient(145deg,#1e293b,#1a1030);border:1px solid #334155;border-radius:16px;padding:28px}
+.ai-typing{border-left:3px solid #8b5cf6;padding-left:16px;font-size:14px;line-height:1.8;color:#cbd5e1}
+.ai-typing .cursor-blink{display:inline-block;width:2px;height:16px;background:#8b5cf6;animation:blink 1s infinite;vertical-align:text-bottom;margin-left:2px}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+/* Job card */
+.job-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:12px;transition:all .2s}
+.job-card:hover{border-color:#3b82f6;transform:translateX(4px)}
+/* Match result */
+.match-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:16px}
+.match-pct{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace}
+/* Notification */
+.notif-bell{position:relative;font-size:24px;cursor:pointer}
+.notif-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#ef4444;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+/* Danger zone */
+.danger-zone{border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:20px;background:rgba(239,68,68,.05)}
+/* Final scene */
+.final-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:600px}
+.stat-card{background:linear-gradient(145deg,#1e293b,#162032);border:1px solid #334155;border-radius:16px;padding:24px;text-align:center}
+.stat-card .num{font-size:36px;font-weight:900;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .lbl{font-size:12px;color:#64748b;font-weight:600;margin-top:4px}
+/* Animated bg */
+.bg-particles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.bg-particles .p{position:absolute;border-radius:50%;background:rgba(59,130,246,.08);animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+/* Scene transition */
+.scene-fade-enter{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+/* Part separator */
+.part-separator{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:50;background:rgba(15,23,42,.95);flex-direction:column;gap:12px}
+.part-separator h1{font-size:40px;font-weight:900;letter-spacing:4px}
+/* Search/filter */
+.search-box{display:flex;gap:8px;margin-bottom:16px}
+.search-box input{flex:1;padding:10px 16px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:14px;outline:none}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+.filter-chip{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;border:1px solid #475569;background:#1e293b;color:#94a3b8;cursor:pointer;transition:all .2s}
+.filter-chip.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
+</style>
+</head>
+<body>
+<!-- Title Bar -->
+<div class="title-bar">
+  <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+  <div class="file-name">▶ IT_Talent_AI_Profile_Final_Demo_1080p.mp4</div>
+  <div style="font-size:11px;color:#475569">1920×1080</div>
+</div>
+
+<!-- Player -->
+<div class="player-wrap" id="player">
+  <!-- Viewport -->
+  <div class="viewport" id="viewport">
+    <!-- Bg particles -->
+    <div class="bg-particles" id="particles"></div>
+    <!-- Watermark -->
+    <div class="watermark">IT TALENT AI PROFILE — FINAL DEMO</div>
+    <!-- Badge -->
+    <div class="demo-badge">
+      <div class="chip" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff" id="partBadge">PART 1: ỨNG VIÊN</div>
+      <div class="chip" style="background:#1e293b;color:#94a3b8;border:1px solid #334155">12/12 Chức Năng • Sprint 1-4</div>
+    </div>
+    <!-- Scene content -->
+    <div id="sceneContent" class="scene-container"></div>
+    <!-- Virtual cursor -->
+    <div class="vcursor" id="vcursor" style="left:-50px;top:-50px">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-7 2-4 7L5 3z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg>
+    </div>
+    <!-- Subtitle -->
+    <div class="subtitle-bar"><div class="subtitle-text" id="subtitleText" style="opacity:0"></div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="ctrl-btn" onclick="prevScene()" title="Previous">⏮</button>
+    <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()" title="Play/Pause">▶</button>
+    <button class="ctrl-btn" onclick="nextScene()" title="Next">⏭</button>
+    <div class="time-display"><span id="timeCur">00:00</span> / <span id="timeTotal">06:00</span></div>
+    <div class="progress-wrap" id="progressWrap" onclick="seekTo(event)">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <button class="speed-btn" id="speedBtn" onclick="cycleSpeed()">1.0x</button>
+    <button class="ctrl-btn" onclick="replayScene()" title="Replay Scene">🔄</button>
+  </div>
+
+  <!-- Scene Chips -->
+  <div class="scene-chips" id="sceneChips"></div>
+</div>
+
+<script>
+// ===== CONFIGURATION =====
+const TOTAL_DURATION = 360;
+const SCENE_DURATION = 30;
+const SPEEDS = [0.5, 1, 1.5, 2, 3];
+let speedIdx = 1;
+let currentTime = 0;
+let isPlaying = false;
+let currentScene = -1;
+let animFrame = null;
+let lastTick = 0;
+
+// ===== SCENES DATA =====
+const scenes = [
+  // ——— Scene 1: Intro & Login ———
+  {
+    id: 1, title: "Đăng nhập", start: 0, end: 30, part: 1,
+    subtitles: [
+      {at:2, text:"Hệ thống sử dụng <code>bcrypt.hashpw(password, bcrypt.gensalt())</code> để băm mật khẩu — không lưu plaintext, chống brute-force với salt ngẫu nhiên."},
+      {at:9, text:"Sau khi xác thực, server tạo JWT token bằng thuật toán <code>HS256</code>: <code>jwt.encode({sub, user_id, email, role, exp, iat}, SECRET_KEY)</code> — token hết hạn sau 60 phút."},
+      {at:17, text:"Guard middleware giải mã JWT → kiểm tra role (candidate/recruiter) → cho phép hoặc từ chối truy cập endpoint. API: <code>POST /login</code>, <code>POST /register</code>."},
+      {at:24, text:"Quick Login cho phép đăng nhập nhanh với tài khoản demo. Toàn bộ 24 API endpoints được bảo vệ bởi JWT authentication layer."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:20px">
+        <div style="text-align:center;margin-bottom:12px">
+          <div style="font-size:48px;font-weight:900;background:linear-gradient(135deg,#3b82f6,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px">IT TALENT AI</div>
+          <div style="font-size:14px;color:#64748b;letter-spacing:4px;font-weight:600;margin-top:4px">PROFILE MANAGEMENT SYSTEM</div>
+        </div>
+        <div class="login-card">
+          <h2>Đăng Nhập</h2>
+          <p class="subtitle">Đăng nhập vào hệ thống quản lý nhân tài IT</p>
+          <div class="form-group">
+            <label>📧 Email</label>
+            <input class="form-input" type="email" value="candidate@demo.com" id="loginEmail"/>
+          </div>
+          <div class="form-group">
+            <label>🔒 Mật khẩu</label>
+            <input class="form-input" type="password" value="••••••••"/>
+          </div>
+          <button class="login-btn primary" id="loginBtn">Đăng Nhập →</button>
+          <div style="text-align:center;margin:16px 0 8px;font-size:12px;color:#475569">— Quick Login —</div>
+          <div class="quick-login">
+            <button id="qlCandidate">👨‍💻 Ứng Viên</button>
+            <button id="qlRecruiter">🏢 Nhà Tuyển Dụng</button>
+          </div>
+          <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);font-size:11px;color:#93c5fd;text-align:center">
+            🔐 Bcrypt + JWT HS256 • Token 60min • Role-based Guard
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 2: 3D Profile & Career ———
+  {
+    id: 2, title: "Hồ sơ 3D", start: 30, end: 60, part: 1,
+    subtitles: [
+      {at:32, text:"Hồ sơ ứng viên hiển thị dạng 3D card với CSS <code>perspective(800px)</code> và LED conic-gradient avatar — tạo trải nghiệm trực quan, hiện đại."},
+      {at:39, text:"Thuật toán xác định Level: <code>Senior</code> (years≥5 AND score≥75), <code>Middle</code> (years≥2 AND score≥55), <code>Junior</code> (years≥1 AND score≥40), <code>Intern</code> (otherwise)."},
+      {at:46, text:"Hàm <code>determine_level(years, total_score)</code> áp dụng logic AND — ứng viên phải thỏa mãn CẢ HAI điều kiện kinh nghiệm VÀ điểm tổng để đạt level."},
+      {at:53, text:"Career Roadmap hiển thị tiến trình từ Intern → Senior, cập nhật tự động sau mỗi lần đánh giá. Dữ liệu lưu trong bảng <code>profiles</code> (level, total_score)."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="gap:40px">
+        <div class="profile-3d" id="profileCard">
+          <div class="avatar-led"><div class="av-inner">NV</div></div>
+          <div style="text-align:center">
+            <div style="font-size:22px;font-weight:800">Nguyễn Văn Anh</div>
+            <div style="font-size:13px;color:#64748b;margin-top:4px">Full-Stack Developer</div>
+            <div style="margin-top:12px;display:flex;justify-content:center;gap:8px">
+              <span class="level-badge" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-size:14px;padding:6px 16px">⭐ MIDDLE</span>
+              <span style="padding:6px 16px;border-radius:12px;background:#0f172a;font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#10b981">72.5 pts</span>
+            </div>
+          </div>
+          <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+            <div style="padding:10px;background:#0f172a;border-radius:8px;text-align:center"><div style="color:#64748b">Kinh nghiệm</div><div style="font-weight:700;font-size:16px;color:#3b82f6;margin-top:2px">3 năm</div></div>
+            <div style="padding:10px;background:#0f172a;border-radius:8px;text-align:center"><div style="color:#64748b">Kỹ năng</div><div style="font-weight:700;font-size:16px;color:#8b5cf6;margin-top:2px">12 skills</div></div>
+          </div>
+          <div style="position:relative;margin-top:24px">
+            <div class="career-line"><div class="career-line-fill" style="width:50%"></div></div>
+            <div class="career-bar">
+              <div class="career-step"><div class="dot filled">✓</div><span>Intern</span></div>
+              <div class="career-step"><div class="dot filled">✓</div><span>Junior</span></div>
+              <div class="career-step"><div class="dot current">★</div><span style="color:#8b5cf6;font-weight:700">Middle</span></div>
+              <div class="career-step"><div class="dot">4</div><span>Senior</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="width:280px;font-size:12px">
+          <div style="font-weight:700;font-size:16px;margin-bottom:16px;color:#8b5cf6">📋 Thông tin API</div>
+          <div style="background:#0f172a;border-radius:12px;padding:16px;border:1px solid #334155">
+            <div style="margin-bottom:8px"><span style="color:#64748b">Endpoint:</span> <code style="color:#93c5fd;font-family:'JetBrains Mono',monospace">GET /profiles/me</code></div>
+            <div style="margin-bottom:8px"><span style="color:#64748b">Auth:</span> <span style="color:#10b981">JWT Bearer Token</span></div>
+            <div style="margin-bottom:8px"><span style="color:#64748b">Tables:</span> <code style="color:#f59e0b;font-family:'JetBrains Mono',monospace">profiles, users</code></div>
+            <div><span style="color:#64748b">Fields:</span> <span style="color:#94a3b8">full_name, desired_position, years_experience, level, total_score</span></div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 3: Skills Management ———
+  {
+    id: 3, title: "Kỹ năng", start: 60, end: 90, part: 1,
+    subtitles: [
+      {at:62, text:"Hệ thống quản lý 60 kỹ năng IT chuẩn hóa, chia thành 6 nhóm: Backend, Frontend, Database, DevOps, Data/AI, Khác — lưu trong bảng <code>skills</code>."},
+      {at:69, text:"Công thức tính điểm: <code>skill_score = proficiency × 12 + min(years_used, 5) × 8</code> — tối đa 100 điểm (proficiency=5→60, years=5→40)."},
+      {at:76, text:"API: <code>POST /profiles/me/skills</code> thêm kỹ năng, <code>DELETE /profiles/me/skills/{id}</code> xóa. Bảng <code>profile_skills</code> lưu proficiency (1-5) và years_used."},
+      {at:83, text:"Group average = <code>sum(scores) / len(scores)</code> cho mỗi skill_group. Total score = trung bình các group, dùng cho thuật toán đánh giá level."}
+    ],
+    render() {
+      const skillData = [
+        {group:"Backend", skills:[{n:"Python",p:5,y:3,s:100},{n:"FastAPI",p:4,y:2,s:64},{n:"Node.js",p:3,y:2,s:52}]},
+        {group:"Frontend", skills:[{n:"React",p:4,y:3,s:72},{n:"TypeScript",p:3,y:1,s:44},{n:"Tailwind CSS",p:4,y:2,s:64}]},
+        {group:"Database", skills:[{n:"PostgreSQL",p:4,y:3,s:72},{n:"Redis",p:3,y:1,s:44}]},
+        {group:"DevOps", skills:[{n:"Docker",p:3,y:2,s:52},{n:"GitHub Actions",p:3,y:1,s:44}]},
+        {group:"Data/AI", skills:[{n:"TensorFlow",p:2,y:1,s:32},{n:"Pandas",p:4,y:2,s:64}]},
+      ];
+      let html = `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:16px">
+        <div style="text-align:center;margin-bottom:4px">
+          <div style="font-size:22px;font-weight:800">🎯 Quản lý Kỹ năng IT</div>
+          <div style="font-size:12px;color:#64748b">60 skills • 6 groups • Bảng profile_skills</div>
+        </div>
+        <div class="skills-panel">`;
+      skillData.forEach(g => {
+        html += `<div class="skill-group-header">${g.group}</div>`;
+        g.skills.forEach(s => {
+          const pct = s.s;
+          const color = pct >= 70 ? '#10b981' : pct >= 50 ? '#3b82f6' : pct >= 40 ? '#f59e0b' : '#94a3b8';
+          let stars = '';
+          for(let i=1;i<=5;i++) stars += `<span class="star ${i<=s.p?'on':'off'}">★</span>`;
+          html += `<div class="skill-row">
+            <div class="skill-name">${s.n}</div>
+            <div class="stars">${stars}</div>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+            <div class="skill-score" style="color:${color}">${pct}</div>
+          </div>`;
+        });
+      });
+      html += `</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:4px">
+          <div style="padding:8px 16px;background:#0f172a;border-radius:10px;border:1px solid #334155;font-size:12px"><span style="color:#64748b">Formula:</span> <code style="color:#93c5fd;font-family:'JetBrains Mono',monospace">prof×12 + min(yrs,5)×8</code></div>
+          <div style="padding:8px 16px;background:#0f172a;border-radius:10px;border:1px solid #334155;font-size:12px"><span style="color:#64748b">Max:</span> <span style="font-weight:700;color:#10b981">100</span></div>
+        </div>
+      </div>`;
+      return html;
+    }
+  },
+  // ——— Scene 4: CV Upload ———
+  {
+    id: 4, title: "Upload CV", start: 90, end: 120, part: 1,
+    subtitles: [
+      {at:92, text:"CV Upload qua API <code>POST /cv/upload</code>: validate PDF bằng magic bytes <code>%PDF-</code>, giới hạn 5MB. Trích xuất text bằng thư viện <code>pypdf</code>."},
+      {at:99, text:"AI Extraction: gửi CV text + 60 skill catalog → Claude Sonnet → trả về JSON có full_name, skills, years_experience. Prompt có 10 safety rules chống hallucination."},
+      {at:106, text:"Retry mechanism: <code>MAX_RETRIES=2</code>, nếu JSON parse thất bại sẽ gửi lại prompt. Skill matching: <code>skill_by_name[name.casefold()]</code> — case-insensitive lookup."},
+      {at:113, text:"Trạng thái CV: pending → success/failed. API <code>POST /cv/{id}/confirm</code> để ứng viên xác nhận kết quả AI. Bảng <code>cv_files</code> lưu ai_result dạng JSON."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:24px">
+        <div style="display:flex;gap:24px;align-items:flex-start">
+          <div>
+            <div style="font-size:20px;font-weight:800;margin-bottom:16px">📄 Upload CV & AI Extraction</div>
+            <div class="cv-upload-zone" id="cvZone">
+              <div class="icon">📁</div>
+              <div style="font-size:16px;font-weight:700;margin-bottom:8px">Kéo thả CV vào đây</div>
+              <div style="font-size:13px;color:#64748b">Hỗ trợ PDF • Tối đa 5MB</div>
+              <div style="margin-top:16px;display:inline-block;padding:10px 24px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:10px;color:#fff;font-weight:600;font-size:13px">Chọn file</div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:#0f172a;border-radius:10px;border:1px solid #334155;font-size:11px;display:flex;gap:12px;justify-content:center">
+              <span>✅ Magic bytes: <code style="color:#93c5fd;font-family:'JetBrains Mono',monospace">%PDF-</code></span>
+              <span>✅ Max: <code style="color:#93c5fd;font-family:'JetBrains Mono',monospace">5MB</code></span>
+              <span>✅ Parser: <code style="color:#93c5fd;font-family:'JetBrains Mono',monospace">pypdf</code></span>
+            </div>
+          </div>
+          <div style="width:320px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:#8b5cf6">🤖 AI Processing Pipeline</div>
+            <div style="background:#0f172a;border-radius:12px;padding:16px;border:1px solid #334155">
+              ${['📥 Nhận PDF file','🔍 Validate magic bytes','📝 Extract text (pypdf)','🤖 Claude Sonnet analyze','📊 Parse JSON result','✅ Match 60 skills catalog'].map((s,i) =>
+                `<div style="display:flex;align-items:center;gap:10px;margin-bottom:${i<5?'10':'0'}px;font-size:12px">
+                  <div style="width:24px;height:24px;border-radius:50%;background:${i<4?'linear-gradient(135deg,#10b981,#059669)':'#334155'};display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">${i<4?'✓':i+1}</div>
+                  <span style="color:${i<4?'#10b981':'#94a3b8'}">${s}</span>
+                </div>`).join('')}
+            </div>
+            <div style="margin-top:12px;padding:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:8px;font-size:11px;color:#c4b5fd;text-align:center">
+              🔄 MAX_RETRIES=2 • 10 Safety Rules • No Hallucination
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 5: AI Evaluation ———
+  {
+    id: 5, title: "Đánh giá AI", start: 120, end: 150, part: 1,
+    subtitles: [
+      {at:122, text:"API <code>GET /evaluation/me</code> gọi hàm <code>evaluate_profile()</code>: tính skill_score cho từng kỹ năng → group average → total score."},
+      {at:129, text:"Skill score = <code>proficiency × 12 + min(years_used, 5) × 8</code>. Group average = <code>sum(scores) / len(scores)</code>. Total = trung bình tất cả group averages."},
+      {at:136, text:"Level thresholds: Senior (yrs≥5, score≥75), Middle (yrs≥2, score≥55), Junior (yrs≥1, score≥40), Intern (otherwise). Hàm <code>determine_level()</code>."},
+      {at:143, text:"Radar chart hiển thị 6 nhóm kỹ năng trực quan. Kết quả đánh giá lưu vào <code>profiles.total_score</code> và <code>profiles.level</code> trong database."}
+    ],
+    render() {
+      const groups = [
+        {name:"Backend",score:72,color:"#3b82f6"},
+        {name:"Frontend",score:60,color:"#8b5cf6"},
+        {name:"Database",score:58,color:"#10b981"},
+        {name:"DevOps",score:48,color:"#f59e0b"},
+        {name:"Data/AI",score:48,color:"#ec4899"},
+        {name:"Khác",score:40,color:"#06b6d4"},
+      ];
+      const total = Math.round(groups.reduce((s,g)=>s+g.score,0)/groups.length);
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:20px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">📊 AI Evaluation Report</div>
+          <div style="font-size:12px;color:#64748b">evaluate_profile() • determine_level()</div>
+        </div>
+        <div style="display:flex;gap:32px;align-items:center">
+          <div class="eval-panel">
+            ${groups.map(g => `<div class="eval-group">
+              <div class="label">${g.name}</div>
+              <div class="bar"><div class="bar-fill" style="width:${g.score}%;background:${g.color}"></div></div>
+              <div class="val" style="color:${g.color}">${g.score}</div>
+            </div>`).join('')}
+            <div style="margin-top:16px;border-top:1px solid #334155;padding-top:16px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:12px;color:#64748b">Total Score</div>
+                <div style="font-size:32px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#3b82f6">${total}</div>
+              </div>
+              <div class="level-badge" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff">⭐ MIDDLE</div>
+            </div>
+          </div>
+          <div style="width:200px;background:#0f172a;border-radius:12px;padding:16px;border:1px solid #334155;font-size:11px">
+            <div style="font-weight:700;margin-bottom:12px;color:#f59e0b">📐 Level Thresholds</div>
+            <div style="margin-bottom:8px;padding:8px;background:rgba(239,68,68,.1);border-radius:6px;color:#fca5a5">🔴 Senior: yrs≥5 & score≥75</div>
+            <div style="margin-bottom:8px;padding:8px;background:rgba(139,92,246,.1);border-radius:6px;color:#c4b5fd">🟣 Middle: yrs≥2 & score≥55</div>
+            <div style="margin-bottom:8px;padding:8px;background:rgba(59,130,246,.1);border-radius:6px;color:#93c5fd">🔵 Junior: yrs≥1 & score≥40</div>
+            <div style="padding:8px;background:rgba(100,116,139,.1);border-radius:6px;color:#94a3b8">⚪ Intern: otherwise</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 6: AI Summary ———
+  {
+    id: 6, title: "AI Summary", start: 150, end: 180, part: 1,
+    subtitles: [
+      {at:152, text:"Claude 3.5 Sonnet tạo bản tóm tắt ≤150 từ bằng Tiếng Việt: phân tích điểm mạnh, điểm yếu dựa trên skill scores và group averages."},
+      {at:159, text:"Prompt engineering: hệ thống gửi profile data (skills, scores, level) → Claude phân tích → trả về summary lưu vào <code>profiles.ai_summary</code>."},
+      {at:166, text:"Hệ thống hỗ trợ mock/real switch: <code>MOCK_AI=true</code> trả kết quả demo tức thì, <code>MOCK_AI=false</code> gọi API Claude thực tế."},
+      {at:173, text:"AI Summary cập nhật tự động mỗi khi evaluate_profile() được gọi. Output bao gồm: strengths, weaknesses, recommendations bằng Tiếng Việt."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:20px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">🤖 AI Summary — Claude LLM</div>
+          <div style="font-size:12px;color:#64748b">Claude 3.5 Sonnet • ≤150 từ • Tiếng Việt</div>
+        </div>
+        <div class="ai-summary-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#ec4899);display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>
+            <div><div style="font-weight:700;font-size:14px">AI Analysis</div><div style="font-size:11px;color:#64748b">Claude 3.5 Sonnet • Vietnamese</div></div>
+            <div style="margin-left:auto;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);color:#10b981;font-size:11px;font-weight:600">✓ Generated</div>
+          </div>
+          <div class="ai-typing">
+            <strong style="color:#8b5cf6">Điểm mạnh:</strong> Ứng viên có nền tảng Backend vững chắc với Python và FastAPI (72 điểm). Khả năng Frontend khá tốt với React và TypeScript. Kinh nghiệm 3 năm thể hiện sự phát triển ổn định.<br><br>
+            <strong style="color:#ec4899">Điểm yếu:</strong> Nhóm DevOps và Data/AI cần cải thiện (48 điểm). Chưa có kinh nghiệm với Kubernetes và Cloud services. Nên tập trung nâng cao kỹ năng CI/CD.<br><br>
+            <strong style="color:#3b82f6">Khuyến nghị:</strong> Ứng viên phù hợp vị trí Middle Full-Stack Developer. Nên đầu tư thêm vào Docker, AWS để mở rộng career path.<span class="cursor-blink"></span>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <span style="padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.1);color:#93c5fd;font-size:11px">profiles.ai_summary</span>
+            <span style="padding:4px 10px;border-radius:6px;background:rgba(139,92,246,.1);color:#c4b5fd;font-size:11px">≤150 words</span>
+            <span style="padding:4px 10px;border-radius:6px;background:rgba(245,158,11,.1);color:#fcd34d;font-size:11px">MOCK_AI switch</span>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 7: Notifications & Delete ———
+  {
+    id: 7, title: "Thông báo & Xóa", start: 180, end: 210, part: 1,
+    subtitles: [
+      {at:182, text:"Hệ thống thông báo cho ứng viên khi nhà tuyển dụng xem hồ sơ hoặc gửi lời mời. Notification bell hiển thị số thông báo chưa đọc."},
+      {at:189, text:"Danger Zone: API <code>DELETE /profiles/me</code> kích hoạt CASCADE deletion — xóa User → tự động xóa Profile → ProfileSkills → CvFiles."},
+      {at:196, text:"Physical file cleanup: hệ thống iterate qua <code>cv_files</code>, gọi <code>os.remove(file_path)</code> để xóa PDF đã upload khỏi server storage."},
+      {at:203, text:"SQLAlchemy CASCADE được cấu hình: <code>relationship(cascade='all, delete-orphan')</code>. Đảm bảo không còn orphan records sau khi xóa tài khoản."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:24px">
+        <div style="display:flex;gap:32px">
+          <div style="width:340px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+              <div style="font-size:22px;font-weight:800">🔔 Thông báo</div>
+              <div class="notif-bell">🔔<div class="notif-badge">3</div></div>
+            </div>
+            ${[
+              {t:"Nhà tuyển dụng ABC Corp đã xem hồ sơ của bạn",time:"2 phút trước",icon:"👁️"},
+              {t:"Bạn được mời phỏng vấn vị trí Senior Developer",time:"1 giờ trước",icon:"💌"},
+              {t:"Hồ sơ của bạn match 85% với JD #12",time:"3 giờ trước",icon:"🎯"},
+            ].map(n => `<div style="padding:14px;background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+              <div style="font-size:20px;flex-shrink:0">${n.icon}</div>
+              <div><div style="font-size:13px;font-weight:500">${n.t}</div><div style="font-size:11px;color:#64748b;margin-top:4px">${n.time}</div></div>
+            </div>`).join('')}
+          </div>
+          <div style="width:340px">
+            <div style="font-size:22px;font-weight:800;margin-bottom:20px;color:#ef4444">⚠️ Danger Zone</div>
+            <div class="danger-zone">
+              <div style="font-size:15px;font-weight:700;color:#ef4444;margin-bottom:8px">Xóa tài khoản vĩnh viễn</div>
+              <div style="font-size:12px;color:#94a3b8;margin-bottom:16px;line-height:1.6">
+                Hành động này sẽ xóa tất cả dữ liệu: User → Profile → ProfileSkills → CvFiles (CASCADE). Không thể hoàn tác.
+              </div>
+              <div style="padding:12px;background:rgba(239,68,68,.08);border-radius:8px;margin-bottom:16px;font-size:11px;font-family:'JetBrains Mono',monospace;color:#fca5a5">
+                DELETE /profiles/me<br>
+                CASCADE: User → Profile → Skills → CVs<br>
+                os.remove(file_path) → cleanup PDFs
+              </div>
+              <button style="width:100%;padding:10px;border-radius:8px;background:#ef4444;color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer">🗑️ Xóa tài khoản</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 8: Recruiter Login ———
+  {
+    id: 8, title: "Recruiter Login", start: 210, end: 240, part: 2,
+    subtitles: [
+      {at:212, text:"Chuyển sang tài khoản Nhà tuyển dụng. JWT token mới chứa <code>role: 'recruiter'</code> — Guard middleware cho phép truy cập các endpoint quản lý JD."},
+      {at:219, text:"Role-based routing: recruiter thấy Job Dashboard, candidate thấy Profile Dashboard. Backend kiểm tra <code>token.role</code> tại mỗi guard middleware."},
+      {at:226, text:"Job Dashboard hiển thị tất cả JD đã tạo với trạng thái Open/Closed. API: <code>GET /jobs</code> trả danh sách, <code>PATCH /jobs/{id}/status</code> toggle."},
+      {at:233, text:"Bảng <code>jobs</code>: id, recruiter_id, title, description, min_years, is_open, created_at. Foreign key recruiter_id → users.id đảm bảo data integrity."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:20px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">🏢 Recruiter Dashboard</div>
+          <div style="font-size:12px;color:#64748b">Job Management Center • role: recruiter</div>
+        </div>
+        <div style="width:650px">
+          <div style="display:flex;gap:12px;margin-bottom:16px">
+            <div style="flex:1;padding:16px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:12px;text-align:center"><div style="font-size:28px;font-weight:900">5</div><div style="font-size:11px;opacity:.8">JDs Active</div></div>
+            <div style="flex:1;padding:16px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:12px;text-align:center"><div style="font-size:28px;font-weight:900">23</div><div style="font-size:11px;opacity:.8">Candidates</div></div>
+            <div style="flex:1;padding:16px;background:linear-gradient(135deg,#10b981,#059669);border-radius:12px;text-align:center"><div style="font-size:28px;font-weight:900">87%</div><div style="font-size:11px;opacity:.8">Avg Match</div></div>
+          </div>
+          ${[
+            {t:"Senior Full-Stack Developer",s:true,c:8,m:"92%",y:5},
+            {t:"Junior React Developer",s:true,c:15,m:"78%",y:1},
+            {t:"DevOps Engineer",s:true,c:5,m:"65%",y:3},
+            {t:"Data Scientist (Closed)",s:false,c:12,m:"71%",y:2},
+          ].map(j => `<div class="job-card" style="border-left:3px solid ${j.s?'#10b981':'#64748b'}">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:15px;font-weight:700">${j.t}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:4px">Min ${j.y} năm • ${j.c} ứng viên match</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:${parseInt(j.m)>=80?'#10b981':'#f59e0b'}">${j.m}</span>
+                <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:${j.s?'rgba(16,185,129,.15)':'rgba(100,116,139,.15)'};color:${j.s?'#10b981':'#64748b'}">${j.s?'Open':'Closed'}</span>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 9: Create Job ———
+  {
+    id: 9, title: "Tạo JD", start: 240, end: 270, part: 2,
+    subtitles: [
+      {at:242, text:"API <code>POST /jobs</code> tạo Job Description mới. Recruiter nhập title, description, min_years_experience. Dữ liệu lưu vào bảng <code>jobs</code>."},
+      {at:249, text:"Gắn kỹ năng qua <code>POST /jobs/{id}/skills</code> với field <code>is_required</code> (0=preferred, 1=required). Bảng <code>job_skills</code>: job_id, skill_id, is_required."},
+      {at:256, text:"<code>DELETE /jobs/{id}/skills/{skill_id}</code> xóa kỹ năng khỏi JD. <code>PUT /jobs/{id}</code> cập nhật. <code>DELETE /jobs/{id}</code> xóa toàn bộ JD và job_skills liên quan."},
+      {at:263, text:"Mỗi JD có trạng thái is_open: <code>PATCH /jobs/{id}/status</code> toggle Open↔Closed. Chỉ JD open mới xuất hiện trong kết quả matching."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:20px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">📝 Tạo Job Description</div>
+          <div style="font-size:12px;color:#64748b">POST /jobs • POST /jobs/{id}/skills</div>
+        </div>
+        <div style="width:580px;background:#1e293b;border-radius:16px;border:1px solid #334155;padding:28px">
+          <div class="form-group"><label>📌 Vị trí</label><input class="form-input" value="Senior Full-Stack Developer"/></div>
+          <div class="form-group"><label>📄 Mô tả</label><textarea class="form-input" style="height:60px;resize:none;font-family:inherit">Tìm kiếm Full-Stack Developer có kinh nghiệm React + Python/FastAPI, triển khai Docker...</textarea></div>
+          <div class="form-group"><label>📅 Kinh nghiệm tối thiểu (năm)</label><input class="form-input" type="number" value="3"/></div>
+          <div style="margin-top:16px">
+            <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:8px">🎯 Kỹ năng yêu cầu</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${["Python ★","React ★","Docker ★","PostgreSQL ★"].map(s => `<span style="padding:5px 12px;border-radius:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:12px;font-weight:600">${s} (required)</span>`).join('')}
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:8px">💡 Kỹ năng ưu tiên</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${["TypeScript","Redis","GitHub Actions"].map(s => `<span style="padding:5px 12px;border-radius:8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd;font-size:12px;font-weight:600">${s} (preferred)</span>`).join('')}
+            </div>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:10px">
+            <button style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer">✅ Tạo JD</button>
+            <button style="padding:10px 20px;border-radius:10px;background:#334155;color:#94a3b8;border:1px solid #475569;font-weight:600;font-size:13px;cursor:pointer">Hủy</button>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 10: AI Matching ———
+  {
+    id: 10, title: "AI Match", start: 270, end: 300, part: 2,
+    subtitles: [
+      {at:272, text:"API <code>GET /matching/jobs/{id}</code> gọi hàm <code>calc_match()</code>: tính match% cho mỗi ứng viên với JD. Thuật toán 3 thành phần trọng số."},
+      {at:279, text:"Công thức: <code>match% = 60×(matched_required/total_required) + 20×(matched_preferred/total_preferred) + 20×min(years/min_years, 1)</code>"},
+      {at:286, text:"<code>MIN_PROFICIENCY=3</code>: kỹ năng chỉ được tính là \"matched\" nếu proficiency ≥ 3. Required skills chiếm 60% — quan trọng nhất trong đánh giá."},
+      {at:293, text:"Kết quả sort: <code>ORDER BY match_percent DESC, total_score DESC, id ASC</code>. API trả danh sách ứng viên kèm chi tiết skills matched."}
+    ],
+    render() {
+      const candidates = [
+        {name:"Nguyễn Văn Anh",level:"Middle",score:72,match:92,req:"4/4",pref:"2/3",yrs:"3/3"},
+        {name:"Trần Thị Bình",level:"Senior",score:85,match:87,req:"3/4",pref:"3/3",yrs:"5/3"},
+        {name:"Lê Hoàng Cường",level:"Middle",score:68,match:75,req:"3/4",pref:"1/3",yrs:"3/3"},
+        {name:"Phạm Minh Đức",level:"Junior",score:52,match:58,req:"2/4",pref:"1/3",yrs:"2/3"},
+      ];
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:16px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">🎯 AI Job-Candidate Matching</div>
+          <div style="font-size:12px;color:#64748b">calc_match() • 60% required + 20% preferred + 20% years</div>
+        </div>
+        <div style="width:650px">
+          <div style="padding:12px;background:#0f172a;border-radius:10px;border:1px solid #334155;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#93c5fd;text-align:center">
+            match% = 60 × (req_matched/req_total) + 20 × (pref_matched/pref_total) + 20 × min(years/min_years, 1)
+          </div>
+          ${candidates.map(c => {
+            const color = c.match >= 90 ? '#10b981' : c.match >= 70 ? '#3b82f6' : c.match >= 55 ? '#f59e0b' : '#94a3b8';
+            const bg = c.match >= 90 ? 'rgba(16,185,129,.15)' : c.match >= 70 ? 'rgba(59,130,246,.15)' : c.match >= 55 ? 'rgba(245,158,11,.15)' : 'rgba(100,116,139,.15)';
+            return `<div class="match-card">
+              <div class="match-pct" style="background:${bg};color:${color};border:2px solid ${color}">${c.match}%</div>
+              <div style="flex:1">
+                <div style="font-size:14px;font-weight:700">${c.name}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px">${c.level} • Score: ${c.score}</div>
+              </div>
+              <div style="display:flex;gap:6px;font-size:10px">
+                <span style="padding:3px 8px;border-radius:4px;background:rgba(239,68,68,.1);color:#fca5a5">Req: ${c.req}</span>
+                <span style="padding:3px 8px;border-radius:4px;background:rgba(59,130,246,.1);color:#93c5fd">Pref: ${c.pref}</span>
+                <span style="padding:3px 8px;border-radius:4px;background:rgba(16,185,129,.1);color:#6ee7b7">Yrs: ${c.yrs}</span>
+              </div>
+            </div>`;
+          }).join('')}
+          <div style="text-align:center;margin-top:8px;font-size:11px;color:#64748b">MIN_PROFICIENCY = 3 • Sort: match% DESC, score DESC, id ASC</div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 11: Candidate Search ———
+  {
+    id: 11, title: "Tìm ứng viên", start: 300, end: 330, part: 2,
+    subtitles: [
+      {at:302, text:"API <code>GET /matching/candidates</code> hỗ trợ filter: skill_ids (AND logic — ứng viên phải có TẤT CẢ skills), level (Intern/Junior/Middle/Senior)."},
+      {at:309, text:"AND filter: query SQL <code>HAVING COUNT(DISTINCT skill_id) = len(skill_ids)</code> — đảm bảo ứng viên sở hữu mọi kỹ năng được yêu cầu."},
+      {at:316, text:"Pagination: <code>PAGE_SIZE=10</code>, tham số page trong query string. Chỉ hiển thị hồ sơ công khai <code>is_public=1</code> từ bảng profiles."},
+      {at:323, text:"<code>GET /matching/candidates/{id}</code> xem chi tiết ứng viên. Recruiter có thể xem skills, scores, evaluation report của candidate public profile."}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:16px">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:800">🔍 Tìm kiếm Ứng viên</div>
+          <div style="font-size:12px;color:#64748b">GET /matching/candidates • AND filter • PAGE_SIZE=10</div>
+        </div>
+        <div style="width:620px">
+          <div class="search-box">
+            <input placeholder="🔍 Tìm kiếm theo kỹ năng..." value="Python, React, Docker"/>
+            <button style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;font-weight:700;font-size:13px;cursor:pointer">Tìm</button>
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px">Filter by Level:</div>
+            <div class="filter-chips">
+              <div class="filter-chip">All</div>
+              <div class="filter-chip">Intern</div>
+              <div class="filter-chip">Junior</div>
+              <div class="filter-chip active">Middle</div>
+              <div class="filter-chip">Senior</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:8px">Kết quả: 3 ứng viên (is_public=1) • Trang 1/1</div>
+          ${[
+            {name:"Nguyễn Văn Anh",level:"Middle",score:72,skills:["Python","React","Docker","PostgreSQL"],pub:true},
+            {name:"Trần Thị Bình",level:"Middle",score:68,skills:["Python","React","Docker","TypeScript"],pub:true},
+            {name:"Lê Hoàng Cường",level:"Middle",score:65,skills:["Python","React","Docker","Node.js"],pub:true},
+          ].map(c => `<div class="match-card">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">${c.name.charAt(0)}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700">${c.name} ${c.pub?'<span style="font-size:10px;color:#10b981">🌐 Public</span>':''}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px">${c.level} • Score: ${c.score}</div>
+              <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${c.skills.map(s => `<span style="padding:2px 8px;border-radius:4px;background:rgba(59,130,246,.1);color:#93c5fd;font-size:10px">${s}</span>`).join('')}</div>
+            </div>
+            <button style="padding:6px 14px;border-radius:8px;background:#334155;border:1px solid #475569;color:#e2e8f0;font-size:11px;font-weight:600;cursor:pointer">Xem →</button>
+          </div>`).join('')}
+          <div style="display:flex;justify-content:center;gap:4px;margin-top:12px">
+            <span style="padding:4px 10px;border-radius:6px;background:#3b82f6;color:#fff;font-size:11px;font-weight:600">1</span>
+            <span style="padding:4px 10px;border-radius:6px;background:#1e293b;color:#64748b;font-size:11px;border:1px solid #334155">2</span>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  // ——— Scene 12: Summary ———
+  {
+    id: 12, title: "Tổng kết", start: 330, end: 360, part: 2,
+    subtitles: [
+      {at:332, text:"Hệ thống IT Talent AI Profile: 24 API endpoints, 7 bảng database, 148 test cases passed — coverage toàn diện từ Auth đến Matching."},
+      {at:339, text:"Tech stack: Python FastAPI + SQLAlchemy ORM, Claude 3.5 Sonnet AI, Bcrypt + JWT Auth, pypdf CV parser. Frontend: HTML/CSS/JS + Tailwind CSS."},
+      {at:346, text:"Kiến trúc: 3-tier (Presentation → Business Logic → Data Access). Separation of concerns: routes, services, repositories, models, schemas."},
+      {at:353, text:"Sprint 1-4 hoàn thành 12/12 chức năng: Auth, Profile CRUD, Skills, CV Upload, AI Evaluation, AI Summary, Job CRUD, Matching, Search, Delete CASCADE. 🎉"}
+    ],
+    render() {
+      return `<div class="scene-container scene-fade-enter" style="flex-direction:column;gap:24px">
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:900;background:linear-gradient(135deg,#3b82f6,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🎉 System Summary</div>
+          <div style="font-size:14px;color:#64748b;margin-top:8px">IT Talent AI Profile — Complete</div>
+        </div>
+        <div class="final-stats">
+          <div class="stat-card"><div class="num">148</div><div class="lbl">Tests Passed ✅</div></div>
+          <div class="stat-card"><div class="num">24</div><div class="lbl">API Endpoints</div></div>
+          <div class="stat-card"><div class="num">7</div><div class="lbl">Database Tables</div></div>
+          <div class="stat-card"><div class="num">12</div><div class="lbl">Chức năng</div></div>
+          <div class="stat-card"><div class="num">60</div><div class="lbl">IT Skills</div></div>
+          <div class="stat-card"><div class="num">4</div><div class="lbl">Sprints</div></div>
+        </div>
+        <div style="width:600px;display:flex;gap:12px">
+          <div style="flex:1;padding:16px;background:#1e293b;border-radius:12px;border:1px solid #334155">
+            <div style="font-weight:700;font-size:13px;color:#3b82f6;margin-bottom:8px">🔧 Backend</div>
+            <div style="font-size:11px;color:#94a3b8;line-height:1.8">Python FastAPI<br>SQLAlchemy ORM<br>Bcrypt + JWT HS256<br>pypdf Parser</div>
+          </div>
+          <div style="flex:1;padding:16px;background:#1e293b;border-radius:12px;border:1px solid #334155">
+            <div style="font-weight:700;font-size:13px;color:#8b5cf6;margin-bottom:8px">🤖 AI Engine</div>
+            <div style="font-size:11px;color:#94a3b8;line-height:1.8">Claude 3.5 Sonnet<br>CV Extraction<br>Skill Evaluation<br>Vietnamese Summary</div>
+          </div>
+          <div style="flex:1;padding:16px;background:#1e293b;border-radius:12px;border:1px solid #334155">
+            <div style="font-weight:700;font-size:13px;color:#10b981;margin-bottom:8px">📊 Data</div>
+            <div style="font-size:11px;color:#94a3b8;line-height:1.8">7 Tables Schema<br>CASCADE Delete<br>60 Skills Catalog<br>Matching Algorithm</div>
+          </div>
+        </div>
+        <div style="text-align:center;padding:16px;background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.1));border-radius:12px;border:1px solid rgba(59,130,246,.2);width:600px">
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">🏆 Sprint 1-4 Complete • 12/12 Features • All Tests Green</div>
+          <div style="font-size:12px;color:#64748b;margin-top:4px">IT TALENT AI PROFILE — FINAL DEMO</div>
+        </div>
+      </div>`;
+    }
+  },
+];
+
+// ===== INIT =====
+function init() {
+  createParticles();
+  buildSceneChips();
+  loadScene(0);
+}
+
+function createParticles() {
+  const c = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'p';
+    const size = 4 + Math.random() * 12;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*8}s`;
+    c.appendChild(p);
+  }
+}
+
+function buildSceneChips() {
+  const c = document.getElementById('sceneChips');
+  c.innerHTML = '';
+  let lastPart = 0;
+  scenes.forEach((s, i) => {
+    if (s.part !== lastPart) {
+      const lbl = document.createElement('div');
+      lbl.className = 'scene-chip part-label';
+      lbl.textContent = s.part === 1 ? 'PART 1' : 'PART 2';
+      c.appendChild(lbl);
+      lastPart = s.part;
+    }
+    const ch = document.createElement('div');
+    ch.className = 'scene-chip' + (i === 0 ? ' active' : '');
+    ch.textContent = `${s.id}. ${s.title}`;
+    ch.dataset.index = i;
+    ch.onclick = () => jumpToScene(i);
+    c.appendChild(ch);
+  });
+}
+
+function loadScene(idx) {
+  if (idx < 0 || idx >= scenes.length) return;
+  const prev = currentScene;
+  currentScene = idx;
+  const scene = scenes[idx];
+  document.getElementById('sceneContent').innerHTML = scene.render();
+  document.getElementById('partBadge').textContent = scene.part === 1 ? 'PART 1: ỨNG VIÊN' : 'PART 2: NHÀ TUYỂN DỤNG';
+  document.getElementById('partBadge').style.background = scene.part === 1 ? 'linear-gradient(135deg,#3b82f6,#8b5cf6)' : 'linear-gradient(135deg,#ec4899,#f59e0b)';
+
+  // Update chips
+  document.querySelectorAll('.scene-chip:not(.part-label)').forEach((ch, i) => {
+    ch.classList.toggle('active', i === idx);
+  });
+  // Scroll chip into view
+  const activeChip = document.querySelector('.scene-chip.active');
+  if (activeChip) activeChip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+  updateSubtitle();
+}
+
+// ===== PLAYBACK =====
+function togglePlay() {
+  if (isPlaying) {
+    pause();
+  } else {
+    play();
+  }
+}
+
+function play() {
+  isPlaying = true;
+  document.getElementById('playBtn').textContent = '⏸';
+  lastTick = performance.now();
+  tick();
+}
+
+function pause() {
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶';
+  if (animFrame) cancelAnimationFrame(animFrame);
+}
+
+function tick() {
+  if (!isPlaying) return;
+  const now = performance.now();
+  const dt = (now - lastTick) / 1000 * SPEEDS[speedIdx];
+  lastTick = now;
+  currentTime = Math.min(currentTime + dt, TOTAL_DURATION);
+
+  updateUI();
+
+  if (currentTime >= TOTAL_DURATION) {
+    pause();
+    return;
+  }
+  animFrame = requestAnimationFrame(tick);
+}
+
+function updateUI() {
+  // Progress
+  const pct = (currentTime / TOTAL_DURATION) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  // Time display
+  document.getElementById('timeCur').textContent = formatTime(currentTime);
+
+  // Scene
+  const sceneIdx = Math.min(Math.floor(currentTime / SCENE_DURATION), scenes.length - 1);
+  if (sceneIdx !== currentScene) {
+    loadScene(sceneIdx);
+  }
+
+  updateSubtitle();
+  updateCursor();
+}
+
+function updateSubtitle() {
+  const scene = scenes[currentScene];
+  if (!scene) return;
+  const el = document.getElementById('subtitleText');
+  const localTime = currentTime;
+  let activeText = '';
+  for (let i = scene.subtitles.length - 1; i >= 0; i--) {
+    if (localTime >= scene.subtitles[i].at) {
+      activeText = scene.subtitles[i].text;
+      break;
+    }
+  }
+  if (activeText) {
+    el.innerHTML = activeText;
+    el.style.opacity = '1';
+  } else {
+    el.style.opacity = '0';
+  }
+}
+
+function updateCursor() {
+  const vc = document.getElementById('vcursor');
+  const scene = scenes[currentScene];
+  if (!scene) return;
+  // Simple cursor animation based on scene time
+  const t = currentTime - scene.start;
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.offsetWidth;
+  const vh = viewport.offsetHeight;
+
+  // Move cursor around important areas
+  const phase = (t % 7.5) / 7.5; // cycle every 7.5s
+  const cx = vw * (0.3 + 0.4 * Math.sin(phase * Math.PI * 2));
+  const cy = vh * (0.3 + 0.3 * Math.cos(phase * Math.PI * 1.5));
+  vc.style.left = cx + 'px';
+  vc.style.top = cy + 'px';
+
+  // Click ripple every ~5s
+  if (Math.abs(t % 5 - 0.1) < 0.15) {
+    createRipple(cx, cy);
+  }
+}
+
+function createRipple(x, y) {
+  const viewport = document.getElementById('viewport');
+  const r = document.createElement('div');
+  r.className = 'click-ripple';
+  r.style.left = (x - 20) + 'px';
+  r.style.top = (y - 20) + 'px';
+  viewport.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+// ===== CONTROLS =====
+function seekTo(e) {
+  const wrap = document.getElementById('progressWrap');
+  const rect = wrap.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  currentTime = pct * TOTAL_DURATION;
+  updateUI();
+}
+
+function prevScene() {
+  const idx = Math.max(0, currentScene - 1);
+  currentTime = scenes[idx].start;
+  loadScene(idx);
+  updateUI();
+}
+
+function nextScene() {
+  const idx = Math.min(scenes.length - 1, currentScene + 1);
+  currentTime = scenes[idx].start;
+  loadScene(idx);
+  updateUI();
+}
+
+function replayScene() {
+  currentTime = scenes[currentScene].start;
+  updateUI();
+  if (!isPlaying) play();
+}
+
+function jumpToScene(idx) {
+  currentTime = scenes[idx].start;
+  loadScene(idx);
+  updateUI();
+}
+
+function cycleSpeed() {
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  document.getElementById('speedBtn').textContent = SPEEDS[speedIdx] + 'x';
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', e => {
+  switch(e.key) {
+    case ' ': e.preventDefault(); togglePlay(); break;
+    case 'ArrowRight': currentTime = Math.min(currentTime + 5, TOTAL_DURATION); updateUI(); break;
+    case 'ArrowLeft': currentTime = Math.max(currentTime - 5, 0); updateUI(); break;
+    case 'ArrowUp': e.preventDefault(); nextScene(); break;
+    case 'ArrowDown': e.preventDefault(); prevScene(); break;
+  }
+});
+
+// Start
+init();
+</script>
+</body>
+</html>
