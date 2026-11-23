@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tải Lên CV & Phân Tích AI - IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --hero-bg: radial-gradient(130% 120% at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    }
+
+    body {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 30%, rgba(168, 85, 247, 0.06) 0px, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* 3D HERO HEADER */
+    .hero-3d-wrapper {
+      perspective: 1200px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero-3d-card {
+      background: var(--hero-bg);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-blob {
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-glow-blob-2 {
+      position: absolute;
+      bottom: -60px;
+      left: 15%;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .hero-identity {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .avatar-3d-container {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      font-size: 32px;
+    }
+
+    .hero-meta h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px 0;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-meta p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13.5px;
+    }
+
+    /* CARDS */
+    .card-3d {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    /* UPLOAD DROP ZONE */
+    .upload-dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: var(--radius-xl);
+      padding: 40px 20px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      border-color: #6366f1;
+      background: #eef2ff;
+    }
+
+    .upload-dropzone-icon {
+      font-size: 54px;
+      margin-bottom: 14px;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .upload-dropzone h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+    }
+
+    .upload-dropzone p {
+      font-size: 13.5px;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* LOADING SPINNER BOX */
+    .loading-box {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-xl);
+      margin-bottom: 24px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ERROR ALERT & FALLBACK */
+    .error-alert-box {
+      display: none;
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      color: #991b1b;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESULT SECTION */
+    .result-section {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .table-skills {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+    }
+
+    .table-skills th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px 16px;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+    }
+
+    .table-skills td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    .table-skills tr:hover td {
+      background: #f8fafc;
+    }
+
+    .skill-not-found-chip {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 1200px; width: 95%; padding-bottom: 60px;">
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success" style="display: none;"></div>
+
+    <!-- 1. 3D HERO HEADER -->
+    <div class="hero-3d-wrapper">
+      <div class="hero-3d-card">
+        <div class="hero-glow-blob"></div>
+        <div class="hero-glow-blob-2"></div>
+        <div class="hero-content">
+          <div class="hero-identity">
+            <div class="avatar-3d-container">📄</div>
+            <div class="hero-meta">
+              <h1>Tải Lên CV & Trích Xuất Bằng AI</h1>
+              <p>Mô hình AI tự động đọc CV file PDF, trích xuất kinh nghiệm làm việc, học vấn và 60 kỹ năng chuẩn IT</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="profile.html" class="btn secondary" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); font-size: 13.5px;">
+              <span>←</span> Về Trang Hồ Sơ
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. UPLOAD CARD -->
+    <div class="card-3d" id="uploadZoneCard">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>📤</span> Chọn Tệp CV (Định dạng PDF, Tối đa 5MB)
+        </h2>
+        <span style="font-size: 12px; color: #6366f1; font-weight: 700; background: #eef2ff; padding: 4px 10px; border-radius: 9999px;">
+          ✨ Tự động nhận diện & chấm điểm
+        </span>
+      </div>
+
+      <!-- Dropzone -->
+      <div class="upload-dropzone" id="dropZone" onclick="document.getElementById('cvFileInput').click()">
+        <input type="file" id="cvFileInput" accept=".pdf,application/pdf" style="display: none;" onchange="handleFileSelected(event)">
+        <div class="upload-dropzone-icon">📑</div>
+        <h3 id="dropZoneTitle">Nhấp để chọn tệp CV hoặc kéo thả file PDF vào đây</h3>
+        <p id="dropZoneSubtitle">Hỗ trợ file PDF chuẩn văn bản (Text PDF). Dung lượng tối đa: 5.0 MB.</p>
+        <div id="fileSelectedInfo" style="display: none; margin-top: 14px; font-weight: 700; color: #4f46e5; font-size: 15px;"></div>
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="font-size: 13px; color: #64748b;">
+          💡 <em>Mẹo: Sau khi AI phân tích, bạn hoàn toàn có thể kiểm tra, sửa đổi mức kỹ năng và xác nhận trước khi lưu.</em>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="profile.html" class="btn secondary" style="padding: 10px 18px; font-size: 13.5px;">
+            Nhập hồ sơ thủ công
+          </a>
+          <button type="button" class="btn" id="btnUploadCV" onclick="uploadAndAnalyzeCV()" style="padding: 10px 24px; font-size: 13.5px;" disabled>
+            <span>🚀</span> Bắt Đầu Phân Tích Bằng AI
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. LOADING PROGRESS (DoD Requirement) -->
+    <div class="loading-box" id="loadingBox">
+      <div class="spinner"></div>
+      <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Đang tải lên và phân tích CV bằng AI...</h3>
+      <p style="font-size: 14px; color: #64748b; margin: 0;">Quá trình trích xuất thông tin, đối chiếu 60 kỹ năng và lập hồ sơ tự động đang diễn ra.</p>
+    </div>
+
+    <!-- 4. ERROR & MANUAL FALLBACK ALERT (DoD Requirement) -->
+    <div class="error-alert-box" id="errorAlertBox">
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+        <div style="font-size: 32px; line-height: 1;">⚠️</div>
+        <div style="flex: 1;">
+          <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 800;" id="errorAlertTitle">Phân tích CV không thành công</h3>
+          <p style="margin: 0 0 16px 0; font-size: 13.5px; line-height: 1.5;" id="errorAlertMessage">
+            Đã có lỗi xảy ra trong quá trình đọc file CV. Bạn có thể thử lại với file khác hoặc chuyển sang nhập hồ sơ thủ công.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn secondary" style="padding: 8px 16px; font-size: 13px;" onclick="resetUpload()">
+              🔄 Thử tải lại file khác
+            </button>
+            <a href="profile.html" class="btn" style="padding: 8px 20px; font-size: 13px; background: #dc2626;">
+              ✏️ Chuyển sang Nhập Hồ Sơ Thủ Công
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. AI EXTRACTION REVIEW SECTION (DoD Requirement) -->
+    <div class="result-section" id="resultSection">
+      
+      <!-- General CV Meta -->
+      <div class="card-3d">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+          <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>📋</span> Kết Quả Phân Tích Thông Tin Cơ Bản
+          </h2>
+          <span style="font-size: 12px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 4px 10px; border-radius: 9999px;">
+            ✓ Trích xuất thành công
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; display: block; margin-bottom: 6px;">
+              Số Năm Kinh Nghiệm Đã Xác Nhận (*):
+            </label>
+            <input type="number" id="reviewExpYears" min="0" max="40" step="0.5" style="font-weight: 700; font-size: 15px; color: #0f172a;" required>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; display: block; margin-bottom: 6px;">
+              Học Vấn / Trường / Bằng Cấp:
+            </label>
+            <input type="text" id="reviewEducation" placeholder="Ví dụ: Đại học Bách Khoa - Kỹ sư CNTT">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; display: block; margin-bottom: 6px;">
+            Tóm Tắt Quá Trình Làm Việc & Dự Án:
+          </label>
+          <textarea id="reviewExperience" rows="4" placeholder="Mô tả các dự án và vai trò chính từ CV..."></textarea>
+        </div>
+      </div>
+
+      <!-- Skills Review Table -->
+      <div class="card-3d">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <span>⭐</span> Danh Mục Kỹ Năng Chuẩn IT Tìm Thấy
+            </h2>
+            <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">
+              Bạn có thể điều chỉnh mức độ thành thạo (1-5 sao), số năm sử dụng hoặc xóa kỹ năng không mong muốn.
+            </p>
+          </div>
+          <button type="button" class="btn secondary" style="padding: 8px 16px; font-size: 13px;" onclick="openAddSkillModal()">
+            <span>➕</span> Bổ sung kỹ năng khác
+          </button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="table-skills">
+            <thead>
+              <tr>
+                <th style="width: 35%;">Kỹ Năng</th>
+                <th style="width: 25%;">Mức Thành Thạo (1-5)</th>
+                <th style="width: 25%;">Số Năm Sử Dụng</th>
+                <th style="width: 15%; text-align: right;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="skillsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Skills Not Found (DoD Requirement) -->
+        <div id="skillsNotFoundWrapper" style="margin-top: 24px; padding: 18px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-lg); display: none;">
+          <div style="font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>ℹ️</span> Kỹ năng/từ khóa khác tìm thấy trong CV nhưng chưa nằm trong 60 kỹ năng chuẩn:
+          </div>
+          <div id="skillsNotFoundList" style="display: flex; flex-wrap: wrap;"></div>
+        </div>
+
+        <!-- Action Confirmation -->
+        <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn secondary" onclick="resetUpload()" style="padding: 11px 20px; font-size: 14px;">
+            Hủy & Tải lại CV khác
+          </button>
+          <button type="button" class="btn btn-success" id="btnConfirmCV" onclick="confirmAndSaveCV()" style="padding: 11px 28px; font-size: 14px;">
+            <span>✅</span> Xác Nhận & Lưu Vào Hồ Sơ Cá Nhân
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let selectedFile = null;
+    let currentCvId = null;
+    let extractedData = null;
+    let standardSkillsCatalog = [];
+
+    function esc(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 5000);
+    }
+
+    function showSuccess(msg) {
+      const el = document.getElementById("success");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 5000);
+    }
+
+    // Drag and drop handlers
+    const dropZone = document.getElementById("dropZone");
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        validateAndSetFile(files[0]);
+      }
+    });
+
+    function handleFileSelected(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        validateAndSetFile(files[0]);
+      }
+    }
+
+    function validateAndSetFile(file) {
+      hideErrorAlert();
+      if (!file.name.toLowerCase().endsWith(".pdf")) {
+        showErrorAlert("Định dạng tệp không hợp lệ", "Hệ thống chỉ hỗ trợ tệp định dạng PDF (.pdf). Vui lòng chọn đúng file CV dạng PDF.");
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showErrorAlert("Dung lượng vượt quá giới hạn", `Tệp của bạn có kích thước ${(file.size / (1024 * 1024)).toFixed(2)} MB, vượt quá giới hạn tối đa cho phép là 5.0 MB.`);
+        return;
+      }
+
+      selectedFile = file;
+      document.getElementById("fileSelectedInfo").innerHTML = `📄 Đã chọn: <strong>${esc(file.name)}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+      document.getElementById("fileSelectedInfo").style.display = "block";
+      document.getElementById("btnUploadCV").disabled = false;
+    }
+
+    function showErrorAlert(title, msg) {
+      document.getElementById("errorAlertTitle").textContent = title;
+      document.getElementById("errorAlertMessage").textContent = msg;
+      document.getElementById("errorAlertBox").style.display = "block";
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    function hideErrorAlert() {
+      document.getElementById("errorAlertBox").style.display = "none";
+    }
+
+    function resetUpload() {
+      selectedFile = null;
+      currentCvId = null;
+      extractedData = null;
+      document.getElementById("cvFileInput").value = "";
+      document.getElementById("fileSelectedInfo").style.display = "none";
+      document.getElementById("btnUploadCV").disabled = true;
+      document.getElementById("uploadZoneCard").style.display = "block";
+      document.getElementById("resultSection").style.display = "none";
+      document.getElementById("loadingBox").style.display = "none";
+      hideErrorAlert();
+    }
+
+    async function uploadAndAnalyzeCV() {
+      if (!selectedFile) return;
+
+      hideErrorAlert();
+      document.getElementById("uploadZoneCard").style.display = "none";
+      document.getElementById("loadingBox").style.display = "block";
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      try {
+        const token = getToken();
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        const res = await fetch(`${API_BASE_URL}/cv/upload`, {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + token
+          },
+          body: formData
+        });
+
+        document.getElementById("loadingBox").style.display = "none";
+
+        if (res.status === 401) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        if (res.status === 413) {
+          document.getElementById("uploadZoneCard").style.display = "block";
+          showErrorAlert("Tệp quá lớn (413)", "Tệp CV vượt quá dung lượng tối đa 5.0 MB. Vui lòng nén nhỏ file hoặc chọn file khác.");
+          return;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          document.getElementById("uploadZoneCard").style.display = "block";
+          showErrorAlert("Lỗi tải lên", errData.detail || "Không thể tải lên file CV.");
+          return;
+        }
+
+        const data = await res.json();
+        currentCvId = data.cv_id;
+
+        if (data.status === "failed") {
+          document.getElementById("uploadZoneCard").style.display = "block";
+          showErrorAlert("Không thể trích xuất văn bản từ CV", data.error_message || "Tệp PDF không chứa văn bản có thể trích xuất (có thể là ảnh chụp/scan). Vui lòng dùng PDF văn bản hoặc nhập hồ sơ thủ công.");
+          return;
+        }
+
+        if (!data.result) {
+          document.getElementById("uploadZoneCard").style.display = "block";
+          showErrorAlert("Lỗi xử lý AI", "Mô hình AI chưa trích xuất được thông tin từ CV này. Bạn có thể chuyển sang nhập hồ sơ thủ công.");
+          return;
+        }
+
+        extractedData = data.result;
+        renderReviewSection(extractedData);
+
+      } catch (err) {
+        document.getElementById("loadingBox").style.display = "none";
+        document.getElementById("uploadZoneCard").style.display = "block";
+        showErrorAlert("Lỗi kết nối", "Không thể kết nối đến máy chủ AI: " + err.message);
+      }
+    }
+
+    function renderReviewSection(result) {
+      document.getElementById("reviewExpYears").value = result.years_experience || 0;
+      document.getElementById("reviewEducation").value = result.education || "";
+      document.getElementById("reviewExperience").value = result.experience || "";
+
+      renderSkillsTable();
+
+      // Render skills not found
+      const notFoundWrap = document.getElementById("skillsNotFoundWrapper");
+      const notFoundList = document.getElementById("skillsNotFoundList");
+      if (result.skills_not_found && result.skills_not_found.length > 0) {
+        notFoundWrap.style.display = "block";
+        notFoundList.innerHTML = result.skills_not_found.map(s => 
+          `<span class="skill-not-found-chip">${esc(s)}</span>`
+        ).join("");
+      } else {
+        notFoundWrap.style.display = "none";
+      }
+
+      document.getElementById("resultSection").style.display = "block";
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    function renderSkillsTable() {
+      const tbody = document.getElementById("skillsTableBody");
+      if (!extractedData.skills || extractedData.skills.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: #94a3b8; padding: 24px;">
+              Chưa có kỹ năng nào. Nhấp vào "Bổ sung kỹ năng khác" để thêm thủ công.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = extractedData.skills.map((s, idx) => `
+        <tr data-index="${idx}">
+          <td>
+            <strong style="color: #0f172a; font-size: 14px;">${esc(s.name)}</strong>
+          </td>
+          <td>
+            <select style="padding: 6px 10px; border-radius: 6px; font-weight: 600; width: 100%; max-width: 170px;" onchange="updateSkillProf(${idx}, this.value)">
+              <option value="1" ${s.proficiency == 1 ? 'selected' : ''}>★☆☆☆☆ 1 - Mới bắt đầu</option>
+              <option value="2" ${s.proficiency == 2 ? 'selected' : ''}>★★☆☆☆ 2 - Cơ bản</option>
+              <option value="3" ${s.proficiency == 3 ? 'selected' : ''}>★★★☆☆ 3 - Khá (Đạt)</option>
+              <option value="4" ${s.proficiency == 4 ? 'selected' : ''}>★★★★☆ 4 - Thành thạo</option>
+              <option value="5" ${s.proficiency == 5 ? 'selected' : ''}>★★★★★ 5 - Chuyên gia</option>
+            </select>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <input type="number" min="0" max="40" step="0.5" value="${s.years_used || 0}" style="width: 80px; padding: 6px 8px; font-weight: 700;" onchange="updateSkillYears(${idx}, this.value)">
+              <span style="font-size: 13px; color: #64748b;">năm</span>
+            </div>
+          </td>
+          <td style="text-align: right;">
+            <button type="button" class="btn secondary" style="padding: 5px 12px; font-size: 12px; color: #dc2626; border-color: #fecaca;" onclick="removeSkill(${idx})">
+              ✕ Bỏ
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function updateSkillProf(idx, val) {
+      if (extractedData.skills[idx]) {
+        extractedData.skills[idx].proficiency = parseInt(val);
+      }
+    }
+
+    function updateSkillYears(idx, val) {
+      if (extractedData.skills[idx]) {
+        extractedData.skills[idx].years_used = parseFloat(val) || 0;
+      }
+    }
+
+    function removeSkill(idx) {
+      extractedData.skills.splice(idx, 1);
+      renderSkillsTable();
+    }
+
+    async function confirmAndSaveCV() {
+      if (!currentCvId || !extractedData) return;
+
+      const btn = document.getElementById("btnConfirmCV");
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> Đang lưu vào hồ sơ...`;
+
+      const payload = {
+        skills: extractedData.skills.map(s => ({
+          skill_id: s.skill_id,
+          proficiency: s.proficiency,
+          years_used: s.years_used
+        })),
+        years_experience: parseFloat(document.getElementById("reviewExpYears").value) || 0,
+        education: document.getElementById("reviewEducation").value.trim() || null,
+        experience: document.getElementById("reviewExperience").value.trim() || null
+      };
+
+      try {
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/cv/${currentCvId}/confirm`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          showError(errData.detail || "Không thể xác nhận dữ liệu CV.");
+          btn.disabled = false;
+          btn.innerHTML = `<span>✅</span> Xác Nhận & Lưu Vào Hồ Sơ Cá Nhân`;
+          return;
+        }
+
+        const profile = await res.json();
+        showSuccess("Hồ sơ đã được lưu và hệ thống AI đã cập nhật đánh giá năng lực thành công!");
+        
+        setTimeout(() => {
+          window.location.href = "profile.html";
+        }, 1500);
+
+      } catch (err) {
+        showError("Lỗi kết nối khi xác nhận: " + err.message);
+        btn.disabled = false;
+        btn.innerHTML = `<span>✅</span> Xác Nhận & Lưu Vào Hồ Sơ Cá Nhân`;
+      }
+    }
+
+    // Modal to add extra skills from system catalog
+    async function initSkillsCatalog() {
+      const data = await api("/skills");
+      if (data) standardSkillsCatalog = data;
+    }
+
+    function openAddSkillModal() {
+      if (standardSkillsCatalog.length === 0) {
+        showError("Đang nạp danh mục kỹ năng, vui lòng thử lại sau giây lát.");
+        return;
+      }
+      const existingIds = new Set(extractedData.skills.map(s => s.skill_id));
+      const available = standardSkillsCatalog.filter(s => !existingIds.has(s.id));
+
+      if (available.length === 0) {
+        alert("Bạn đã thêm tất cả kỹ năng có trong hệ thống!");
+        return;
+      }
+
+      const promptHtml = available.map(s => `${s.id}: ${s.name} (${s.skill_group})`).slice(0, 15).join("\n");
+      const chosenId = prompt(`Chọn ID kỹ năng muốn bổ sung:\n\n${promptHtml}\n\n(Nhập ID kỹ năng):`);
+      if (chosenId) {
+        const skill = available.find(s => s.id == chosenId.trim());
+        if (skill) {
+          extractedData.skills.push({
+            skill_id: skill.id,
+            name: skill.name,
+            proficiency: 3,
+            years_used: 1.0
+          });
+          renderSkillsTable();
+        } else {
+          alert("ID kỹ năng không hợp lệ!");
+        }
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (typeof guard === "function") {
+        if (!guard("candidate")) return;
+      }
+      initSkillsCatalog();
+    });
+  </script>
+</body>
+</html>

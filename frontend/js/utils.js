@@ -1,12 +1,13 @@
 const MENUS = {
   candidate: [
     { href: "profile.html", label: "Hồ sơ cá nhân" },
-    { href: "cv-upload.html", label: "Tải lên CV" },
+    { href: "upload_cv.html", label: "Tải lên CV" },
     { href: "evaluation.html", label: "Đánh giá năng lực" }
   ],
   recruiter: [
     { href: "jobs.html", label: "Tin tuyển dụng" },
-    { href: "candidates.html", label: "Tìm kiếm ứng viên" }
+    { href: "candidates.html", label: "Tìm kiếm ứng viên" },
+    { href: "match.html", label: "Bảng đối sánh AI" }
   ]
 };
 let skillList = null;
@@ -47,7 +48,10 @@ function showMenu(role) {
       const link = document.createElement("a");
       link.href = item.href;
       link.textContent = item.label;
-      if (location.pathname.endsWith(item.href)) link.className = "active";
+      if (location.pathname.endsWith(item.href) || 
+          (item.href === "upload_cv.html" && location.pathname.endsWith("cv-upload.html"))) {
+        link.className = "active";
+      }
       nav.appendChild(link);
     });
   }

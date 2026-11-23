@@ -441,6 +441,7 @@
   </div>
 
   <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
   <script>
     let selectedFile = null;
     let currentCvId = null;
@@ -787,6 +788,9 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      if (typeof guard === "function") {
+        if (!guard("candidate")) return;
+      }
       initSkillsCatalog();
     });
   </script>

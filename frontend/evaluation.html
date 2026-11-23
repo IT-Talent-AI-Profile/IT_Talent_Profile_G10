@@ -450,6 +450,7 @@
   </div>
 
   <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
   <script>
     function esc(str) {
       if (str === null || str === undefined) return "";
@@ -629,6 +630,9 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      if (typeof guard === "function") {
+        if (!guard("candidate")) return;
+      }
       loadEvaluation();
     });
   </script>
