@@ -129,7 +129,7 @@ def test_pdf_valid_text_extraction():
 
 def test_pdf_extracts_text_from_multiple_pages():
     extracted = extract_pdf_text(create_text_pdf(["First page contains a detailed explanation of backend development and APIs", "Second page contains additional project experience and database skills"]))
-    assert extracted == "First page\nSecond page"
+    assert extracted == "First page contains a detailed explanation of backend development and APIs\nSecond page contains additional project experience and database skills"
 
 
 def test_pdf_no_text_scanned_image():
