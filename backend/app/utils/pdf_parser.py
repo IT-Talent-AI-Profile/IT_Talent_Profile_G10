@@ -39,7 +39,7 @@ def extract_pdf_text(file_content: bytes) -> str:
     if len(file_content) > MAX_PDF_SIZE:
         raise PdfTooLargeError("Dung lượng CV không được vượt quá 5 MB")
 
-    if PDF_HEADER not in file_content[:1024]:
+    if file_content[:4] != b"%PDF":
         raise InvalidPdfError("File tải lên không đúng định dạng PDF")
 
     try:
@@ -66,10 +66,10 @@ def extract_pdf_text(file_content: bytes) -> str:
         raise InvalidPdfError("File PDF không hợp lệ hoặc đã bị hỏng") from error
 
     result = "\n".join(extracted_pages).strip()
-    if not result:
+    if len(result) < 50:
         raise PdfNoTextError(
-            "Không trích xuất được văn bản từ PDF. "
-            "File có thể là ảnh quét hoặc không chứa văn bản. Hãy nhập hồ sơ thủ công."
+            "Không trích xuất được tối thiểu 50 ký tự từ PDF. "
+            "File có thể là ảnh quét hoặc không chứa đủ văn bản. Hãy nhập hồ sơ thủ công."
         )
 
     return result

@@ -19,3 +19,12 @@ def read_my_evaluation(
 ):
     profile = _get_candidate_profile(db, current_user)
     return recalculate_profile_evaluation(db, profile)
+
+
+@router.post("/me/recalculate", response_model=EvaluationOut, summary="Tính lại điểm và cấp độ")
+def recalculate_my_evaluation(
+    current_user: User = Depends(get_candidate),
+    db: Session = Depends(get_db),
+):
+    profile = _get_candidate_profile(db, current_user)
+    return recalculate_profile_evaluation(db, profile)

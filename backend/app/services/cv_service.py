@@ -124,11 +124,14 @@ def process_cv_upload(
     try:
         cv_text = extract_pdf_text(file_content)
     except PdfNoTextError as error:
-        failed_file = _save_cv_record(
+        _save_cv_record(
             db, profile, original_name, file_content,
             state="failed", error_message=str(error),
         )
-        return _status_output(failed_file)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        ) from error
     except PdfTooLargeError as error:
         raise HTTPException(status_code=413, detail=str(error)) from error
     except (InvalidPdfError, PdfEncryptedError) as error:
@@ -143,21 +146,35 @@ def process_cv_upload(
         skill_by_name = {item.name.casefold(): item for item in skills}
         ai_result = extract_cv(cv_text, [item.name for item in skills])
 
-        mapped_skills = []
+        mapped_skills_by_id = {}
         skills_not_found = []
+        unknown_skill_names = set()
         for ai_skill in ai_result.skills:
-            matched = skill_by_name.get(ai_skill.name.casefold())
+            normalized_name = ai_skill.name.casefold()
+            matched = skill_by_name.get(normalized_name)
             if matched is None:
-                skills_not_found.append(ai_skill.name)
+                if normalized_name not in unknown_skill_names:
+                    skills_not_found.append(ai_skill.name)
+                    unknown_skill_names.add(normalized_name)
                 continue
-            mapped_skills.append(
-                CvSkillOut(
+
+            current = mapped_skills_by_id.get(matched.id)
+            if current is None:
+                mapped_skills_by_id[matched.id] = CvSkillOut(
                     skill_id=matched.id,
                     name=matched.name,
                     proficiency=ai_skill.proficiency,
                     years_used=ai_skill.years,
                 )
-            )
+            else:
+                mapped_skills_by_id[matched.id] = CvSkillOut(
+                    skill_id=matched.id,
+                    name=matched.name,
+                    proficiency=max(current.proficiency, ai_skill.proficiency),
+                    years_used=max(current.years_used, ai_skill.years),
+                )
+
+        mapped_skills = list(mapped_skills_by_id.values())
 
         analysis = CvAnalysisOut(
             cv_id=cv_file.id,
@@ -181,7 +198,10 @@ def process_cv_upload(
         failed_file.error_message = str(error)[:2000]
         db.commit()
         db.refresh(failed_file)
-        return _status_output(failed_file)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Không thể phân tích CV bằng AI. Vui lòng thử lại hoặc nhập hồ sơ thủ công.",
+        ) from error
 
     return _status_output(cv_file)
 
@@ -216,9 +236,14 @@ def confirm_cv(
     )
     if cv_file is None:
         raise HTTPException(status_code=404, detail="Không tìm thấy CV")
-    if cv_file.status not in {"success", "confirmed"}:
+    if cv_file.status == "confirmed":
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="CV này đã được xác nhận",
+        )
+    if cv_file.status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="CV chưa phân tích thành công nên không thể xác nhận",
         )
 
@@ -239,18 +264,32 @@ def confirm_cv(
         )
 
     try:
-        db.query(ProfileSkill).filter(ProfileSkill.profile_id == profile.id).delete(
-            synchronize_session=False
-        )
-        for item in request.skills:
-            db.add(
-                ProfileSkill(
-                    profile_id=profile.id,
-                    skill_id=item.skill_id,
-                    proficiency=item.proficiency,
-                    years_used=item.years_used,
-                )
+        existing_skills = (
+            db.query(ProfileSkill)
+            .filter(
+                ProfileSkill.profile_id == profile.id,
+                ProfileSkill.skill_id.in_(skill_ids),
             )
+            .all()
+            if skill_ids else []
+        )
+        existing_by_skill_id = {
+            item.skill_id: item for item in existing_skills
+        }
+        for item in request.skills:
+            existing = existing_by_skill_id.get(item.skill_id)
+            if existing is None:
+                db.add(
+                    ProfileSkill(
+                        profile_id=profile.id,
+                        skill_id=item.skill_id,
+                        proficiency=item.proficiency,
+                        years_used=item.years_used,
+                    )
+                )
+            else:
+                existing.proficiency = item.proficiency
+                existing.years_used = item.years_used
 
         profile.years_experience = request.years_experience
         profile.education = request.education
