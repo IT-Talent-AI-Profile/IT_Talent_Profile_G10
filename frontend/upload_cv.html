@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tải CV | IT Talent AI Profile</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body { min-height: 100vh; background: #f8fafc; }
+    .page { max-width: 1100px; margin: 36px auto; padding: 0 22px 48px; }
+    .hero { padding: 30px; border-radius: 20px; color: #fff; background: linear-gradient(130deg,#1e1b4b,#312e81 58%,#0369a1); box-shadow: 0 18px 40px rgba(30,41,59,.18); }
+    .hero h1 { color: #fff; margin-bottom: 8px; }
+    .hero p { color: #cbd5e1; margin: 0; }
+    .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; margin-top: 22px; box-shadow: 0 8px 24px rgba(15,23,42,.05); }
+    .muted { color: #64748b; font-size: 13px; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .skill-table-wrap { overflow-x: auto; }
+    .skill-table input { min-width: 82px; }
+    .skill-table select { min-width: 110px; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px; }
+    .notice { padding: 12px 15px; border-radius: 10px; margin-top: 14px; display:none; white-space:pre-wrap; }
+    .notice.error { display:block; }
+    .notice.success { display:block; }
+    .loading { color:#4f46e5; font-weight:700; margin-top:12px; display:none; }
+    .tag { display:inline-block; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px; padding:5px 10px; margin:4px; font-size:12px; }
+    @media(max-width:700px) { .field-grid { grid-template-columns:1fr; } .panel {padding:18px;} .hero {padding:22px;} }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="nav-brand" href="index.html"><span class="logo-icon">⚡</span> IT Talent AI</a>
+    <a href="profile.html">Hồ sơ của tôi</a>
+    <a class="active" href="upload_cv.html">Tải CV</a>
+    <button class="logout" type="button" onclick="logout()">Đăng xuất</button>
+  </nav>
+
+  <main class="page">
+    <section class="hero">
+      <h1>Phân tích CV bằng AI</h1>
+      <p>Tải CV PDF, xem lại thông tin được trích xuất, chỉnh sửa rồi xác nhận để cập nhật hồ sơ năng lực.</p>
+    </section>
+
+    <section class="panel">
+      <h2>1. Chọn CV PDF</h2>
+      <p class="muted">Chỉ nhận PDF tối đa 5 MB. PDF dạng ảnh quét hoặc có dưới 50 ký tự cần nhập hồ sơ thủ công.</p>
+      <input id="cvFile" type="file" accept="application/pdf,.pdf">
+      <div class="actions">
+        <button id="uploadButton" type="button" onclick="uploadCv()">Tải lên và phân tích</button>
+        <a href="profile.html">Nhập hồ sơ thủ công</a>
+      </div>
+      <div id="loading" class="loading">⏳ Đang phân tích CV, vui lòng chờ...</div>
+      <div id="notice" class="notice" role="alert"></div>
+    </section>
+
+    <section id="resultPanel" class="panel" hidden>
+      <h2>2. Kiểm tra và chỉnh sửa kết quả</h2>
+      <p class="muted">Anh có thể sửa mức thành thạo, số năm sử dụng hoặc bỏ kỹ năng không phù hợp trước khi xác nhận.</p>
+      <div class="skill-table-wrap">
+        <table class="skill-table">
+          <thead><tr><th>Kỹ năng</th><th>Mức thành thạo</th><th>Số năm</th><th></th></tr></thead>
+          <tbody id="skillsBody"></tbody>
+        </table>
+      </div>
+      <div id="notFoundBlock" style="margin-top:18px" hidden>
+        <strong>Kỹ năng AI tìm thấy nhưng chưa có trong danh mục</strong>
+        <div id="notFoundSkills"></div>
+      </div>
+      <div class="field-grid" style="margin-top:22px">
+        <div>
+          <label for="yearsExperience">Tổng số năm kinh nghiệm</label>
+          <input id="yearsExperience" type="number" min="0" step="0.1" value="0">
+        </div>
+        <div>
+          <label for="education">Học vấn</label>
+          <input id="education" type="text" maxlength="500" placeholder="Ví dụ: Đại học Công nghệ Thông tin">
+        </div>
+      </div>
+      <label for="experience">Kinh nghiệm làm việc</label>
+      <textarea id="experience" rows="4" placeholder="Mô tả kinh nghiệm và dự án..."></textarea>
+      <div class="actions">
+        <button id="confirmButton" type="button" class="btn-success" onclick="confirmCv()">Xác nhận và cập nhật hồ sơ</button>
+        <a href="profile.html">Quay lại hồ sơ</a>
+      </div>
+    </section>
+  </main>
+
+<script>
+  const API_BASE = window.location.port === "8000" ? window.location.origin : "http://127.0.0.1:8000";
+  let currentCvId = null;
+  let skillCatalog = [];
+
+  function authHeaders() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "login.html";
+      throw new Error("Vui lòng đăng nhập lại.");
+    }
+    return { "Authorization": "Bearer " + token };
+  }
+
+  async function api(path, options = {}) {
+    const headers = { ...authHeaders(), ...(options.headers || {}) };
+    const response = await fetch(API_BASE + path, { ...options, headers });
+    const payload = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "login.html";
+      throw new Error("Phiên đăng nhập đã hết hạn.");
+    }
+    if (!response.ok) {
+      throw new Error(payload.detail || payload.message || "Yêu cầu thất bại (" + response.status + ").");
+    }
+    return payload;
+  }
+
+  function showNotice(message, type = "error") {
+    const box = document.getElementById("notice");
+    box.className = "notice " + type;
+    box.textContent = message;
+    box.style.display = "block";
+  }
+
+  function clearNotice() {
+    const box = document.getElementById("notice");
+    box.textContent = "";
+    box.className = "notice";
+    box.style.display = "none";
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "login.html";
+  }
+
+  async function loadSkillCatalog() {
+    skillCatalog = await api("/skills");
+  }
+
+  function addSkillRow(skill = {}) {
+    const tbody = document.getElementById("skillsBody");
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    const name = document.createElement("strong");
+    name.textContent = skill.name || "Kỹ năng";
+    nameCell.appendChild(name);
+
+    const proficiencyCell = document.createElement("td");
+    const proficiency = document.createElement("select");
+    proficiency.setAttribute("aria-label", "Mức thành thạo");
+    for (let level = 1; level <= 5; level++) {
+      const option = document.createElement("option");
+      option.value = String(level);
+      option.textContent = level + "/5";
+      option.selected = Number(skill.proficiency || 3) === level;
+      proficiency.appendChild(option);
+    }
+    proficiencyCell.appendChild(proficiency);
+
+    const yearsCell = document.createElement("td");
+    const years = document.createElement("input");
+    years.type = "number";
+    years.min = "0";
+    years.step = "0.1";
+    years.value = String(skill.years_used ?? 0);
+    years.setAttribute("aria-label", "Số năm sử dụng");
+    yearsCell.appendChild(years);
+
+    const removeCell = document.createElement("td");
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "danger";
+    remove.textContent = "Bỏ";
+    remove.addEventListener("click", () => row.remove());
+    removeCell.appendChild(remove);
+
+    row.dataset.skillId = String(skill.skill_id);
+    row.append(nameCell, proficiencyCell, yearsCell, removeCell);
+    tbody.appendChild(row);
+  }
+
+  function renderAnalysis(result) {
+    currentCvId = result.cv_id;
+    document.getElementById("skillsBody").replaceChildren();
+    (result.skills || []).forEach(addSkillRow);
+    document.getElementById("yearsExperience").value = result.years_experience ?? 0;
+    document.getElementById("education").value = result.education || "";
+    document.getElementById("experience").value = result.experience || "";
+
+    const notFound = result.skills_not_found || [];
+    const block = document.getElementById("notFoundBlock");
+    const list = document.getElementById("notFoundSkills");
+    list.replaceChildren();
+    notFound.forEach(name => {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = name;
+      list.appendChild(tag);
+    });
+    block.hidden = notFound.length === 0;
+    document.getElementById("resultPanel").hidden = false;
+  }
+
+  async function uploadCv() {
+    clearNotice();
+    const file = document.getElementById("cvFile").files[0];
+    if (!file) {
+      showNotice("Vui lòng chọn một file PDF trước khi tải lên.");
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      showNotice("File không đúng định dạng PDF. Vui lòng chọn file .pdf.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showNotice("Dung lượng file vượt quá 5 MB.");
+      return;
+    }
+
+    const button = document.getElementById("uploadButton");
+    button.disabled = true;
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("resultPanel").hidden = true;
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const response = await api("/cv/upload", { method: "POST", body: form });
+      if (response.status !== "success" || !response.result) {
+        throw new Error(response.error_message || "CV chưa được phân tích thành công.");
+      }
+      renderAnalysis(response.result);
+      showNotice("Đã phân tích CV. Hãy kiểm tra và chỉnh sửa thông tin trước khi xác nhận.", "success");
+    } catch (error) {
+      showNotice(error.message + " Bạn có thể chuyển sang nhập hồ sơ thủ công.");
+    } finally {
+      button.disabled = false;
+      document.getElementById("loading").style.display = "none";
+    }
+  }
+
+  async function confirmCv() {
+    clearNotice();
+    if (!currentCvId) {
+      showNotice("Chưa có kết quả CV để xác nhận.");
+      return;
+    }
+    const rows = [...document.querySelectorAll("#skillsBody tr")];
+    const skills = rows.map(row => ({
+      skill_id: Number(row.dataset.skillId),
+      proficiency: Number(row.querySelector("select").value),
+      years_used: Number(row.querySelector("input").value)
+    }));
+    if (skills.some(item => !Number.isInteger(item.skill_id) || item.years_used < 0)) {
+      showNotice("Vui lòng kiểm tra kỹ năng và số năm sử dụng. Số năm không được âm.");
+      return;
+    }
+
+    const button = document.getElementById("confirmButton");
+    button.disabled = true;
+    button.textContent = "Đang lưu...";
+    try {
+      await api("/cv/" + currentCvId + "/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          skills,
+          years_experience: Number(document.getElementById("yearsExperience").value),
+          education: document.getElementById("education").value.trim() || null,
+          experience: document.getElementById("experience").value.trim() || null
+        })
+      });
+      showNotice("Đã xác nhận CV và cập nhật hồ sơ. Đang chuyển về trang hồ sơ...", "success");
+      window.setTimeout(() => { window.location.href = "profile.html"; }, 900);
+    } catch (error) {
+      showNotice(error.message + " Nếu cần, anh có thể nhập hồ sơ thủ công.");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Xác nhận và cập nhật hồ sơ";
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    if (localStorage.getItem("role") !== "candidate") {
+      showNotice("Trang này chỉ dành cho tài khoản ứng viên.");
+      return;
+    }
+    try {
+      await loadSkillCatalog();
+    } catch (error) {
+      showNotice(error.message);
+    }
+  });
+</script>
+</body>
+</html>

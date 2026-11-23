@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.main import app
 from app.models import Profile, Skill, User
 from app.services import cv_service
+from app.schemas.cv import CvResult
 from app.services.ai_client import settings as ai_settings
 from tests.test_pdf_parser import create_blank_pdf, create_text_pdf
 
@@ -64,7 +65,7 @@ def cv_test_context(tmp_path, monkeypatch):
 
 def test_cv_upload_get_and_confirm_flow(cv_test_context):
     client, db, candidate, profile, python, fastapi = cv_test_context
-    pdf = create_text_pdf(["Backend Developer", "Experience with Python and FastAPI"])
+    pdf = create_text_pdf(["Backend Developer with Python and FastAPI experience across production services, REST APIs, SQL databases and cloud deployment projects"])
 
     upload = client.post(
         "/cv/upload",
@@ -103,6 +104,21 @@ def test_cv_upload_get_and_confirm_flow(cv_test_context):
     assert confirm.json()["total_score"] == 68.0
     assert confirm.json()["level"] == "Middle"
     assert confirm.json()["ai_summary"]
+
+    second_confirm = client.post(
+        f"/cv/{cv_id}/confirm",
+        json={
+            "skills": [{
+                "skill_id": selected_skill["skill_id"],
+                "proficiency": 4,
+                "years_used": 2.5,
+            }],
+            "years_experience": 2.5,
+            "education": "Bachelor of Information Technology",
+            "experience": "Backend Developer",
+        },
+    )
+    assert second_confirm.status_code == 400
 
     evaluation = client.get("/evaluation/me")
     assert evaluation.status_code == 200, evaluation.text
@@ -147,15 +163,70 @@ def test_cv_upload_records_pdf_without_text_as_failed(cv_test_context):
         "/cv/upload",
         files={"file": ("scanned.pdf", create_blank_pdf(), "application/pdf")},
     )
+    assert response.status_code == 400, response.text
+    assert "nhập hồ sơ thủ công" in response.json()["detail"].lower()
+    failed_file = db.query(cv_service.CvFile).one()
+    assert failed_file.status == "failed"
+    assert "Không trích xuất được" in failed_file.error_message
+
+
+def test_cv_upload_records_ai_failure_and_returns_502(cv_test_context, monkeypatch):
+    client, db, *_ = cv_test_context
+
+    def fail_ai(*args, **kwargs):
+        raise RuntimeError("Claude API unavailable")
+
+    monkeypatch.setattr(cv_service, "extract_cv", fail_ai)
+    response = client.post(
+        "/cv/upload",
+        files={
+            "file": (
+                "resume.pdf",
+                create_text_pdf(["Backend developer with Python, FastAPI, SQL and multiple production project experiences"]),
+                "application/pdf",
+            )
+        },
+    )
+    assert response.status_code == 502
+    failed_file = db.query(cv_service.CvFile).one()
+    assert failed_file.status == "failed"
+    assert "Claude API unavailable" in failed_file.error_message
+
+
+def test_cv_upload_merges_duplicate_skills(cv_test_context, monkeypatch):
+    client, _, _, _, python, _ = cv_test_context
+    monkeypatch.setattr(
+        cv_service,
+        "extract_cv",
+        lambda *_args, **_kwargs: CvResult(
+            skills=[
+                {"name": "Python", "proficiency": 2, "years": 1},
+                {"name": "python", "proficiency": 4, "years": 3},
+            ],
+            years_experience=3,
+        ),
+    )
+    response = client.post(
+        "/cv/upload",
+        files={
+            "file": (
+                "resume.pdf",
+                create_text_pdf(["Backend developer with Python, FastAPI, SQL and multiple production project experiences"]),
+                "application/pdf",
+            )
+        },
+    )
     assert response.status_code == 200, response.text
-    body = response.json()
-    assert body["status"] == "failed"
-    assert "Không trích xuất được văn bản" in body["error_message"]
+    skills = response.json()["result"]["skills"]
+    assert len(skills) == 1
+    assert skills[0]["skill_id"] == python.id
+    assert skills[0]["proficiency"] == 4
+    assert skills[0]["years_used"] == 3
 
 
 def test_cv_confirm_rejects_duplicate_skills(cv_test_context):
     client, _, _, _, python, _ = cv_test_context
-    pdf = create_text_pdf(["Python Developer"])
+    pdf = create_text_pdf(["Python developer with experience building backend services, REST APIs and SQL database applications"])
     upload = client.post("/cv/upload", files={"file": ("resume.pdf", pdf, "application/pdf")})
     assert upload.status_code == 200
     cv_id = upload.json()["cv_id"]
@@ -176,7 +247,7 @@ def test_cv_result_is_private_to_owning_candidate(cv_test_context):
     client, db, _, _, _, _ = cv_test_context
     upload = client.post(
         "/cv/upload",
-        files={"file": ("resume.pdf", create_text_pdf(["Python Developer"]), "application/pdf")},
+        files={"file": ("resume.pdf", create_text_pdf(["Python developer with experience building backend services, REST APIs and SQL database applications"]), "application/pdf")},
     )
     assert upload.status_code == 200
     cv_id = upload.json()["cv_id"]

@@ -106,20 +106,30 @@ def test_pdf_invalid_header():
         extract_pdf_text(b"This is not a PDF")
 
 
+def test_pdf_header_must_start_at_first_byte():
+    with pytest.raises(InvalidPdfError, match="không đúng định dạng PDF"):
+        extract_pdf_text(b"xxxx%PDF-1.4\\n" + create_blank_pdf())
+
+
+def test_pdf_text_shorter_than_50_characters():
+    with pytest.raises(PdfNoTextError, match="tối thiểu 50 ký tự"):
+        extract_pdf_text(create_text_pdf(["Short CV text"]))
+
+
 def test_pdf_corrupted_data():
     with pytest.raises(InvalidPdfError, match="không hợp lệ hoặc đã bị hỏng"):
         extract_pdf_text(b"%PDF-1.4\ncorrupted bytes without a PDF catalog")
 
 
 def test_pdf_valid_text_extraction():
-    extracted = extract_pdf_text(create_text_pdf(["Vo Chi Duc - Fullstack Developer"]))
+    extracted = extract_pdf_text(create_text_pdf(["Vo Chi Duc - Fullstack Developer with Python, FastAPI, SQL and several years of backend project experience"]))
     assert "Vo Chi Duc" in extracted
     assert "Fullstack Developer" in extracted
 
 
 def test_pdf_extracts_text_from_multiple_pages():
-    extracted = extract_pdf_text(create_text_pdf(["First page", "Second page"]))
-    assert extracted == "First page\nSecond page"
+    extracted = extract_pdf_text(create_text_pdf(["First page contains a detailed explanation of backend development and APIs", "Second page contains additional project experience and database skills"]))
+    assert extracted == "First page contains a detailed explanation of backend development and APIs\nSecond page contains additional project experience and database skills"
 
 
 def test_pdf_no_text_scanned_image():
