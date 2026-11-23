@@ -116,6 +116,16 @@ def test_pdf_text_shorter_than_50_characters():
         extract_pdf_text(create_text_pdf(["Short CV text"]))
 
 
+def test_pdf_header_must_start_at_first_byte():
+    with pytest.raises(InvalidPdfError, match="không đúng định dạng PDF"):
+        extract_pdf_text(b"xxxx%PDF-1.4\\n" + create_blank_pdf())
+
+
+def test_pdf_text_shorter_than_50_characters():
+    with pytest.raises(PdfNoTextError, match="tối thiểu 50 ký tự"):
+        extract_pdf_text(create_text_pdf(["Short CV text"]))
+
+
 def test_pdf_corrupted_data():
     with pytest.raises(InvalidPdfError, match="không hợp lệ hoặc đã bị hỏng"):
         extract_pdf_text(b"%PDF-1.4\ncorrupted bytes without a PDF catalog")
