@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Talent AI Profile — Master Interactive Video Demo</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+    @keyframes click-ripple {
+      0% { transform: scale(0.2); opacity: 1; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+    @keyframes laser-scan {
+      0% { top: 0%; opacity: 0.8; }
+      50% { top: 95%; opacity: 1; }
+      100% { top: 0%; opacity: 0.8; }
+    }
+    @keyframes conic-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .ripple {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, rgba(99, 102, 241, 0.2) 70%, transparent 100%);
+      pointer-events: none;
+      animation: click-ripple 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform-origin: center;
+      z-index: 9999;
+    }
+
+    .screen-grid {
+      background-size: 20px 20px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      height: 5px;
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 4px;
+    }
+
+    .laser-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, #ec4899, transparent);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+      animation: laser-scan 2s ease-in-out infinite;
+    }
+
+    .conic-led {
+      background: conic-gradient(from 0deg, #38bdf8, #818cf8, #c084fc, #f43f5e, #38bdf8);
+      animation: conic-spin 4s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-2 md:p-4 flex flex-col items-center justify-center select-none antialiased">
+
+  <!-- MASTER PLAYER WRAPPER -->
+  <div class="w-full max-w-6xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- TOP BROWSER & SYSTEM WINDOW HEADER -->
+    <div class="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="w-3 h-3 rounded-full bg-red-500 inline-block shadow-sm"></span>
+        <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block shadow-sm"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-sm"></span>
+        <span class="text-xs font-bold text-slate-300 ml-3 tracking-wide flex items-center gap-2 font-mono">
+          <span class="text-indigo-400">⚡ IT TALENT AI PROFILE</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-slate-400 font-normal">Full-System Interactive Master Demo 60FPS</span>
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <span id="role-indicator-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-700/60 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          PHẦN 1: ỨNG VIÊN (CANDIDATE)
+        </span>
+        <span class="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-mono font-bold">
+          148/148 Tests Passed
+        </span>
+      </div>
+    </div>
+
+    <!-- SIMULATED BROWSER ADDRESS BAR -->
+    <div class="bg-slate-950/80 px-4 py-1.5 border-b border-slate-800/80 flex items-center gap-3 text-xs">
+      <div class="flex items-center gap-1.5 text-slate-500">
+        <button id="sim-back-btn" class="p-1 hover:text-white transition">◀</button>
+        <button id="sim-forward-btn" class="p-1 hover:text-white transition">▶</button>
+        <button id="sim-reload-btn" class="p-1 hover:text-white transition">🔄</button>
+      </div>
+      <div class="flex-1 bg-slate-900 border border-slate-700/60 rounded-lg px-3 py-1 flex items-center justify-between font-mono text-[11px]">
+        <div class="flex items-center gap-1.5 text-slate-300 truncate">
+          <span class="text-emerald-400">🔒</span>
+          <span class="text-slate-500">http://127.0.0.1:8000/web/</span><span id="sim-url-path" class="text-indigo-300 font-bold">index.html</span>
+        </div>
+        <span class="text-[10px] text-slate-500 font-sans bg-slate-800/80 px-1.5 py-0.5 rounded">FastAPI + MySQL 8.0</span>
+      </div>
+    </div>
+
+    <!-- MAIN 16:9 SIMULATION CANVAS SCREEN -->
+    <div id="video-viewport" class="relative w-full aspect-[16/9] bg-slate-950 overflow-hidden screen-grid flex flex-col justify-between">
+      
+      <!-- Virtual Cursor (Mouse Pointer) -->
+      <div id="virtual-cursor" class="absolute z-50 pointer-events-none transition-all duration-700 ease-out flex items-start -top-12 -left-12" style="transform: translate(240px, 180px);">
+        <svg class="w-6 h-6 text-indigo-400 drop-shadow-[0_2px_10px_rgba(99,102,241,0.9)] filter" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 2v18l5-5 4 8 3-1.5-4-8h7L4 2z"/>
+        </svg>
+        <span id="cursor-action-label" class="opacity-0 transition-opacity duration-300 ml-1.5 mt-3 text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded shadow-lg whitespace-nowrap">
+          Click
+        </span>
+      </div>
+
+      <!-- Watermark & Resolution info -->
+      <div class="absolute top-3 right-4 z-20 pointer-events-none flex flex-col items-end opacity-40">
+        <span class="text-[10px] font-mono text-cyan-400 font-bold tracking-widest">IT TALENT AI PROFILE</span>
+        <span class="text-[9px] font-mono text-slate-400">1920x1080 • 60 FPS • LIVE ACTION SIMULATION</span>
+      </div>
+
+      <!-- Toast Notification in Screen -->
+      <div id="screen-toast" class="absolute top-4 left-1/2 -translate-x-1/2 z-40 bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-2xl border border-emerald-300/40 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2">
+        <span class="text-sm">✅</span>
+        <span id="screen-toast-msg">Thao tác thành công!</span>
+      </div>
+
+      <!-- DEDICATED ALGORITHM & LOGIC FLOATING CARD (VIETSUB POPUP) -->
+      <div id="algo-panel" class="absolute top-3 right-4 z-30 w-80 md:w-96 bg-slate-950/95 border border-indigo-500/50 rounded-xl p-3.5 shadow-2xl backdrop-blur-md transition-all duration-500 transform translate-x-0">
+        <div class="flex items-center justify-between border-b border-indigo-500/30 pb-2 mb-2">
+          <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            🧠 LOGIC & THUẬT TOÁN ĐÃ ÁP DỤNG
+          </span>
+          <span id="algo-badge" class="text-[10px] bg-indigo-900/80 text-indigo-300 px-2 py-0.5 rounded font-mono font-bold">AUTH</span>
+        </div>
+        <div id="algo-action-title" class="text-xs font-bold text-white mb-1.5 flex items-center gap-1">
+          <span>🎯 Thao tác:</span> <span class="text-emerald-400 font-semibold" id="algo-action-text">Khởi động hệ thống</span>
+        </div>
+        <div id="algo-content" class="text-[11px] text-slate-300 leading-relaxed font-sans space-y-1.5">
+          <!-- Updated dynamically per action -->
+          <p>Hệ thống tự động kích hoạt tiến trình mô phỏng các thao tác click trực tiếp và giải thích chi tiết thuật toán backend.</p>
+        </div>
+      </div>
+
+      <!-- SCENE RENDERER CONTAINER (SIMULATED PAGES RENDER HERE) -->
+      <div id="scene-container" class="relative w-full h-full flex items-center justify-center p-2 md:p-6 overflow-hidden">
+        <!-- Scenes are dynamically rendered and animated here via JS -->
+      </div>
+
+      <!-- SYNCHRONIZED NARRATION / SUBTITLE OVERLAY AT BOTTOM -->
+      <div class="relative z-20 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent pt-6 pb-3 px-6 text-center">
+        <div class="inline-flex items-center gap-2 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/90 px-2.5 py-0.5 rounded border border-indigo-700/60 flex items-center gap-1.5 shadow">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+            🎙️ THUYẾT MINH THAO TÁC & BƯỚC THỰC HIỆN
+          </span>
+          <span id="narration-scene-tag" class="text-xs text-slate-400 font-semibold">Cảnh 1/10</span>
+        </div>
+        <p id="narration-text" class="text-xs md:text-sm font-semibold text-slate-100 max-w-4xl mx-auto leading-relaxed min-h-[44px] flex items-center justify-center">
+          Chào mừng hội đồng nghiệm thu! Bắt đầu từ trang Landing Page, con trỏ chuột nhấn vào nút 'Bắt đầu trải nghiệm ngay'.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- VIDEO SCRUBBER & PLAYBACK CONTROLS BAR -->
+    <div class="bg-slate-950 px-4 py-3 border-t border-slate-800 flex flex-col gap-2.5">
+      
+      <!-- Progress Bar (Scrubber) -->
+      <div class="flex items-center gap-3">
+        <span id="time-current" class="text-xs font-mono text-slate-400 w-12 text-right">00:00</span>
+        <div id="progress-container" class="relative flex-1 h-2 bg-slate-800 rounded-full cursor-pointer group">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full w-0 transition-all duration-100"></div>
+          <div id="progress-thumb" class="absolute top-1/2 -translate-y-1/2 left-0 -ml-1.5 w-3.5 h-3.5 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+        <span id="time-total" class="text-xs font-mono text-slate-400 w-12">05:00</span>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        
+        <!-- Left: Play/Pause/Prev/Next -->
+        <div class="flex items-center space-x-2">
+          <button id="btn-prev" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Cảnh trước">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+
+          <button id="btn-play" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center">
+            <svg id="icon-play" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+
+          <button id="btn-next" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Cảnh tiếp">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <button id="btn-replay" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Phát lại từ đầu">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+        </div>
+
+        <!-- Center: Scene Quick Jump Chips -->
+        <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll py-1 max-w-2xl">
+          <button onclick="jumpToScene(0)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium transition whitespace-nowrap" data-scene="0">1. Trang chủ & Đăng nhập</button>
+          <button onclick="jumpToScene(1)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="1">2. Hồ sơ 3D & Lộ trình</button>
+          <button onclick="jumpToScene(2)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="2">3. Chuông Thông báo</button>
+          <button onclick="jumpToScene(3)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="3">4. Tải lên CV & Quét AI</button>
+          <button onclick="jumpToScene(4)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="4">5. Đánh giá Năng lực</button>
+          <button onclick="jumpToScene(5)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="5">6. Thêm Skill & Đăng xuất</button>
+          <button onclick="jumpToScene(6)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="6">7. NTD & Đăng Tin JD</button>
+          <button onclick="jumpToScene(7)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="7">8. Bảng Đối Sánh AI</button>
+          <button onclick="jumpToScene(8)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="8">9. Tìm Kiếm Ứng Viên</button>
+          <button onclick="jumpToScene(9)" class="scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap" data-scene="9">10. Tổng Kết 148 Tests</button>
+        </div>
+
+        <!-- Right: Speed & Mode -->
+        <div class="flex items-center space-x-2">
+          <select id="speed-select" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500">
+            <option value="1">1.0x Chuẩn</option>
+            <option value="1.5">1.5x Nhanh</option>
+            <option value="2">2.0x Siêu tốc</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT MASTER SIMULATION ENGINE -->
+  <script>
+    // Total Duration: 300 seconds (5 minutes, 30s per scene)
+    const TOTAL_DURATION = 300; 
+    let currentTime = 0;
+    let isPlaying = true;
+    let playbackSpeed = 1.0;
+    let timer = null;
+    let activeSceneId = -1;
+
+    // SCENES DEFINITIONS (10 SCENES COVERING BOTH ROLES EXACTLY LIKE THE 13 USER SCREENSHOTS)
+    const scenes = [
+      // -------------------------------------------------------------
+      // CẢNH 1: INDEX.HTML -> LOGIN.HTML -> QUICK LOGIN CANDIDATE
+      // -------------------------------------------------------------
+      {
+        id: 0,
+        start: 0,
+        end: 30,
+        url: "index.html ➔ login.html",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 1/10: Trang chủ & Đăng nhập phân quyền [TK-01, TK-02]",
+        subtitles: [
+          { at: 0, text: "Bắt đầu tại trang chủ index.html. Con trỏ chuột di chuyển và bấm vào nút 'Bắt đầu trải nghiệm ngay 🚀' để chuyển sang màn hình Đăng nhập." },
+          { at: 7, text: "Tại trang login.html, chuột click chọn nhanh tài khoản mẫu: '👤 Ứng viên Senior' (nguyen.senior@example.com). Mật khẩu tự động nạp an toàn." },
+          { at: 15, text: "Chuột nhấn nút 'Đăng nhập ngay'. Hệ thống xác thực danh tính, tạo JWT Token mã hóa HS256 và chuyển thẳng vào trang Hồ sơ năng lực." },
+          { at: 23, text: "Đăng nhập thành công! Bắt đầu phân tích logic băm mật khẩu Bcrypt và tạo phiên đăng nhập bằng JWT Bearer Token." }
+        ],
+        render: () => `
+          <div id="sim-page-index" class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-2xl relative transition-opacity duration-500">
+            <!-- Simulated Landing Navbar -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-8">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">⚡</span>
+                <span class="font-extrabold text-white text-base">IT Talent AI</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <button class="text-xs text-slate-300 hover:text-white px-3 py-1.5 border border-slate-700 rounded-lg">API Swagger Docs</button>
+                <button id="demo-btn-goto-login" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-1.5 rounded-lg shadow-lg shadow-indigo-600/30 transition">Đăng nhập / Đăng ký</button>
+              </div>
+            </div>
+
+            <!-- Hero Banner -->
+            <div class="text-center py-6 px-4">
+              <span class="text-[11px] bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 px-3 py-1 rounded-full font-semibold">✨ Trí tuệ Nhân tạo Thế hệ Mới • Nhóm 10</span>
+              <h1 class="text-2xl md:text-3xl font-black text-white mt-4 leading-tight">
+                Đánh Giá Năng Lực IT & Đối Sánh Tuyển Dụng<br>
+                <span class="bg-gradient-to-r from-cyan-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent">Chuẩn Xác Với Sức Mạnh AI</span>
+              </h1>
+              <p class="text-xs text-slate-400 max-w-xl mx-auto mt-3">
+                Tự động trích xuất kỹ năng từ CV, định lượng năng lực chuyên môn theo 4 cấp bậc tiêu chuẩn, và kết nối bài đăng tuyển dụng với nhân tài công nghệ.
+              </p>
+              <div class="mt-6 flex justify-center gap-3">
+                <button id="demo-btn-start-exp" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-indigo-600/40 transition">
+                  Bắt đầu trải nghiệm ngay 🚀
+                </button>
+                <button class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs rounded-xl">
+                  Xem tài liệu API (24 endpoints)
+                </button>
+              </div>
+            </div>
+
+            <!-- Login Modal Overlay (Toggles when clicked) -->
+            <div id="demo-login-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-2xl p-6 flex items-center justify-center hidden">
+              <div class="w-full max-w-md bg-slate-900 border border-slate-700/70 rounded-2xl p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Chào mừng trở lại! 👋</h3>
+                    <p class="text-[11px] text-slate-400">Nhập thông tin tài khoản của bạn để tiếp tục</p>
+                  </div>
+                  <span class="text-xs bg-indigo-950 text-indigo-300 border border-indigo-700 px-2 py-0.5 rounded">Đăng nhập</span>
+                </div>
+
+                <div class="space-y-2.5">
+                  <div>
+                    <label class="text-[11px] text-slate-300 block mb-1">Email</label>
+                    <input id="demo-login-email" type="text" value="vd: nguyen.senior@example.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none">
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-slate-300 block mb-1">Mật khẩu</label>
+                    <input id="demo-login-pass" type="password" value="" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none" placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)">
+                  </div>
+                  <button id="demo-btn-do-login" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition mt-2">
+                    Đăng nhập ngay
+                  </button>
+                </div>
+
+                <!-- Quick Login Chips (from User's Screenshot 2) -->
+                <div class="mt-4 pt-3 border-t border-slate-800">
+                  <div class="text-[10px] text-amber-400 font-bold mb-1.5">⚡ Tài khoản mẫu để kiểm thử nhanh (Mật khẩu: 12345678):</div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button id="demo-chip-senior" class="text-[10px] bg-slate-800 hover:bg-indigo-900 border border-slate-700 px-2 py-1 rounded text-slate-300 transition">
+                      👤 Ứng viên Senior
+                    </button>
+                    <button class="text-[10px] bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-300">
+                      👤 Ứng viên Middle
+                    </button>
+                    <button id="demo-chip-recruiter" class="text-[10px] bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-300">
+                      🏢 Nhà tuyển dụng
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 3, cursor: [360, 240], click: "#demo-btn-start-exp", onAction: () => {
+            const modal = document.getElementById("demo-login-modal");
+            if (modal) modal.classList.remove("hidden");
+            document.getElementById("sim-url-path").textContent = "login.html";
+            showToast("Đã chuyển sang trang đăng nhập login.html");
+          }},
+          { at: 9, cursor: [400, 310], click: "#demo-chip-senior", onAction: () => {
+            const emailInput = document.getElementById("demo-login-email");
+            const passInput = document.getElementById("demo-login-pass");
+            if (emailInput) emailInput.value = "nguyen.senior@example.com";
+            if (passInput) passInput.value = "12345678";
+            showToast("Đã nạp tài khoản mẫu: nguyen.senior@example.com");
+            updateAlgoPanel("CHỌN TÀI KHOẢN MẪU", "Nạp dữ liệu Ứng viên Senior", `
+              <p>• Email: <code class="text-indigo-400">nguyen.senior@example.com</code></p>
+              <p>• Hồ sơ đã được thiết lập sẵn trong CSDL MySQL với 6 năm kinh nghiệm thực chiến.</p>
+            `);
+          }},
+          { at: 17, cursor: [500, 240], click: "#demo-btn-do-login", onAction: () => {
+            showToast("Xác thực thông tin và tạo Token JWT thành công!");
+            updateAlgoPanel("BCRYPT + JWT HS256", "Đăng nhập & Cấp JWT Token", `
+              <p>1. <strong>Bcrypt Hash Check:</strong> <code>bcrypt.checkpw(password, user.password_hash)</code> so khớp an toàn không lưu plaintext.</p>
+              <p>2. <strong>Tạo JWT Bearer:</strong> Ký thuật toán HS256 với payload <code>{"sub": user.id, "role": "candidate", "exp": 60min}</code>.</p>
+              <p>3. <strong>Guard Router:</strong> Lưu token vào <code>localStorage</code>, tự động điều hướng sang <code>profile.html</code>.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 2: PROFILE.HTML - 3D HERO CARD & CAREER ROADMAP
+      // -------------------------------------------------------------
+      {
+        id: 1,
+        start: 30,
+        end: 60,
+        url: "profile.html",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 2/10: Hồ sơ năng lực 3D & Lộ trình nghề nghiệp [HS-01, HS-03]",
+        subtitles: [
+          { at: 30, text: "Chuyển vào trang profile.html. Giao diện Thẻ Hồ Sơ 3D của ứng viên 'Nguyễn Văn Senior' với điểm tổng AI đạt 85.0/100." },
+          { at: 37, text: "Con trỏ chuột di chuyển qua khung Avatar LED Conic Gradient xoay tròn, thẻ phản hồi nghiêng góc 3D tương tác sống động." },
+          { at: 45, text: "Chuột di chuyển tới Thước Đo Lộ Trình Cấp Bậc Chuyên Môn (Career Roadmap). Điểm 85.0 và 6 năm kinh nghiệm giúp ứng viên đạt mốc Senior 100%." },
+          { at: 53, text: "Hệ thống áp dụng hàm determine_level(years, score) với logic điều kiện kép AND: Phải thỏa mãn CẢ năm kinh nghiệm VÀ điểm tổng." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Navbar Mockup (from User's Screenshot 4) -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-5">
+              <div class="flex items-center gap-4">
+                <span class="font-extrabold text-white text-sm flex items-center gap-1.5"><span class="text-indigo-400">⚡</span> IT Talent AI</span>
+                <span class="text-xs font-bold text-indigo-400 border-b-2 border-indigo-500 pb-1">Hồ sơ cá nhân</span>
+                <span class="text-xs text-slate-400">Tải lên CV</span>
+                <span class="text-xs text-slate-400">Đánh giá năng lực</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="relative">
+                  <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs text-amber-400">🔔</span>
+                  <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs bg-slate-900 border border-slate-700/60 px-2.5 py-1 rounded-full">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="text-slate-300 font-medium">Ứng viên</span>
+                </div>
+                <button class="text-[11px] bg-rose-950 text-rose-300 border border-rose-800/60 px-2 py-1 rounded-lg">🚪 Đăng xuất</button>
+              </div>
+            </div>
+
+            <!-- 3D Profile Hero Card (Pixel Match Screenshot 4) -->
+            <div id="demo-3d-hero-card" class="bg-gradient-to-r from-slate-900 via-indigo-950/70 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-2xl transition-transform duration-300">
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-4">
+                  <!-- Conic LED Avatar -->
+                  <div class="relative w-16 h-16 rounded-full conic-led p-0.5">
+                    <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center text-xl font-black text-white">
+                      N
+                    </div>
+                  </div>
+                  <div>
+                    <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                      Nguyễn Văn Senior
+                      <span class="text-xs text-rose-400">🎯 Senior Backend Engineer</span>
+                    </h2>
+                    <div class="flex gap-2 mt-1">
+                      <span class="text-[10px] bg-purple-900/60 text-purple-300 border border-purple-700 px-2 py-0.5 rounded font-bold">SENIOR</span>
+                      <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700 px-2 py-0.5 rounded font-bold">CÔNG KHAI</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <div class="bg-slate-950/80 border border-slate-800 px-4 py-2 rounded-xl text-center">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Điểm tổng AI</span>
+                    <span class="text-base font-extrabold text-cyan-400 font-mono">85.0 / 100</span>
+                  </div>
+                  <div class="bg-slate-950/80 border border-slate-800 px-4 py-2 rounded-xl text-center">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Kinh nghiệm</span>
+                    <span class="text-base font-extrabold text-indigo-400 font-mono">6 năm</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Career Progression Bar (Intern -> Senior) -->
+              <div class="mt-6 pt-4 border-t border-slate-800">
+                <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-1.5">
+                  <span class="text-emerald-400">🌱 Intern</span>
+                  <span class="text-cyan-400">🌿 Junior</span>
+                  <span class="text-indigo-400">⚡ Middle</span>
+                  <span class="text-amber-400 font-extrabold">👑 Senior (Cấp hiện tại)</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 via-cyan-500 via-indigo-500 to-amber-400 rounded-full w-full shadow-lg"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- AI Summary Quick View -->
+            <div class="mt-4 bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🤖</span>
+                <span class="text-slate-300">Đánh giá năng lực từ AI: <strong class="text-indigo-300">Lập trình viên backend giàu kinh nghiệm, chuyên sâu về Python và tối ưu CSDL.</strong></span>
+              </div>
+              <span class="text-[10px] text-indigo-400 font-semibold bg-indigo-950 px-2 py-0.5 rounded border border-indigo-800">Claude 3.5 Sonnet</span>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 35, cursor: [260, 180], onAction: () => {
+            const card = document.getElementById("demo-3d-hero-card");
+            if (card) card.style.transform = "perspective(600px) rotateY(-8deg) rotateX(4deg)";
+          }},
+          { at: 42, cursor: [360, 180], onAction: () => {
+            const card = document.getElementById("demo-3d-hero-card");
+            if (card) card.style.transform = "perspective(600px) rotateY(8deg) rotateX(-4deg)";
+          }},
+          { at: 50, cursor: [560, 270], onAction: () => {
+            const card = document.getElementById("demo-3d-hero-card");
+            if (card) card.style.transform = "none";
+            showToast("Thuật toán xác định cấp bậc: Đạt mốc SENIOR!");
+            updateAlgoPanel("DETERMINE_LEVEL", "Thuật toán Phân Cấp Bậc Kép", `
+              <p>• <strong>Công thức Python:</strong></p>
+              <pre class="bg-slate-900 p-1.5 rounded text-[10px] text-cyan-300 font-mono">if years >= 5 and total_score >= 75:
+    return "Senior"  # Ứng viên đạt 6 năm & 85.0đ</pre>
+              <p>• Logic yêu cầu <em>đồng thời</em> thâm niên thực chiến và năng lực đo lường thực tế.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 3: NOTIFICATION BELL & INVITATION CARD (SCREENSHOT 5)
+      // -------------------------------------------------------------
+      {
+        id: 2,
+        start: 60,
+        end: 90,
+        url: "profile.html#notifications",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 3/10: Chuông thông báo Navbar & Hộp thư Lời mời [HS-03]",
+        subtitles: [
+          { at: 60, text: "Con trỏ chuột di chuyển lên góc phải Navbar và click vào biểu tượng Chuông thông báo 🔔 đang phát tín hiệu đỏ." },
+          { at: 67, text: "Popup hộp thư hiện ra: Lời mời phỏng vấn từ TechCorp Vietnam vị trí 'Senior Python Backend Engineer' với độ khớp AI 96%." },
+          { at: 75, text: "Chuột nhấn nút 'Chấp nhận lời mời'. Hệ thống gửi phản hồi xác nhận tới nhà tuyển dụng và cập nhật trạng thái thông báo." },
+          { at: 83, text: "Phân tích cơ chế liên kết lời mời: Tự động đối soát hồ sơ đạt ngưỡng Matching >= 80% để kích hoạt gửi thông báo real-time." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Navbar with Active Bell -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-4">
+              <span class="font-extrabold text-white text-sm flex items-center gap-1.5"><span class="text-indigo-400">⚡</span> IT Talent AI</span>
+              
+              <div class="flex items-center gap-3">
+                <button id="demo-btn-bell" class="relative p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-amber-400 transition">
+                  🔔
+                  <span id="demo-bell-ping" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></span>
+                </button>
+                <div class="flex items-center gap-1 text-xs text-slate-300 bg-slate-900 border border-slate-700 px-2 py-0.5 rounded-full">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ứng viên
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulated Dropdown Card (Match Screenshot 5) -->
+            <div id="demo-dropdown-box" class="w-full max-w-lg mx-auto bg-slate-900/95 border border-indigo-500/50 rounded-2xl p-5 shadow-2xl backdrop-blur-md">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <h4 class="text-xs font-extrabold text-white flex items-center gap-1.5">
+                  📬 Hộp Thư & Lời Mời Ứng Tuyển
+                  <span class="text-[10px] bg-rose-950 text-rose-400 border border-rose-800 px-1.5 py-0.2 rounded">1 mới</span>
+                </h4>
+                <span class="text-[10px] text-indigo-400 font-bold hover:underline cursor-pointer">Đánh dấu đã đọc</span>
+              </div>
+
+              <!-- Invitation Item (Screenshot 5) -->
+              <div class="bg-indigo-950/40 border border-indigo-500/40 rounded-xl p-4 space-y-2.5">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-base">🏢</div>
+                    <div>
+                      <h5 class="text-xs font-bold text-white">Lời mời phỏng vấn từ TechCorp Vietnam</h5>
+                      <p class="text-[11px] text-indigo-300">Vị trí: <strong>Senior Python Backend Engineer</strong> (Khớp 96%)</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">10 phút trước</span>
+                </div>
+                
+                <p class="text-[11px] text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                  "Chào bạn! Dựa trên phân tích năng lực của AI, chuyên môn vững vàng của bạn về Python (5★) và MySQL (4★) rất phù hợp với dự án Core Backend chịu tải lớn của chúng tôi..."
+                </p>
+
+                <div class="flex gap-2 pt-1">
+                  <button id="demo-btn-accept" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow-md transition">
+                    ✓ Chấp nhận lời mời phỏng vấn
+                  </button>
+                  <button class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg">
+                    Tạm bỏ qua
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 64, cursor: [560, 70], click: "#demo-btn-bell", onAction: () => {
+            showToast("Đã mở danh sách thông báo và lời mời tuyển dụng!");
+          }},
+          { at: 74, cursor: [400, 310], click: "#demo-btn-accept", onAction: () => {
+            const btn = document.getElementById("demo-btn-accept");
+            const ping = document.getElementById("demo-bell-ping");
+            if (btn) {
+              btn.textContent = "✅ Đã Đồng Ý Tham Gia Phỏng Vấn!";
+              btn.className = "flex-1 py-1.5 bg-slate-800 text-emerald-400 font-bold text-xs rounded-lg border border-emerald-700/60";
+            }
+            if (ping) ping.classList.add("hidden");
+            showToast("Hệ thống đã gửi xác nhận tới TechCorp Vietnam!");
+            updateAlgoPanel("EVENT & NOTIFICATION", "Cơ chế Ghép Nối Realtime", `
+              <p>• Khi NTD kích hoạt đối sánh đạt $\ge 80\%$, hệ thống tự động sinh bản ghi lời mời vào CSDL.</p>
+              <p>• Navbar Badge lắng nghe sự kiện để hiển thị số lượng chưa đọc theo thời gian thực.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 4: UPLOAD_CV.HTML - DRAG & DROP PDF, AI EXTRACTION (SCREENSHOT 6)
+      // -------------------------------------------------------------
+      {
+        id: 3,
+        start: 90,
+        end: 120,
+        url: "upload_cv.html",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 4/10: Tải lên CV & Quét trích xuất kỹ năng bằng AI [CV-01, CV-02]",
+        subtitles: [
+          { at: 90, text: "Chuột click vào menu 'Tải lên CV'. Chuyển sang màn hình upload_cv.html với giao diện thả tệp tiêu chuẩn PDF tối đa 5MB." },
+          { at: 97, text: "Chuột kéo thả tệp 'CV_Nguyen_Van_Senior.pdf' vào vùng dropzone. File hợp lệ xuất hiện với biểu tượng PDF." },
+          { at: 104, text: "Chuột click nút 'Bắt Đầu Phân Tích Bằng AI'. Hiệu ứng tia Laser AI Scanning kích hoạt trích xuất toàn bộ dữ liệu." },
+          { at: 112, text: "Hệ thống trích xuất thành công 6 năm kinh nghiệm cùng các kỹ năng chuẩn: Python, MySQL, Docker. Bấm 'Xác Nhận & Lưu' để đồng bộ." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Header (Match Screenshot 6) -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between mb-5">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-xl">📄</span>
+                <div>
+                  <h3 class="text-sm font-black text-white">Tải Lên CV & Trích Xuất Bằng AI</h3>
+                  <p class="text-[11px] text-slate-400">Mô hình AI tự động đọc CV file PDF, trích xuất kinh nghiệm làm việc, học vấn và 60 kỹ năng chuẩn IT</p>
+                </div>
+              </div>
+              <button class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg">← Về Trang Hồ Sơ</button>
+            </div>
+
+            <!-- Upload Dropzone (Match Screenshot 6) -->
+            <div id="demo-dropzone-box" class="border-2 border-dashed border-slate-700/80 rounded-2xl p-8 text-center bg-slate-900/40 relative overflow-hidden">
+              <div id="demo-laser" class="laser-line hidden"></div>
+              
+              <div id="demo-upload-initial">
+                <div class="text-3xl mb-2">📁</div>
+                <h4 class="text-xs font-bold text-slate-200">Nhấp để chọn tệp CV hoặc kéo thả file PDF vào đây</h4>
+                <p class="text-[10px] text-slate-400 mt-1">Hỗ trợ file PDF chuẩn văn bản (Text PDF). Dung lượng tối đa: 5.0 MB.</p>
+              </div>
+
+              <!-- Uploaded File Badge -->
+              <div id="demo-file-badge" class="hidden flex items-center justify-center gap-3 py-2 bg-indigo-950/60 border border-indigo-700/60 rounded-xl max-w-md mx-auto my-2">
+                <span class="text-xl text-rose-400">📑</span>
+                <div class="text-left">
+                  <div class="text-xs font-bold text-white">CV_Nguyen_Van_Senior.pdf</div>
+                  <div class="text-[10px] text-slate-400">1.4 MB • Text PDF Validated</div>
+                </div>
+                <span class="text-xs text-emerald-400 font-bold ml-2">✓ Sẵn sàng</span>
+              </div>
+
+              <!-- AI Scanning Status -->
+              <div id="demo-scan-status" class="hidden text-xs font-bold text-indigo-400 mt-2 flex items-center justify-center gap-2">
+                <span class="w-3 h-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></span>
+                <span>Đang phân tích cấu trúc PDF và đối chiếu 60 kỹ năng chuẩn IT...</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 mt-4">
+              <button class="text-xs bg-slate-800 text-slate-300 px-4 py-2 rounded-xl border border-slate-700">Nhập hồ sơ thủ công</button>
+              <button id="demo-btn-scan-ai" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition">
+                <span>🚀</span> Bắt Đầu Phân Tích Bằng AI
+              </button>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 96, cursor: [400, 220], onAction: () => {
+            const initBox = document.getElementById("demo-upload-initial");
+            const fileBadge = document.getElementById("demo-file-badge");
+            if (initBox) initBox.classList.add("hidden");
+            if (fileBadge) fileBadge.classList.remove("hidden");
+            showToast("Đã tải tệp CV_Nguyen_Van_Senior.pdf (1.4MB)");
+          }},
+          { at: 104, cursor: [560, 310], click: "#demo-btn-scan-ai", onAction: () => {
+            const laser = document.getElementById("demo-laser");
+            const status = document.getElementById("demo-scan-status");
+            if (laser) laser.classList.remove("hidden");
+            if (status) status.classList.remove("hidden");
+            showToast("Bắt đầu tiến trình AI Extraction...");
+            updateAlgoPanel("PYPDF + CLAUDE LLM", "Trích Xuất Văn Bản & AI Prompting", `
+              <p>1. <strong>Validation:</strong> Kiểm tra magic bytes <code>%PDF-</code> và giới hạn $5\text{MB}$.</p>
+              <p>2. <strong>pypdf Extract:</strong> Trích xuất toàn bộ text thô từng trang.</p>
+              <p>3. <strong>Prompt Engineering:</strong> Gửi kèm danh mục 60 kỹ năng chuẩn, ép chuẩn JSON schema và áp dụng cơ chế Retry (<code>MAX_RETRIES=2</code>).</p>
+            `);
+          }},
+          { at: 114, cursor: [560, 310], onAction: () => {
+            const status = document.getElementById("demo-scan-status");
+            const laser = document.getElementById("demo-laser");
+            if (laser) laser.classList.add("hidden");
+            if (status) {
+              status.innerHTML = `<span class="text-emerald-400">✓ Đã trích xuất thành công: Python (5★), MySQL (4★), Docker (4★) & 6 năm kinh nghiệm!</span>`;
+            }
+            showToast("AI hoàn tất trích xuất dữ liệu!");
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 5: EVALUATION.HTML - RADAR SCORE & RE-EVALUATION (SCREENSHOT 7)
+      // -------------------------------------------------------------
+      {
+        id: 4,
+        start: 120,
+        end: 150,
+        url: "evaluation.html",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 5/10: Báo cáo đánh giá năng lực AI & Điểm số [AI-01, AI-02]",
+        subtitles: [
+          { at: 120, text: "Chuột click vào tab 'Đánh giá năng lực' trên Navbar. Hệ thống mở ra trang evaluation.html với báo cáo định lượng đa chiều." },
+          { at: 127, text: "Điểm tổng hợp đạt 85.0/100 thang điểm chuẩn. Nhận định từ mô hình Claude 3.5 Sonnet khống chế dưới 150 từ tiếng Việt chuẩn UTF-8." },
+          { at: 135, text: "Chuột click nút '⚡ Đánh Giá Lại Bằng AI'. Hệ thống gọi hàm evaluate_profile() tính toán lại điểm nhóm và cập nhật lộ trình." },
+          { at: 143, text: "Phân tích công thức quy đổi: Điểm mỗi kỹ năng = (Mức thành thạo * 12) + (Số năm sử dụng * 8, trần tối đa 5 năm)." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Header (Match Screenshot 7) -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between mb-5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-600/30 border border-cyan-500/50 flex items-center justify-center text-lg font-black text-cyan-300">U</div>
+                <div>
+                  <h3 class="text-sm font-black text-white">Báo Cáo Đánh Giá Năng Lực AI</h3>
+                  <p class="text-[11px] text-slate-400">Phân tích đa chiều về trình độ chuyên môn, điểm số theo từng nhóm kỹ năng và nhận định từ LLM</p>
+                  <div class="flex gap-2 mt-1">
+                    <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-700 px-1.5 py-0.2 rounded font-bold">SENIOR</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded">6.0 NĂM EXP</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg">Trang Hồ Sơ</button>
+                <button id="demo-btn-reeval" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1 transition">
+                  <span id="demo-reeval-spinner">⚡</span> Đánh Giá Lại Bằng AI
+                </button>
+              </div>
+            </div>
+
+            <!-- Score & Level Overview Card (Match Screenshot 7) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center flex flex-col items-center justify-center">
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Điểm tổng hợp AI</span>
+                <span class="text-3xl font-black text-cyan-400 font-mono mt-1">85.0</span>
+                <span class="text-[10px] text-slate-500 mt-0.5">Thang điểm 100</span>
+              </div>
+
+              <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-xs font-bold text-white">Lộ Trình Cấp Bậc Chuyên Môn</span>
+                  <span class="text-xs font-extrabold text-amber-400">Senior</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mb-2">Cấp độ được tính toán kết hợp giữa số năm kinh nghiệm thực tế và điểm số kỹ năng chuyên môn.</p>
+                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 via-indigo-500 to-amber-400 w-full"></div>
+                </div>
+                <div class="flex justify-between text-[9px] text-slate-500 mt-1">
+                  <span>Intern (&lt; 1 năm)</span>
+                  <span>Junior (1–2 năm)</span>
+                  <span>Middle (2–5 năm)</span>
+                  <span class="text-amber-400 font-bold">Senior (&gt; 5 năm &gt;= 75đ)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LLM Analysis Card (Match Screenshot 7) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+              <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-800/80">
+                <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>🤖</span> Nhận Định & Khuyến Nghị Phát Triển Từ AI
+                </span>
+                <span class="text-[10px] text-pink-400 font-mono">Claude 3.5 Sonnet Analysis</span>
+              </div>
+              <p id="demo-eval-summary-text" class="text-xs text-slate-300 leading-relaxed">
+                "Ứng viên Nguyễn Văn Senior thể hiện năng lực chuyên môn xuất sắc ở vai trò Backend với nền tảng vững vàng về Python (5★) và MySQL (4★). Khả năng thiết kế hệ thống phân tán và tối ưu hóa truy vấn tốt. Khuyến nghị: Bổ sung chứng chỉ Kubernetes và kiến trúc Microservices để nâng cấp toàn diện kỹ năng Cloud-native."
+              </p>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 134, cursor: [560, 80], click: "#demo-btn-reeval", onAction: () => {
+            const spinner = document.getElementById("demo-reeval-spinner");
+            const text = document.getElementById("demo-eval-summary-text");
+            if (spinner) spinner.className = "inline-block animate-spin";
+            if (text) text.innerHTML = `<span class="text-indigo-400 animate-pulse">Đang nạp nhận định mới từ mô hình Claude Sonnet...</span>`;
+            showToast("Đang tính toán lại điểm và nhận định AI...");
+          }},
+          { at: 142, cursor: [560, 80], onAction: () => {
+            const spinner = document.getElementById("demo-reeval-spinner");
+            const text = document.getElementById("demo-eval-summary-text");
+            if (spinner) spinner.className = "";
+            if (text) {
+              text.textContent = "Điểm năng lực của bạn đạt 85.0/100 (Senior). Nền tảng Python và MySQL rất vững chắc, đáp ứng hoàn hảo các dự án High-Load và Big Data.";
+            }
+            showToast("Đánh giá hoàn tất!");
+            updateAlgoPanel("SKILL_SCORE + AI_SUMMARY", "Công Thức Tính Điểm Chi Tiết", `
+              <p>• <strong>Điểm từng kỹ năng:</strong><br>
+              <code>score = (prof * 12) + (min(years, 5) * 8)</code></p>
+              <p>• <strong>Điểm tổng (total_score):</strong> Trung bình cộng các nhóm kỹ năng (Backend, DB, DevOps...).</p>
+              <p>• <strong>Claude 3.5 Sonnet:</strong> Khống chế $\le 150$ từ tiếng Việt chuẩn UTF-8.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 6: PROFILE SKILLS EDIT, DANGER ZONE & LOGOUT (SCREENSHOTS 8, 9, 10)
+      // -------------------------------------------------------------
+      {
+        id: 5,
+        start: 150,
+        end: 180,
+        url: "profile.html#skills",
+        part: "PHẦN 1: ỨNG VIÊN (CANDIDATE)",
+        tag: "Cảnh 6/10: Quản lý kỹ năng, Vùng nguy hiểm & Đăng xuất [HS-02, HS-04]",
+        subtitles: [
+          { at: 150, text: "Trở lại trang profile.html. Chuột thao tác tại form 'Chọn kỹ năng (*)' để bổ sung kỹ năng mới vào hồ sơ." },
+          { at: 157, text: "Chọn kỹ năng 'Docker', mức thành thạo 4/5 sao, 4 năm sử dụng và bấm nút '+ Thêm / Cập Nhật Kỹ Năng'. Danh sách lập tức cập nhật!" },
+          { at: 165, text: "Cuộn xuống '⚠️ Vùng Nguy Hiểm: Xóa Hồ Sơ & Tài Khoản (HS-04)'. Nút xóa bảo vệ dữ liệu bằng cơ chế CASCADE toàn diện." },
+          { at: 173, text: "Con trỏ di chuyển lên Navbar và click nút '🚪 Đăng xuất'. Hệ thống dọn sạch JWT Token trong bộ nhớ và quay lại trang đăng nhập." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Navbar with Logout Button (Screenshot 10) -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-4">
+              <span class="font-extrabold text-white text-sm"><span class="text-indigo-400">⚡</span> IT Talent AI</span>
+              <button id="demo-btn-logout" class="text-xs bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 transition">
+                <span>🚪</span> Đăng xuất
+              </button>
+            </div>
+
+            <!-- Skills Management Form (Match Screenshot 8) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <h4 class="text-xs font-bold text-white mb-2">🎯 Chọn Kỹ Năng Bổ Sung</h4>
+                <div class="space-y-2">
+                  <select id="demo-sel-skill" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                    <option>Docker</option>
+                    <option>Redis</option>
+                    <option>Kubernetes</option>
+                  </select>
+                  <div class="grid grid-cols-2 gap-2">
+                    <select class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200">
+                      <option>⭐⭐⭐⭐ 4/5 - Khá</option>
+                    </select>
+                    <input type="text" value="4.0 năm" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200">
+                  </div>
+                  <button id="demo-btn-add-skill" class="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg shadow">
+                    + Thêm / Cập Nhật Kỹ Năng
+                  </button>
+                </div>
+              </div>
+
+              <!-- Added Skills Table (Match Screenshot 8) -->
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <h4 class="text-xs font-bold text-white mb-2">🎯 Kỹ Năng Đã Thêm (5)</h4>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800">
+                    <span class="font-bold text-white">Python <span class="text-[10px] text-indigo-400 font-normal">Backend</span></span>
+                    <span class="text-amber-400">★★★★★ (5/5)</span>
+                    <span class="text-slate-400 text-[10px]">6 năm</span>
+                  </div>
+                  <div id="demo-new-skill-row" class="hidden flex justify-between items-center bg-indigo-950/60 p-1.5 rounded border border-indigo-700/60">
+                    <span class="font-bold text-white">Docker <span class="text-[10px] text-cyan-400 font-normal">DevOps</span></span>
+                    <span class="text-amber-400">★★★★☆ (4/5)</span>
+                    <span class="text-slate-400 text-[10px]">4 năm</span>
+                  </div>
+                  <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800">
+                    <span class="font-bold text-white">MySQL <span class="text-[10px] text-emerald-400 font-normal">Database</span></span>
+                    <span class="text-amber-400">★★★★☆ (4/5)</span>
+                    <span class="text-slate-400 text-[10px]">5 năm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Danger Zone Card (Match Screenshot 9) -->
+            <div class="bg-rose-950/30 border border-rose-800/60 rounded-xl p-3.5 flex items-center justify-between">
+              <div>
+                <h5 class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                  <span>⚠️</span> Vùng Nguy Hiểm: Xóa Hồ Sơ & Tài Khoản (HS-04)
+                </h5>
+                <p class="text-[10px] text-rose-200/70 mt-0.5">Xóa vĩnh viễn tài khoản, profile, danh sách kỹ năng và file PDF lưu trên ổ cứng (CASCADE sạch sẽ).</p>
+              </div>
+              <button class="text-xs bg-rose-600/90 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg shadow whitespace-nowrap">
+                🗑️ Xóa Tài Khoản
+              </button>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 156, cursor: [320, 160], click: "#demo-btn-add-skill", onAction: () => {
+            const row = document.getElementById("demo-new-skill-row");
+            if (row) row.classList.remove("hidden");
+            showToast("Đã lưu kỹ năng Docker (4★, 4 năm) vào CSDL!");
+            updateAlgoPanel("UPSERT SKILL", "Cập Nhật Kỹ Năng Vào Hồ Sơ", `
+              <p>• Kiểm tra <code>(profile_id, skill_id)</code> trong <code>profile_skills</code>.</p>
+              <p>• Đã tồn tại: UPDATE proficiency & years_used.</p>
+              <p>• Chưa có: INSERT dòng mới kết nối danh mục 60 chuẩn kỹ năng.</p>
+            `);
+          }},
+          { at: 172, cursor: [560, 45], click: "#demo-btn-logout", onAction: () => {
+            showToast("Đã đăng xuất! Chuyển đổi sang vai trò Nhà Tuyển Dụng...");
+            updateAlgoPanel("CASCADE DELETE & LOGOUT", "Cơ Chế Bảo Mật Dữ Liệu", `
+              <p>1. <strong>Logout:</strong> <code>localStorage.removeItem('token')</code> thu hồi phiên.</p>
+              <p>2. <strong>HS-04 Cascade:</strong> <code>os.remove(file_path)</code> dọn sạch file PDF mồ côi trên disk + SQL <code>CASCADE</code> xóa User/Profile an toàn.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 7: LOGIN RECRUITER & JOBS MANAGEMENT (SCREENSHOT 11)
+      // -------------------------------------------------------------
+      {
+        id: 6,
+        start: 180,
+        end: 210,
+        url: "jobs.html",
+        part: "PHẦN 2: NHÀ TUYỂN DỤNG (RECRUITER)",
+        tag: "Cảnh 7/10: Nhà tuyển dụng & Quản lý tin tuyển dụng [JD-01, JD-02]",
+        subtitles: [
+          { at: 180, text: "Chuyển sang Phần 2: Tài khoản Nhà tuyển dụng. Đăng nhập với role recruiter và vào trang jobs.html." },
+          { at: 187, text: "Thanh menu đổi thành: Tin tuyển dụng, Tìm kiếm ứng viên, Bảng đối sánh AI. Chuột click nút '+ Đăng Tin Tuyển Dụng'." },
+          { at: 195, text: "Modal mở ra: Nhập tiêu đề 'Senior Python Backend Engineer', kinh nghiệm >= 5 năm, gắn kỹ năng bắt buộc (Python, MySQL)." },
+          { at: 203, text: "Nhấn 'Lưu Tin Tuyển Dụng'. Tin mới xuất hiện với trạng thái Đang mở tuyển cùng 2 nút hành động chính: 'Xem Đối Sánh' và 'Sửa'." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Recruiter Navbar (Match Screenshot 11) -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-4">
+              <div class="flex items-center gap-4">
+                <span class="font-extrabold text-white text-sm"><span class="text-indigo-400">⚡</span> IT Talent AI</span>
+                <span class="text-xs font-bold text-indigo-400 border-b-2 border-indigo-500 pb-1">Tin tuyển dụng</span>
+                <span class="text-xs text-slate-400">Tìm kiếm ứng viên</span>
+                <span class="text-xs text-slate-400">Bảng đối sánh AI</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs bg-slate-900 border border-slate-700 px-2 py-0.5 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-slate-300 font-bold">Nhà tuyển dụng • Trực tuyến</span>
+              </div>
+            </div>
+
+            <!-- Job Management Header (Match Screenshot 11) -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-600/30 border border-purple-500/50 flex items-center justify-center text-xl">🏢</div>
+                <div>
+                  <h3 class="text-sm font-black text-white">Quản Lý Tin Tuyển Dụng</h3>
+                  <p class="text-[11px] text-slate-400">Đăng tin, gắn kỹ năng yêu cầu và đối sánh ứng viên IT phù hợp nhất cho từng vị trí</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-center font-mono">
+                  <span class="text-[9px] text-slate-400 block font-sans">TIN ĐANG MỞ</span>
+                  <span class="text-sm font-bold text-cyan-400">2</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Job List Tools -->
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-xs font-bold text-white">📋 Danh Sách Vị Trí Tuyển Dụng</span>
+              <div class="flex gap-2">
+                <button id="demo-btn-create-jd" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow flex items-center gap-1 transition">
+                  <span>➕</span> Đăng Tin Tuyển Dụng
+                </button>
+                <button class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg">🔍 Tìm Kiếm Ứng Viên</button>
+              </div>
+            </div>
+
+            <!-- Job Card Item (Match Screenshot 11) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-white">Senior Python Backend Engineer</h4>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">● ĐANG MỞ TUYỂN</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Tuyển Senior Python tham gia xây dựng hệ thống phân tán, chịu tải cao.</p>
+                </div>
+
+                <div class="flex gap-1.5">
+                  <button id="demo-btn-goto-match" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-lg shadow-indigo-600/30 flex items-center gap-1 transition">
+                    <span>⚡</span> Xem Đối Sánh
+                  </button>
+                  <button class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1.5 rounded-lg">✏️ Sửa</button>
+                </div>
+              </div>
+
+              <!-- Tagged Skills (Screenshot 11) -->
+              <div class="flex flex-wrap gap-1.5 text-[10px]">
+                <span class="bg-rose-950/80 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-bold">★ Bắt buộc: Python</span>
+                <span class="bg-rose-950/80 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-bold">★ Bắt buộc: MySQL</span>
+                <span class="bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded">⚡ Ưu tiên: Docker</span>
+                <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">⏱️ Yêu cầu: >= 5 năm kinh nghiệm</span>
+              </div>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 188, cursor: [520, 160], click: "#demo-btn-create-jd", onAction: () => {
+            showToast("Mở Modal Soạn Thảo Tin Tuyển Dụng Mới!");
+            updateAlgoPanel("JOB_SERVICE CRUD", "Tạo và Phân Loại Kỹ Năng JD", `
+              <p>• <strong>Bảng CSDL:</strong> <code>jobs</code> lưu tiêu đề, mô tả và <code>min_years</code>.</p>
+              <p>• <strong>Cờ bắt buộc:</strong> Bảng <code>job_skills</code> phân định rõ ràng <code>is_required=1</code> (bắt buộc) vs <code>is_required=0</code> (ưu tiên).</p>
+            `);
+          }},
+          { at: 202, cursor: [540, 230], click: "#demo-btn-goto-match", onAction: () => {
+            showToast("Kích hoạt thuật toán AI Matching cho vị trí Senior Python!");
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 8: MATCH.HTML - AI MATCHING ALGORITHM (SCREENSHOTS 11, 13)
+      // -------------------------------------------------------------
+      {
+        id: 7,
+        start: 210,
+        end: 240,
+        url: "match.html",
+        part: "PHẦN 2: NHÀ TUYỂN DỤNG (RECRUITER)",
+        tag: "Cảnh 8/10: Bảng đối sánh AI & Thuật toán xếp hạng [DS-01]",
+        subtitles: [
+          { at: 210, text: "Nhấn nút '⚡ Xem Đối Sánh'. Màn hình chuyển sang match.html - Bảng Xếp Hạng Đối Sánh Ứng Viên AI theo độ tương thích thực tế." },
+          { at: 218, text: "Vị trí 'Senior Python Backend Engineer' chọn tự động. Thuật toán calc_match tính toán và hiển thị Top 1: Nguyễn Văn Senior đạt 96%!" },
+          { at: 226, text: "Ứng viên đạt 4/4 kỹ năng bắt buộc, 2/2 kỹ năng ưu tiên và 6/5 năm kinh nghiệm. Con trỏ click 'Gửi Lời Mời Phỏng Vấn'." },
+          { at: 233, text: "Phân tích công thức thuật toán: 60% Kỹ năng bắt buộc + 20% Kỹ năng ưu tiên + 20% Số năm kinh nghiệm, với ngưỡng tối thiểu 3 sao." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Match Header (Match Screenshot 13) -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-xl">⚡</div>
+                <div>
+                  <h3 class="text-sm font-black text-white">Bảng Xếp Hạng Đối Sánh Ứng Viên AI</h3>
+                  <p class="text-[11px] text-slate-400">Thuật toán đối sánh đa tiêu chí: Phân tích độ khớp kỹ năng thực tế, số năm kinh nghiệm và điểm đánh giá năng lực AI</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <div class="bg-slate-950 px-3 py-1 rounded-lg border border-slate-800 text-center font-mono">
+                  <span class="text-[9px] text-slate-400 block font-sans">KHỚP CAO NHẤT</span>
+                  <span class="text-sm font-black text-emerald-400">96.0%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Job Selector -->
+            <div class="flex items-center gap-3 bg-slate-900 p-2.5 rounded-xl border border-slate-800 mb-4 text-xs">
+              <span class="text-slate-400 font-bold whitespace-nowrap">VỊ TRÍ TUYỂN DỤNG:</span>
+              <select class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-bold">
+                <option>Senior Python Backend Engineer (2 bắt buộc, 1 ưu tiên, >=5 năm exp)</option>
+              </select>
+            </div>
+
+            <!-- Match Candidate Cards -->
+            <div class="space-y-2.5">
+              
+              <!-- TOP 1 CANDIDATE (Match 96%) -->
+              <div class="bg-slate-900/90 border-2 border-emerald-500/50 rounded-xl p-3.5 flex items-center justify-between shadow-xl">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-base font-black text-white">N</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-xs font-bold text-white">Nguyễn Văn Senior</h4>
+                      <span class="text-[9px] bg-purple-950 text-purple-300 border border-purple-700 px-1.5 py-0.2 rounded font-bold">SENIOR</span>
+                      <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-700 px-1.5 py-0.2 rounded font-bold">🏆 TOP 1 PHÙ HỢP NHẤT</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Python (5★), MySQL (4★), Docker (4★) • 6 năm kinh nghiệm • Điểm AI: 85.0</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <span class="text-base font-black text-emerald-400 font-mono">96.0%</span>
+                    <span class="text-[9px] text-emerald-300 block">Khớp tuyệt đối</span>
+                  </div>
+                  <button id="demo-btn-send-inv" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-md transition">
+                    Gửi Lời Mời
+                  </button>
+                </div>
+              </div>
+
+              <!-- TOP 2 CANDIDATE -->
+              <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-3 flex items-center justify-between opacity-80">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-white">D</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white">Nguyễn Văn Demo</h4>
+                    <p class="text-[10px] text-slate-400">Python, Docker • 5 năm kinh nghiệm</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-bold text-cyan-400 font-mono">88.5%</span>
+                  <button class="text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded">Xem Hồ Sơ</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 224, cursor: [560, 240], click: "#demo-btn-send-inv", onAction: () => {
+            const btn = document.getElementById("demo-btn-send-inv");
+            if (btn) {
+              btn.textContent = "✓ Đã Gửi Lời Mời";
+              btn.className = "text-xs bg-slate-800 text-emerald-400 font-bold px-3 py-1.5 rounded-lg border border-emerald-700/60";
+            }
+            showToast("Đã gửi lời mời phỏng vấn tới Nguyễn Văn Senior!");
+            updateAlgoPanel("CALC_MATCH FORMULA", "Thuật Toán Đối Sánh Trọng Số", `
+              <p>• <strong>Công thức chuẩn:</strong></p>
+              <pre class="bg-slate-900 p-1.5 rounded text-[10px] text-emerald-300 font-mono">Match = 60 * (Req/Total) + 20 * (Pref/Total) + 20 * min(Years/MinY, 1)</pre>
+              <p>• <strong>MIN_PROFICIENCY = 3:</strong> Chỉ tính đạt nếu kỹ năng $\ge 3$ sao.</p>
+              <p>• <strong>Sort:</strong> <code>ORDER BY match_percent DESC, total_score DESC</code>.</p>
+            `);
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 9: CANDIDATES.HTML - SEARCH & LEVEL FILTER (SCREENSHOT 12)
+      // -------------------------------------------------------------
+      {
+        id: 8,
+        start: 240,
+        end: 270,
+        url: "candidates.html",
+        part: "PHẦN 2: NHÀ TUYỂN DỤNG (RECRUITER)",
+        tag: "Cảnh 9/10: Tìm kiếm & Lọc ứng viên nâng cao [DS-02]",
+        subtitles: [
+          { at: 240, text: "Chuột click vào menu 'Tìm kiếm ứng viên' trên Navbar. Hệ thống mở màn hình candidates.html với bộ lọc đa tiêu chí." },
+          { at: 247, text: "Con trỏ chuột nhấn vào chip lọc cấp độ: 'Senior'. Danh sách lập tức tự động lọc, chỉ hiển thị các ứng viên đạt cấp bậc Senior." },
+          { at: 255, text: "Chuột chọn kỹ năng yêu cầu: 'Python' và bấm '+ Thêm'. Danh sách tiếp tục áp dụng toán tử AND chặt chẽ." },
+          { at: 263, text: "Nhấn nút '👤 Xem Hồ Sơ' tại thẻ Nguyễn Văn Senior để kiểm tra thông tin chi tiết. Dữ liệu bảo mật chỉ truy vấn các hồ sơ có is_public=1." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+            
+            <!-- Search & Filter Controls (Match Screenshot 12) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-4">
+              <div class="flex flex-wrap justify-between items-center gap-3">
+                <div>
+                  <span class="text-[11px] font-bold text-slate-400 block mb-1.5 uppercase">Cấp độ năng lực:</span>
+                  <div class="flex gap-1.5">
+                    <button class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">Tất cả</button>
+                    <button class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">Intern</button>
+                    <button class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">Junior</button>
+                    <button class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">Middle</button>
+                    <button id="demo-chip-filter-senior" class="text-xs px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold shadow">Senior</button>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <select class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
+                    <option>Python (Backend)</option>
+                    <option>MySQL (Database)</option>
+                  </select>
+                  <button id="demo-btn-add-filter" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg shadow">+ Thêm</button>
+                  <button class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-lg">Đặt lại</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Candidate Cards Grid (Match Screenshot 12) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              
+              <!-- Card 1: Nguyen Van Senior -->
+              <div class="bg-slate-900 border border-indigo-500/40 rounded-xl p-3.5 space-y-2.5 shadow-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center font-bold text-white text-base">N</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white">Nguyễn Văn Senior</h4>
+                    <p class="text-[10px] text-slate-400">Senior Backend Engineer</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-between text-[10px] bg-slate-950 p-2 rounded-lg border border-slate-800">
+                  <span>Cấp độ: <strong class="text-purple-400">Senior</strong></span>
+                  <span>Kinh nghiệm: <strong class="text-cyan-400">6 năm</strong></span>
+                  <span>Điểm AI: <strong class="text-emerald-400">85.0</strong></span>
+                </div>
+
+                <div class="flex gap-2">
+                  <button id="demo-btn-view-profile" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition">
+                    👤 Xem Hồ Sơ
+                  </button>
+                  <button class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow">
+                    ⚡ Đối Sánh
+                  </button>
+                </div>
+              </div>
+
+              <!-- Card 2: Nguyen Van Demo -->
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center font-bold text-white text-base">D</div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white">Nguyễn Văn Demo</h4>
+                    <p class="text-[10px] text-slate-400">Senior Fullstack Engineer</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-between text-[10px] bg-slate-950 p-2 rounded-lg border border-slate-800">
+                  <span>Cấp độ: <strong class="text-purple-400">Senior</strong></span>
+                  <span>Kinh nghiệm: <strong class="text-cyan-400">5 năm</strong></span>
+                  <span>Điểm AI: <strong class="text-emerald-400">88.5</strong></span>
+                </div>
+
+                <div class="flex gap-2">
+                  <button class="flex-1 py-1.5 bg-slate-800 text-slate-200 text-xs rounded-lg">👤 Xem Hồ Sơ</button>
+                  <button class="flex-1 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg">⚡ Đối Sánh</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 248, cursor: [360, 95], click: "#demo-chip-filter-senior", onAction: () => {
+            showToast("Đã kích hoạt bộ lọc: Cấp bậc Senior");
+          }},
+          { at: 256, cursor: [560, 95], click: "#demo-btn-add-filter", onAction: () => {
+            showToast("Đã bổ sung điều kiện lọc: Kỹ năng Python");
+            updateAlgoPanel("SQL AND QUERY", "Thuật Toán Tìm Kiếm Nâng Cao", `
+              <p>• <strong>Toán tử AND:</strong> Ứng viên phải có <em>tất cả</em> kỹ năng trong filter.</p>
+              <pre class="bg-slate-900 p-1.5 rounded text-[10px] text-cyan-300 font-mono">query = query.filter(
+    Profile.is_public == True,
+    Profile.level == "Senior",
+    Profile.skills.any(skill_id == python_id)
+)</pre>
+              <p>• <strong>Phân trang:</strong> <code>PAGE_SIZE = 10</code> tối ưu tốc độ.</p>
+            `);
+          }},
+          { at: 264, cursor: [260, 290], click: "#demo-btn-view-profile", onAction: () => {
+            showToast("Mở Modal xem nhanh hồ sơ ứng viên công khai!");
+          }}
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // CẢNH 10: SUMMARY & AUTOMATED TEST SUITE (148/148 PASSED)
+      // -------------------------------------------------------------
+      {
+        id: 9,
+        start: 270,
+        end: 300,
+        url: "summary.html",
+        part: "TỔNG KẾT & NGHIỆM THU",
+        tag: "Cảnh 10/10: Tổng kết nghiệm thu & 148 Tests Passed [KT-01 ➔ KT-08]",
+        subtitles: [
+          { at: 270, text: "Tổng kết toàn bộ dự án IT Talent AI Profile: Hoàn thành 100% các chức năng từ Sprint 1 đến Sprint 4." },
+          { at: 277, text: "Bộ kiểm thử tự động với 148 / 148 Test Cases đạt trạng thái PASSED xanh tuyệt đối, bao phủ toàn bộ 24 Endpoints." },
+          { at: 285, text: "Cơ sở dữ liệu MySQL 7 bảng chuẩn hóa với 3 chỉ mục Index tối ưu truy vấn, kiến trúc 3 tầng sạch và bảo mật." },
+          { at: 293, text: "Cảm ơn quý thầy cô và hội đồng đã theo dõi! Hệ thống đã sẵn sàng cho giai đoạn triển khai thực tế." }
+        ],
+        render: () => `
+          <div class="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-2xl relative text-center">
+            
+            <div class="inline-flex p-3 bg-gradient-to-tr from-emerald-600 to-cyan-600 rounded-2xl mb-3 shadow-xl">
+              <span class="text-3xl">🏆</span>
+            </div>
+
+            <h2 class="text-xl md:text-2xl font-black text-white">
+              Hệ Thống IT Talent AI Profile Hoàn Thành Xuất Sắc!
+            </h2>
+            <p class="text-xs text-slate-400 mt-1 max-w-xl mx-auto">
+              Nghiệm thu toàn diện 4 Sprints • Nhóm 10 • Điểm đánh giá LMS: 100/100
+            </p>
+
+            <!-- Hologram Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 my-6">
+              <div class="bg-slate-900 border border-emerald-500/40 p-3.5 rounded-xl text-center shadow-lg">
+                <span class="text-2xl font-black text-emerald-400 font-mono">148 / 148</span>
+                <span class="text-[10px] text-slate-400 block mt-1 font-bold">AUTOMATED TESTS (100%)</span>
+              </div>
+              <div class="bg-slate-900 border border-indigo-500/40 p-3.5 rounded-xl text-center shadow-lg">
+                <span class="text-2xl font-black text-indigo-400 font-mono">24</span>
+                <span class="text-[10px] text-slate-400 block mt-1 font-bold">API ENDPOINTS</span>
+              </div>
+              <div class="bg-slate-900 border border-cyan-500/40 p-3.5 rounded-xl text-center shadow-lg">
+                <span class="text-2xl font-black text-cyan-400 font-mono">7 TABLES</span>
+                <span class="text-[10px] text-slate-400 block mt-1 font-bold">MYSQL 8.0 CASCADE</span>
+              </div>
+              <div class="bg-slate-900 border border-purple-500/40 p-3.5 rounded-xl text-center shadow-lg">
+                <span class="text-2xl font-black text-purple-400 font-mono">60 SKILLS</span>
+                <span class="text-[10px] text-slate-400 block mt-1 font-bold">CHUẨN HÓA IT</span>
+              </div>
+            </div>
+
+            <!-- Tech Stack Pills -->
+            <div class="flex flex-wrap justify-center gap-2 text-xs">
+              <span class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">FastAPI</span>
+              <span class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">Claude 3.5 Sonnet</span>
+              <span class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">Bcrypt + JWT HS256</span>
+              <span class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">SQLAlchemy ORM</span>
+              <span class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">Tailwind CSS 3D</span>
+            </div>
+
+          </div>
+        `,
+        actions: [
+          { at: 275, cursor: [400, 200], onAction: () => {
+            showToast("Bộ kiểm thử Pytest: 148/148 Passed!");
+            updateAlgoPanel("QUALITY ASSURANCE", "Báo Cáo Kiểm Thử Tự Động", `
+              <p>• Toàn bộ 8 module test đạt 100% passed.</p>
+              <p>• Tích hợp End-to-End Integration Tests (KT-04).</p>
+              <p>• Hiệu năng Benchmark (KT-05) đáp ứng thời gian thực &lt; 500ms.</p>
+            `);
+          }}
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // HELPER FUNCTIONS & RUNTIME CONTROLS
+    // =========================================================================
+    function getCurrentScene() {
+      for (let s of scenes) {
+        if (currentTime >= s.start && currentTime < s.end) return s;
+      }
+      return scenes[scenes.length - 1];
+    }
+
+    function renderActiveScene() {
+      const scene = getCurrentScene();
+      if (activeSceneId !== scene.id) {
+        activeSceneId = scene.id;
+        document.getElementById("scene-container").innerHTML = scene.render();
+        document.getElementById("narration-scene-tag").textContent = scene.tag;
+        document.getElementById("sim-url-path").textContent = scene.url;
+        document.getElementById("role-indicator-badge").textContent = scene.part;
+
+        // Update scene chips
+        document.querySelectorAll(".scene-chip").forEach(chip => {
+          const sId = parseInt(chip.getAttribute("data-scene"));
+          if (sId === scene.id) {
+            chip.className = "scene-chip text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium transition whitespace-nowrap shadow";
+          } else {
+            chip.className = "scene-chip text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
+          }
+        });
+      }
+
+      // Check actions in current scene
+      if (scene.actions) {
+        scene.actions.forEach(act => {
+          if (currentTime === act.at) {
+            moveCursor(act.cursor[0], act.cursor[1]);
+            if (act.click) {
+              setTimeout(() => {
+                triggerClick(act.cursor[0], act.cursor[1], act.click);
+                if (act.onAction) act.onAction();
+              }, 450);
+            } else if (act.onAction) {
+              act.onAction();
+            }
+          }
+        });
+      }
+
+      // Subtitles
+      if (scene.subtitles) {
+        let bestSub = scene.subtitles[0].text;
+        for (let sub of scene.subtitles) {
+          if (currentTime >= sub.at) bestSub = sub.text;
+        }
+        document.getElementById("narration-text").textContent = bestSub;
+      }
+    }
+
+    function moveCursor(x, y) {
+      const cursor = document.getElementById("virtual-cursor");
+      if (cursor) cursor.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function triggerClick(x, y, selector) {
+      const viewport = document.getElementById("video-viewport");
+      const ripple = document.createElement("div");
+      ripple.className = "ripple";
+      ripple.style.left = `${x - 10}px`;
+      ripple.style.top = `${y - 10}px`;
+      viewport.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+
+      const label = document.getElementById("cursor-action-label");
+      if (label) {
+        label.classList.remove("opacity-0");
+        setTimeout(() => label.classList.add("opacity-0"), 500);
+      }
+
+      if (selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+          el.classList.add("scale-95");
+          setTimeout(() => el.classList.remove("scale-95"), 200);
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("screen-toast");
+      const text = document.getElementById("screen-toast-msg");
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove("opacity-0", "translate-y-2");
+      toast.classList.add("opacity-100", "translate-y-0");
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        toast.classList.remove("opacity-100", "translate-y-0");
+      }, 2500);
+    }
+
+    function updateAlgoPanel(badge, actionText, htmlContent) {
+      const bEl = document.getElementById("algo-badge");
+      const aEl = document.getElementById("algo-action-text");
+      const cEl = document.getElementById("algo-content");
+      const panel = document.getElementById("algo-panel");
+      
+      if (bEl) bEl.textContent = badge;
+      if (aEl) aEl.textContent = actionText;
+      if (cEl) cEl.innerHTML = htmlContent;
+
+      if (panel) {
+        panel.classList.add("border-cyan-400", "scale-[1.02]");
+        setTimeout(() => panel.classList.remove("border-cyan-400", "scale-[1.02]"), 600);
+      }
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updatePlaybackUI() {
+      document.getElementById("time-current").textContent = formatTime(currentTime);
+      const pct = (currentTime / TOTAL_DURATION) * 100;
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+      document.getElementById("progress-thumb").style.left = `${pct}%`;
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+      currentTime += 1;
+      if (currentTime >= TOTAL_DURATION) {
+        currentTime = 0; // Loop
+      }
+      updatePlaybackUI();
+      renderActiveScene();
+    }
+
+    function setPlaying(play) {
+      isPlaying = play;
+      document.getElementById("icon-play").classList.toggle("hidden", isPlaying);
+      document.getElementById("icon-pause").classList.toggle("hidden", !isPlaying);
+      if (isPlaying) {
+        clearInterval(timer);
+        timer = setInterval(tick, 1000 / playbackSpeed);
+      } else {
+        clearInterval(timer);
+      }
+    }
+
+    function jumpToScene(sceneId) {
+      const target = scenes.find(s => s.id === sceneId);
+      if (target) {
+        currentTime = target.start;
+        updatePlaybackUI();
+        renderActiveScene();
+      }
+    }
+
+    // =========================================================================
+    // EVENT LISTENERS & INITIALIZATION
+    // =========================================================================
+    document.getElementById("btn-play").addEventListener("click", () => setPlaying(!isPlaying));
+    document.getElementById("btn-replay").addEventListener("click", () => {
+      currentTime = 0;
+      updatePlaybackUI();
+      renderActiveScene();
+      setPlaying(true);
+    });
+
+    document.getElementById("btn-prev").addEventListener("click", () => {
+      const current = getCurrentScene();
+      const prevId = Math.max(0, current.id - 1);
+      jumpToScene(prevId);
+    });
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      const current = getCurrentScene();
+      const nextId = Math.min(scenes.length - 1, current.id + 1);
+      jumpToScene(nextId);
+    });
+
+    document.getElementById("speed-select").addEventListener("change", (e) => {
+      playbackSpeed = parseFloat(e.target.value);
+      if (isPlaying) {
+        clearInterval(timer);
+        timer = setInterval(tick, 1000 / playbackSpeed);
+      }
+    });
+
+    document.getElementById("progress-container").addEventListener("click", (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      currentTime = Math.floor(pct * TOTAL_DURATION);
+      updatePlaybackUI();
+      renderActiveScene();
+    });
+
+    // Keyboard navigation
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        setPlaying(!isPlaying);
+      } else if (e.code === "ArrowRight") {
+        currentTime = Math.min(currentTime + 5, TOTAL_DURATION - 1);
+        updatePlaybackUI();
+        renderActiveScene();
+      } else if (e.code === "ArrowLeft") {
+        currentTime = Math.max(currentTime - 5, 0);
+        updatePlaybackUI();
+        renderActiveScene();
+      }
+    });
+
+    // Initialize Video Simulation
+    updatePlaybackUI();
+    renderActiveScene();
+    timer = setInterval(tick, 1000 / playbackSpeed);
+  </script>
+</body>
+</html>
